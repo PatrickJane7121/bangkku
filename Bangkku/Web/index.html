@@ -295,6 +295,12 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
 .sec h3{font-size:15px;margin:16px 0 6px}
 .sumbox{background:var(--sage-soft);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.6}
 .sumbox p{margin:0 0 6px}.sumbox p:last-child{margin:0}
+.pe.ss{color:var(--deep-dark);font-weight:600;text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer;padding:4px 6px;margin:-4px -6px;border-radius:6px}
+.pe.ss.on{background:var(--sage-soft)}
+#sstip{position:fixed;z-index:95;width:min(300px,calc(100vw - 32px));background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:0 8px 24px rgba(31,80,56,.18);font-size:13.5px;line-height:1.55;display:none}
+#sstip.on{display:block}
+#sstip b{display:block;font-size:15px;margin-bottom:2px;color:var(--deep-dark)}
+#sstip small{display:block;color:var(--ink-soft);font-size:12px;margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -518,7 +524,7 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
       <h1 id="sj-title"></h1>
       <p class="sub" id="sj-note"></p>
       <div id="sj-hero"></div>
-      <div class="card"><h2>사주 원국</h2><div class="pils" id="sj-pils"></div></div>
+      <div class="card"><h2>사주 원국</h2><div class="pils" id="sj-pils"></div><p class="hint" style="margin-top:10px">밑줄 친 십성(비견·편관 등)을 누르면 뜻을 알려드려요.</p></div>
       <div class="card"><h2>오행 분포</h2><div id="sj-bars"></div><p class="hint" id="sj-judge"></p></div>
       <div id="sj-report"></div>
     </div>
@@ -541,6 +547,7 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
 
   <div id="sheet" onclick="if(event.target===this)this.classList.remove('on')"><div class="sc"><div class="sb"></div><div class="btn-row" style="margin-top:12px"><button class="btn btn-line" onclick="this.closest('#sheet').classList.remove('on')">배치 더 고치기</button><button class="btn btn-primary" onclick="this.closest('#sheet').classList.remove('on');openReport()">진단 리포트 보기</button></div></div></div>
   <div class="toast" id="toast"></div>
+  <div id="sstip" role="tooltip"></div>
 </div>
 
 <script>
@@ -1148,10 +1155,42 @@ const DX_ORDER=["SRC-001","SRC-002","SRC-057","SRC-058","SRC-004","SRC-003","SRC
 function pillarHtml2(lbl,p,isDay,o){
   if(!p) return pillarHtml(lbl,p,isDay);
   const [s,b]=p, es=SE[s], eb=BE[b];
-  return `<div class="pil${isDay?" day":""}"><span class="pl">${lbl}${isDay?" · 나":""}</span><span class="pe">${isDay?"일간(나)":SSN[o.s]}</span>
+  return `<div class="pil${isDay?" day":""}"><span class="pl">${lbl}${isDay?" · 나":""}</span><span class="pe ss" data-ss="${isDay?-1:o.s}">${isDay?"일간(나)":SSN[o.s]}</span>
     <div class="pc" style="background:${EL[es].c}22;color:${EL[es].c}"><b>${STEMH[s]}</b><small>${STEM[s]} · ${EL[es].n}</small></div>
-    <div class="pc" style="background:${EL[eb].c}22;color:${EL[eb].c}"><b>${BRH[b]}</b><small>${BR[b]} · ${EL[eb].n}</small></div><span class="pe">${SSN[o.b]}</span></div>`;
+    <div class="pc" style="background:${EL[eb].c}22;color:${EL[eb].c}"><b>${BRH[b]}</b><small>${BR[b]} · ${EL[eb].n}</small></div><span class="pe ss" data-ss="${o.b}">${SSN[o.b]}</span></div>`;
 }
+// 십성 뜻 — 사주 원국에서 십성을 누르면 설명창으로 보여줌
+const SSDESC=[
+  ["나와 같은 오행 · 같은 음양","나와 어깨를 나란히 하는 기운이에요. 자립심과 주체성이 강하고, 친구·형제·동료처럼 대등한 관계를 뜻해요. 지나치면 고집이 세질 수 있어요."],
+  ["나와 같은 오행 · 다른 음양","경쟁심과 승부욕의 기운이에요. 목표를 향해 밀어붙이는 추진력이 있지만, 재물이나 성과를 남과 나누거나 다투게 되기도 해요."],
+  ["내가 생(生)하는 오행 · 같은 음양","내가 만들어 내는 기운이에요. 재능·표현·먹을 복을 뜻하고, 여유롭게 꾸준히 결과물을 만들어 내는 힘이에요."],
+  ["내가 생(生)하는 오행 · 다른 음양","언변과 창의력의 기운이에요. 기존 틀을 깨는 아이디어와 표현력이 뛰어나지만, 날카로운 말이나 반항심으로 나타나기도 해요."],
+  ["내가 극(克)하는 오행 · 같은 음양","크고 유동적인 재물의 기운이에요. 사업 수완과 활동력, 기회를 잡는 감각을 뜻해요. 들어오는 만큼 나가기도 쉬워요."],
+  ["내가 극(克)하는 오행 · 다른 음양","안정적인 재물의 기운이에요. 성실하게 모으는 수입, 꼼꼼한 관리와 현실 감각을 뜻해요."],
+  ["나를 극(克)하는 오행 · 같은 음양","강한 압박과 책임의 기운이에요(칠살이라고도 해요). 위기에 강한 결단력과 카리스마가 있지만, 스트레스와 긴장을 크게 느낄 수 있어요."],
+  ["나를 극(克)하는 오행 · 다른 음양","질서와 명예의 기운이에요. 규칙을 지키는 바른 태도, 직장·직위·사회적 인정을 뜻해요."],
+  ["나를 생(生)하는 오행 · 같은 음양","직관과 독특한 배움의 기운이에요. 눈치가 빠르고 예술·철학·전문 기술처럼 남다른 분야에 끌려요. 생각이 많아지기도 해요."],
+  ["나를 생(生)하는 오행 · 다른 음양","배움과 보살핌의 기운이에요. 학문·자격·어머니 같은 든든한 지원과 인정을 뜻하고, 이해력과 인내심이 좋아요."]
+];
+function hideSsTip(){document.getElementById("sstip").classList.remove("on"); document.querySelectorAll(".pe.ss.on").forEach(e=>e.classList.remove("on"));}
+function showSsTip(el){
+  const tip=document.getElementById("sstip"), i=+el.dataset.ss;
+  if(el.classList.contains("on")){hideSsTip(); return;}
+  hideSsTip(); el.classList.add("on");
+  tip.innerHTML=i<0?`<b>일간 (나)</b><small>일주의 천간</small>사주의 주인공인 ‘나’를 나타내는 글자예요. 다른 글자들의 십성은 모두 일간과의 관계로 정해져요.`
+    :`<b>${SSN[i]}</b><small>${SSDESC[i][0]}</small>${SSDESC[i][1]}`;
+  tip.classList.add("on");
+  const r=el.getBoundingClientRect(), tw=tip.offsetWidth, th=tip.offsetHeight, vw=window.innerWidth, vh=window.innerHeight;
+  const left=Math.max(16,Math.min(vw-16-tw,r.left+r.width/2-tw/2));
+  const top=r.bottom+8+th<=vh-16?r.bottom+8:Math.max(16,r.top-8-th);
+  tip.style.left=left+"px"; tip.style.top=top+"px";
+}
+document.addEventListener("pointerdown",e=>{        // 십성을 누르면 설명, 다른 곳을 누르면 닫기
+  const ss=e.target.closest&&e.target.closest(".pe.ss");
+  if(ss){showSsTip(ss); return;}
+  if(!e.target.closest||!e.target.closest("#sstip")) hideSsTip();
+},true);
+window.addEventListener("scroll",hideSsTip,{passive:true});
 function renderConcern(){
   document.getElementById("cn-list").innerHTML=CONC.map(([k,e,t,d])=>
     `<div class="cn${draft.concerns.includes(k)?" on":""}" onclick="toggleConcern('${k}')"><span class="e">${e}</span><div><b>${t}</b><small>${d}</small></div><span class="ck"></span></div>`).join("");
@@ -1600,6 +1639,7 @@ let draft = {photo:null, shape:"rect", w:3.6, d:3.0, birth:"1995-05-15", btime:"
    화면 전환
    ========================================================= */
 function go(id){
+  hideSsTip();
   document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active", s.id===id));
   window.scrollTo(0,0);
   if(id==="s-home") renderHome();
