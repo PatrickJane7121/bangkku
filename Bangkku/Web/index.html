@@ -437,7 +437,7 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
       <div class="palette" id="palette"></div>
     </div>
     <div class="foot">
-      <div class="btn-row"><button class="btn btn-ghost" onclick="checkRules()">🔍 풍수 검사하기</button><button class="btn btn-primary" onclick="openReport()">진단 리포트 보기</button></div>
+      <button class="btn btn-primary" onclick="checkRules()">🔍 풍수 검사하기</button>
     </div>
   </section>
 
@@ -539,7 +539,7 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
     </div>
   </section>
 
-  <div id="sheet" onclick="if(event.target===this)this.classList.remove('on')"><div class="sc"><div class="sb"></div><button class="btn btn-primary" style="margin-top:12px" onclick="this.closest('#sheet').classList.remove('on')">확인</button></div></div>
+  <div id="sheet" onclick="if(event.target===this)this.classList.remove('on')"><div class="sc"><div class="sb"></div><div class="btn-row" style="margin-top:12px"><button class="btn btn-line" onclick="this.closest('#sheet').classList.remove('on')">배치 더 고치기</button><button class="btn btn-primary" onclick="this.closest('#sheet').classList.remove('on');openReport()">진단 리포트 보기</button></div></div></div>
   <div class="toast" id="toast"></div>
 </div>
 
