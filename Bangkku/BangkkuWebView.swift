@@ -120,6 +120,12 @@ struct BangkkuWebView: UIViewRepresentable {
             webView.reload()
         }
 
+        // 방위 설정의 '나침반' 버튼은 사용자가 직접 누를 때만 요청하므로 바로 허용
+        func webView(_ webView: WKWebView, requestDeviceOrientationAndMotionPermissionFor origin: WKSecurityOrigin,
+                     initiatedByFrame frame: WKFrameInfo, decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+            decisionHandler(.grant)
+        }
+
         func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
                      initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
             guard let presenter = webView.window?.rootViewController?.topMost else { return completionHandler() }
