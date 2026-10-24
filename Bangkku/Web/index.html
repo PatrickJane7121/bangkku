@@ -1848,7 +1848,7 @@ function drawMini(i){
     ctx.strokeRect(ox+it.x*s, oy+it.y*s, it.w*s, it.d*s);
   });
   ctx.fillStyle="#B7C7BF"; ctx.font="bold 11px -apple-system,sans-serif";
-  ctx.textAlign="center"; ctx.fillText("北", size/2, oy-5);
+  ctx.textAlign="center"; ctx.fillText("북", size/2, oy-5);
 }
 document.getElementById("rec-go").onclick=()=>{
   state.cur.items = state.recs[state.recIdx].items.map(i=>({...i, id:"i"+Math.random().toString(36).slice(2,8)}));
@@ -1883,7 +1883,7 @@ function renderCanvas(){
 }
 /* ---------- 방위 설정 (나침반) ---------- */
 function compassHtml(c,W,H){        // 방위 글자를 실제 방위 쪽 캔버스 가장자리에 배치
-  return [["北",0],["東",90],["南",180],["西",270]].map(([ch,b])=>{
+  return [["북",0],["동",90],["남",180],["서",270]].map(([ch,b])=>{
     const [vx,vy]=scrVec(b,c), t=Math.min(Math.abs(vx)>1e-6?(W/2-9)/Math.abs(vx):1e9,Math.abs(vy)>1e-6?(H/2-9)/Math.abs(vy):1e9);
     return `<span class="compass${b===0?" cn-n":""}" style="left:${W/2+vx*t}px;top:${H/2+vy*t}px;transform:translate(-50%,-50%)">${ch}</span>`;
   }).join("");
