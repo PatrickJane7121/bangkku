@@ -1600,7 +1600,7 @@ async function runCompare(){
   const rest=still.map(id=>`<li><b>${FL[id]||"배치"}</b> — ${escapeHtml(R(id).fx)}</li>`).join("");
   box.innerHTML=`<p class="hint" style="margin:0">현재 배치를 점검한 뒤 ${cs.map(k=>CLAB[k]).join("·")} 고민과 오행(${ELEMENTS[c.el]?ELEMENTS[c.el].name:""}) 방향에 맞춰 가구를 자동으로 다시 놓았어요.</p>
     <div class="cmpg"><div><div class="cap">기존 배치</div>${planSvg(base,room,hl0,null)}</div><div><div class="cap">수정 후 (제안)</div>${planSvg(ideal,room,hl1,mv)}</div></div>
-    <p class="hint">빨간 테두리 = 규칙 위반 · 주황 테두리 = 이동한 가구 · 점선 = 이동 경로 · 진한 띠 = 침대 머리/소파 등받이, 동그라미 = 의자</p>
+    <p class="hint">빨간 테두리 = 아쉬운 배치 · 주황 테두리 = 이동한 가구 · 점선 = 이동 경로 · 진한 띠 = 침대 머리/소파 등받이, 동그라미 = 의자</p>
     ${tot?`<div class="sc2"><div><small>기존 점수</small><b>${s0}</b></div><span class="ar">→</span><div><small>수정 후 점수</small><b style="color:var(--deep)">${s1}</b></div></div>`:""}
     <h3>비교 · 이렇게 바뀌었어요</h3>
     ${moves.length?`<ul class="plain">${moves.join("")}</ul>`:`<p class="hint">변경 없음</p>`}
