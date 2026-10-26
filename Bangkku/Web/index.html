@@ -174,8 +174,8 @@ input:focus,select:focus{outline:none;border-color:var(--sage)}
 .row span{color:var(--ink-soft);font-size:14px}
 
 .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(12px);
-  background:rgba(45,52,54,.94);color:#fff;padding:11px 20px;border-radius:999px;font-size:13.5px;
-  opacity:0;pointer-events:none;transition:all .25s;z-index:100;white-space:nowrap}
+  background:rgba(45,52,54,.94);color:#fff;padding:11px 20px;border-radius:18px;font-size:13.5px;
+  opacity:0;pointer-events:none;transition:all .25s;z-index:100;width:max-content;max-width:calc(100vw - 32px);text-align:center;line-height:1.45}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
@@ -332,6 +332,32 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
 .bsr button{flex:none;width:30px;height:30px;border-radius:9px;border:1.5px solid var(--line);background:#F3F7F5;font-size:16px;font-weight:700;color:var(--deep-dark);padding:0;cursor:pointer}
 .bsr input{flex:1;min-width:0;width:100%;padding:6px 4px;text-align:center;font-size:15px;font-weight:700;border-radius:9px}
 .bsr em{font-style:normal;color:var(--ink-soft);flex:none}
+.fsearch{position:relative;margin:4px 0 0}
+.fsearch input{padding:12px 40px 12px 14px;font-size:15px;border-radius:12px;-webkit-appearance:none;appearance:none}
+.fsearch input::-webkit-search-cancel-button{display:none}
+.fsearch button{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border:none;border-radius:50%;background:#EBF2EE;color:var(--ink-soft);font-size:13px;cursor:pointer}
+.fres{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+.fres:empty{display:none}
+.fres .fcap{width:100%;font-size:12px;color:var(--ink-soft);margin:0 0 -2px}
+.fchip{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font:inherit;font-size:13.5px;color:var(--ink);cursor:pointer}
+.fchip small{color:var(--ink-soft);font-size:11.5px}
+.fchip.make{border-style:dashed;border-color:var(--deep);color:var(--deep-dark);font-weight:700;background:var(--sage-soft)}
+.fnew{background:#fff;border:1.5px solid var(--deep);border-radius:14px;padding:12px 14px;margin:10px 0 0}
+.fnh{font-weight:800;font-size:15px;margin-bottom:8px}
+.fnr{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:13px}
+.fnr>span{width:40px;color:var(--ink-soft);flex:none}
+.fnr input{padding:9px 10px;font-size:15px}
+.fnr3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fnr3 label{display:flex;flex-direction:column;font-size:12px;color:var(--ink-soft);gap:4px;position:relative}
+.fnr3 input{padding:9px 22px 9px 8px;font-size:15px;text-align:center}
+.fnr3 em{position:absolute;right:8px;bottom:10px;font-style:normal;font-size:12px}
+.fnicons{display:flex;flex-wrap:wrap;gap:6px}
+.fnicons button{width:36px;height:36px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font-size:18px;padding:0;cursor:pointer}
+.fnicons button.on{border-color:var(--deep);background:var(--sage-soft)}
+.pal{position:relative}
+.pal.mine{border-color:#CFE0D7;background:#FAFDFB}
+.pal .px{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#fff;border:1.5px solid var(--line);font-size:10px;line-height:17px;color:var(--ink-soft)}
+.pal-sep{flex:none;width:1px;background:var(--line);margin:6px 2px}
 </style>
 </head>
 <body>
@@ -508,6 +534,23 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
         <div class="sr" id="sr-d"><span>세로</span><input type="range" id="sp-d" min="0.3" max="3" step="0.05" oninput="panelSet('d',this.value)"><i id="sp-dv"></i></div>
         <div class="sr" id="sr-a"><span>회전</span><input type="range" id="sp-a" min="0" max="359" step="1" oninput="panelSet('a',this.value)"><i id="sp-av"></i></div>
       </div>
+      <div class="fsearch">
+        <input type="search" id="fq" placeholder="🔍 가구 검색·직접 추가 (예: 화장대, 에어컨)" autocomplete="off" enterkeyhint="search"
+          oninput="renderFSearch()" onfocus="renderFSearch()" onkeydown="if(event.key==='Enter'){event.preventDefault();fqEnter();}">
+        <button id="fq-x" onclick="clearFSearch()" aria-label="검색 지우기" hidden>✕</button>
+      </div>
+      <div class="fres" id="fres"></div>
+      <div class="fnew" id="fnew" hidden>
+        <div class="fnh">새 가구 만들기</div>
+        <div class="fnr"><span>이름</span><input type="text" id="fn-name" maxlength="12" placeholder="예: 캣타워"></div>
+        <div class="fnr3">
+          <label>가로<input type="number" id="fn-w" step="0.1" min="0.2" max="5" value="1.0" inputmode="decimal"><em>m</em></label>
+          <label>세로<input type="number" id="fn-d" step="0.1" min="0.2" max="5" value="0.6" inputmode="decimal"><em>m</em></label>
+          <label>높이<input type="number" id="fn-h" step="0.1" min="0.05" max="3" value="1.0" inputmode="decimal"><em>m</em></label>
+        </div>
+        <div class="fnr"><span>아이콘</span><div class="fnicons" id="fn-icons"></div></div>
+        <div class="btn-row" style="margin-top:10px"><button class="btn btn-line" onclick="closeFNew()">취소</button><button class="btn btn-primary" onclick="createCustom()">추가하기</button></div>
+      </div>
       <div class="palette" id="palette"></div>
     </div>
     <div class="foot">
@@ -643,6 +686,46 @@ const FURN = {
   win:      {name:"창문",  w:1.4, d:0.15,h:1.2,  color:"#9CC8E6", icon:"🪟"},
   door:     {name:"문",    w:0.9, d:0.15,h:2.0,  color:"#C9A27A", icon:"🚪"}
 };
+const BASE_TYPES=Object.keys(FURN);   // 기본 가구 (팔레트에 항상 표시)
+/* 검색으로 추가하는 가구 카탈로그 — 크기는 일반적인 제품 기준(m), al=검색 별칭 */
+const FURN_CAT={
+  x_dresser:  {name:"화장대",     w:0.9, d:0.45,h:1.4, icon:"💄", al:["드레스룸","메이크업","거울 달린"]},
+  x_aircon:   {name:"에어컨",     w:0.5, d:0.4, h:1.8, icon:"❄️", al:["스탠드 에어컨","냉방기","냉난방기","에어콘"]},
+  x_aircon_w: {name:"벽걸이 에어컨",w:0.9, d:0.25,h:0.3, icon:"🌬️", al:["에어컨","벽걸이","에어콘"]},
+  x_washer:   {name:"세탁기",     w:0.65,d:0.7, h:1.0, icon:"🧺", al:["드럼세탁기","통돌이","빨래"]},
+  x_dryer:    {name:"건조기",     w:0.65,d:0.7, h:1.0, icon:"🌀", al:["의류건조기","빨래 건조","드라이어"]},
+  x_fridge:   {name:"냉장고",     w:0.9, d:0.75,h:1.8, icon:"🧊", al:["김치냉장고","양문형"]},
+  x_tv:       {name:"TV장",       w:1.6, d:0.4, h:0.5, icon:"📺", al:["티비","텔레비전","tv","거실장","티비장"]},
+  x_night:    {name:"협탁",       w:0.45,d:0.4, h:0.55,icon:"🛋", al:["사이드테이블","침대 옆","나이트스탠드"]},
+  x_drawer:   {name:"서랍장",     w:0.8, d:0.45,h:1.0, icon:"🗄️", al:["수납장","체스트","서랍"]},
+  x_cabinet:  {name:"수납장",     w:0.8, d:0.4, h:1.2, icon:"🗃️", al:["캐비닛","선반장","수납"]},
+  x_hanger:   {name:"행거",       w:1.2, d:0.45,h:1.6, icon:"👔", al:["옷걸이","드레스룸 행거"]},
+  x_mirror:   {name:"전신거울",   w:0.5, d:0.1, h:1.6, icon:"🪞", al:["거울","스탠드 거울"]},
+  x_chair:    {name:"의자",       w:0.5, d:0.5, h:0.9, icon:"🪑", al:["체어","책상 의자"]},
+  x_armchair: {name:"1인 소파",   w:0.8, d:0.8, h:0.8, icon:"🛋", al:["암체어","안락의자","리클라이너"]},
+  x_ldesk:    {name:"ㄱ자 책상",  w:1.6, d:1.4, h:0.75,icon:"🖥️", al:["코너 책상","L자 책상","컴퓨터 책상"]},
+  x_bunk:     {name:"2층 침대",   w:1.0, d:2.0, h:1.6, icon:"🛏", al:["벙커침대","이층침대","2단 침대"]},
+  x_sbed:     {name:"싱글 침대",  w:1.0, d:2.0, h:0.45,icon:"🛏", al:["침대","1인 침대"]},
+  x_piano:    {name:"피아노",     w:1.5, d:0.6, h:1.2, icon:"🎹", al:["전자피아노","디지털피아노"]},
+  x_treadmill:{name:"러닝머신",   w:0.8, d:1.8, h:1.3, icon:"🏃", al:["트레드밀","운동기구"]},
+  x_plant:    {name:"화분",       w:0.4, d:0.4, h:1.0, icon:"🪴", al:["식물","나무"]},
+  x_lamp:     {name:"스탠드 조명",w:0.35,d:0.35,h:1.6, icon:"💡", al:["조명","장스탠드","플로어 램프"]},
+  x_purifier: {name:"공기청정기", w:0.35,d:0.35,h:0.7, icon:"🍃", al:["청정기","가습기"]},
+  x_rug:      {name:"러그",       w:1.6, d:1.2, h:0.02,icon:"🟫", al:["카펫","매트"]},
+  x_vanity:   {name:"세면대",     w:0.6, d:0.45,h:0.85,icon:"🚰", al:["세면기"]},
+  x_shoe:     {name:"신발장",     w:0.9, d:0.35,h:1.2, icon:"👟", al:["현관장"]},
+  x_kitchen:  {name:"싱크대",     w:1.8, d:0.6, h:0.85,icon:"🍳", al:["주방","조리대"]},
+  x_pc:       {name:"컴퓨터",     w:0.6, d:0.3, h:0.5, icon:"💻", al:["PC","본체","모니터"]}
+};
+const CUST_COLORS=["#D9CFE6","#CFE3E0","#E8D9C4","#D7E4C6","#E6CFCF","#CFD8E8","#E3E0C6","#D3D3DC"];
+const colorFor=k=>CUST_COLORS[[...k].reduce((a,c)=>a+c.charCodeAt(0),0)%CUST_COLORS.length];
+Object.entries(FURN_CAT).forEach(([k,f])=>{FURN[k]={name:f.name,w:f.w,d:f.d,h:f.h,icon:f.icon,color:colorFor(k)};});
+// 사용자가 직접 만든 가구 정의 + 팔레트에 추가한 가구 목록 (브라우저/앱에 저장)
+let customFurn={}, myFurn=[];
+try{customFurn=JSON.parse(store.get("bangku.customFurn")||"{}"); myFurn=JSON.parse(store.get("bangku.myFurn")||"[]");}catch(e){}
+Object.entries(customFurn).forEach(([k,f])=>{FURN[k]=f;});
+myFurn=myFurn.filter(k=>FURN[k]);
+function saveFurnPrefs(){store.set("bangku.customFurn",JSON.stringify(customFurn)); store.set("bangku.myFurn",JSON.stringify(myFurn));}
 
 /* =========================================================
    사주 — 생년(천간)으로 오행 판정 (0,1=금 / 2,3=수 / 4,5=목 / 6,7=화 / 8,9=토)
@@ -1942,9 +2025,13 @@ function startNew(){
   setStep(0);
   go("s-input");
 }
+function ensureTypes(items){
+  items.forEach(i=>{if(!FURN[i.type]) FURN[i.type]={name:i.name||"가구",w:i.w||1,d:i.d||1,h:1,icon:"📦",color:"#D3D3DC"};});
+}
 function openSpace(id){
   const s=state.spaces.find(x=>x.id===id);
   if(!s) return;
+  ensureTypes(s.items);
   state.editing=id;
   state.cur={...s, items:s.items.map(i=>({...i})), rtype:s.rtype||"bed", rdir:s.rdir||"?", door:s.door||{wall:"S",pos:15}, win:s.win===undefined?null:s.win, answers:{...(s.answers||{})}};
   if(!state.cur.poly) state.cur.poly=[[0,0],[s.w,0],[s.w,s.d],[0,s.d]];
@@ -2265,23 +2352,72 @@ function clearItems(){
   if(!state.cur.items.length) return;
   state.cur.items=[]; renderCanvas(); toast("가구를 모두 비웠어요");
 }
-function renderPalette(){
-  document.getElementById("palette").innerHTML = Object.entries(FURN).map(([k,f])=>
-    `<div class="pal" onclick="addItem('${k}')"><span class="pi">${f.icon}</span>${f.name}</div>`).join("");
+function renderPalette(){       // 기본 가구 + 내가 추가한 가구(× 로 목록에서 빼기)
+  const pal=k=>{const f=FURN[k], mine=!BASE_TYPES.includes(k);
+    return `<div class="pal${mine?" mine":""}" onclick="addItem('${k}')"><span class="pi">${f.icon}</span>${escapeHtml(f.name)}${mine?`<span class="px" onclick="event.stopPropagation();unpinFurn('${k}')" aria-label="목록에서 빼기">✕</span>`:""}</div>`;};
+  document.getElementById("palette").innerHTML=BASE_TYPES.map(pal).join("")+(myFurn.length?`<span class="pal-sep"></span>`+myFurn.map(pal).join(""):"");
+}
+function pinFurn(k){if(!BASE_TYPES.includes(k)&&!myFurn.includes(k)){myFurn.unshift(k); saveFurnPrefs();} renderPalette();}
+function unpinFurn(k){myFurn=myFurn.filter(x=>x!==k); saveFurnPrefs(); renderPalette(); toast(`‘${FURN[k].name}’을(를) 목록에서 뺐어요. 검색하면 다시 추가할 수 있어요`);}
+/* ---------- 가구 검색 · 직접 추가 ---------- */
+const POPULAR=["x_dresser","x_aircon","x_washer","x_dryer","x_fridge","x_tv","x_ldesk","x_bunk"];
+const norm=t=>String(t).toLowerCase().replace(/\s+/g,"");
+function searchFurn(q){
+  const n=norm(q); if(!n) return [];
+  const all=[...BASE_TYPES,...Object.keys(FURN_CAT),...Object.keys(customFurn)];
+  const sc=k=>{const f=FURN[k], nm=norm(f.name), al=(FURN_CAT[k]&&FURN_CAT[k].al||[]).map(norm);
+    if(nm===n) return 100; if(nm.startsWith(n)) return 80; if(nm.includes(n)) return 60;
+    if(al.some(a=>a===n)) return 55; if(al.some(a=>a.includes(n)||n.includes(a)&&a.length>=2)) return 40; return 0;};
+  return all.map(k=>[k,sc(k)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).map(x=>x[0]).slice(0,8);
+}
+function fchip(k){const f=FURN[k]; return `<button class="fchip" onclick="pickFurn('${k}')">${f.icon} ${escapeHtml(f.name)} <small>${f.w}×${f.d}m</small></button>`;}
+function renderFSearch(){
+  const q=document.getElementById("fq").value.trim(), box=document.getElementById("fres");
+  document.getElementById("fq-x").hidden=!q;
+  if(!q){box.innerHTML=`<span class="fcap">자주 찾는 가구</span>`+POPULAR.filter(k=>!myFurn.includes(k)).slice(0,6).map(fchip).join(""); return;}
+  const r=searchFurn(q), exact=r.some(k=>norm(FURN[k].name)===norm(q));
+  box.innerHTML=(r.length?`<span class="fcap">검색 결과 · 누르면 방에 놓여요</span>`+r.map(fchip).join(""):`<span class="fcap">‘${escapeHtml(q)}’ 은(는) 목록에 없어요. 직접 만들어 보세요</span>`)
+    +(exact?"":`<button class="fchip make" onclick="openFNew()">＋ ‘${escapeHtml(q)}’ 직접 만들기</button>`);
+}
+function fqEnter(){const q=document.getElementById("fq").value.trim(); if(!q) return; const r=searchFurn(q); if(r.length&&norm(FURN[r[0]].name)===norm(q)) pickFurn(r[0]); else if(r.length===0) openFNew();}
+function clearFSearch(){const i=document.getElementById("fq"); i.value=""; document.getElementById("fres").innerHTML=""; document.getElementById("fq-x").hidden=true; closeFNew();}
+function pickFurn(k){
+  pinFurn(k); clearFSearch(); document.getElementById("fq").blur();
+  if(addItem(k)) toast(`‘${FURN[k].name}’을(를) 놓았어요. 끌어서 옮기고 모서리로 크기를 맞춰요`);
+}
+const FN_ICONS=["📦","🪑","🛋","🗄️","🧺","📺","🖥️","🎮","🐈","🪴","🎸","🧸","🏋️","🧳","🪞","💡"];
+let fnIcon="📦";
+function openFNew(){
+  const q=document.getElementById("fq").value.trim(), g=id=>document.getElementById(id);
+  g("fn-name").value=q.slice(0,12); g("fn-w").value="1.0"; g("fn-d").value="0.6"; g("fn-h").value="1.0"; fnIcon="📦";
+  g("fn-icons").innerHTML=FN_ICONS.map(e=>`<button type="button" class="${e===fnIcon?"on":""}" onclick="fnIcon='${e}';this.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===this))">${e}</button>`).join("");
+  g("fnew").hidden=false; g("fres").innerHTML=""; g("fnew").scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+function closeFNew(){document.getElementById("fnew").hidden=true;}
+function createCustom(){
+  const g=id=>document.getElementById(id), name=g("fn-name").value.replace(/[<>&"'`]/g,"").trim();
+  const num=(id,lo,hi,def)=>{const v=parseFloat(g(id).value); return isNaN(v)?def:Math.round(Math.max(lo,Math.min(hi,v))*100)/100;};
+  if(!name){toast("가구 이름을 입력해 주세요"); g("fn-name").focus(); return;}
+  const same=Object.keys(FURN).find(k=>norm(FURN[k].name)===norm(name)&&k!=="win"&&k!=="door");
+  if(same){closeFNew(); pickFurn(same); return;}
+  const k="c_"+Date.now().toString(36);
+  customFurn[k]={name,w:num("fn-w",0.2,5,1),d:num("fn-d",0.2,5,0.6),h:num("fn-h",0.05,3,1),icon:fnIcon,color:colorFor(k),custom:true};
+  FURN[k]=customFurn[k]; saveFurnPrefs(); closeFNew(); pickFurn(k);
 }
 function addItem(type){
   const f=FURN[type];
-  if(f.w>state.cur.w||f.d>state.cur.d){ toast("방이 좁아서 이 가구는 들어가지 않아요"); return; }
+  if(f.w>state.cur.w||f.d>state.cur.d){ toast("방이 좁아서 이 가구는 들어가지 않아요"); return false; }
   const q=innerPt(), it=clampIn(place(type,q[0]-f.w/2,q[1]-f.d/2,0),state.cur.w,state.cur.d);
   if(type==="win"||type==="door"){it.x=state.cur.w/2-f.w/2; it.y=0; snapWin(it);}
   state.cur.items.push(it);
   document.getElementById("canvas").appendChild(makeItemEl(it));
   select(it.id); liveScore();
+  return true;
 }
 
 /* ---------- 저장 ---------- */
 function saveSpace(){
-  const rec={...state.cur, items:state.cur.items.map(i=>({...i}))};
+  const rec={...state.cur, items:state.cur.items.map(i=>({...i,name:FURN[i.type]?FURN[i.type].name:i.name}))};
   const i=state.spaces.findIndex(s=>s.id===rec.id);
   if(i>=0) state.spaces[i]=rec; else state.spaces.unshift(rec);
   store.set("bangku.spaces", JSON.stringify(state.spaces));
