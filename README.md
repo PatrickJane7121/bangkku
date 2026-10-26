@@ -30,3 +30,13 @@ Bangkku/
 3. 시뮬레이터나 연결한 iPhone을 고르고 ▶︎ Run.
 
 App Store 배포는 Product → Archive 후 Organizer에서 업로드하면 됩니다 (Apple Developer Program 가입 필요).
+
+## 웹으로 실행 (GitHub Pages)
+
+저장소 최상위의 `index.html` 하나에 HTML·CSS·JavaScript가 모두 들어 있어, 파일 하나만으로 웹 앱이 동작해요
+(외부 라이브러리·인터넷 연결 불필요).
+
+1. GitHub 저장소 **Settings → Pages**에서 Source를 **Deploy from a branch**, Branch를 `main` / `/(root)`로 저장합니다.
+2. 1~2분 뒤 `https://<사용자명>.github.io/<저장소명>/` 주소로 열립니다.
+
+`index.html`은 앱 안의 `Bangkku/Web/index.html`과 같은 파일이에요. 화면을 고치면 두 파일을 함께 바꿔 주세요.
