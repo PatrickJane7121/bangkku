@@ -312,6 +312,26 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
 .dirtxt b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dirtxt small{display:block;font-size:11.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dbtn{flex:none;height:36px;min-width:36px;padding:0 9px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font:inherit;font-size:13px;font-weight:600;color:var(--ink);cursor:pointer}
+.guide{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;margin:0 0 14px}
+.guide summary{font-size:14px;font-weight:700;color:var(--deep-dark);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.guide summary::-webkit-details-marker{display:none}
+.guide summary::after{content:"접기";font-size:12px;font-weight:600;color:var(--ink-soft)}
+.guide:not([open]) summary::after{content:"펼치기"}
+.gs{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.45;margin:6px 0}
+.gs b{flex:none;width:22px;height:22px;border-radius:50%;background:var(--deep);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.gs strong{color:var(--ink)}
+.gs span{color:var(--ink-soft)}
+.gdot{display:inline-block;width:11px;height:11px;border-radius:50%;background:#fff;border:2.5px solid var(--deep);vertical-align:-1px}
+.gtip{margin:8px 0 0;padding-top:8px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--ink-soft)}
+.rinfo{text-align:center;font-size:13.5px;color:var(--deep-dark);margin:10px 0 0;min-height:20px}
+.rinfo.warn{color:#B4503F}
+.bsize{display:flex;gap:10px;margin:12px 0 0;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.bsize.off{opacity:.45;pointer-events:none}
+.bsr{flex:1;display:flex;align-items:center;gap:5px;font-size:13px;min-width:0}
+.bsr span{color:var(--ink-soft);flex:none}
+.bsr button{flex:none;width:30px;height:30px;border-radius:9px;border:1.5px solid var(--line);background:#F3F7F5;font-size:16px;font-weight:700;color:var(--deep-dark);padding:0;cursor:pointer}
+.bsr input{flex:1;min-width:0;width:100%;padding:6px 4px;text-align:center;font-size:15px;font-weight:700;border-radius:9px}
+.bsr em{font-style:normal;color:var(--ink-soft);flex:none}
 </style>
 </head>
 <body>
@@ -368,9 +388,38 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
     <div class="body">
       <!-- 3-2 방 모양 -->
       <div class="step-pane" data-step="1" hidden>
-        <h1>방 모양을 그려주세요</h1>
-        <p class="sub">점을 차례로 눌러 벽을 그리고, 첫 점을 누르면 완성돼요. 점은 끌어서 옮기고, 선을 끌어 새로 꺾을 수도 있어요.</p>
+        <h1>방 모양을 만들어 주세요</h1>
+        <p class="sub">네모 블록을 끌어서 내 방과 비슷한 모양·크기로 맞추면 돼요. 정확하지 않아도 괜찮아요.</p>
+        <details class="guide" id="rguide" open ontoggle="try{localStorage.setItem('bangku.guide',this.open?'1':'0')}catch(e){}">
+          <summary>처음이라면 이렇게 따라 해 보세요</summary>
+          <div class="gs"><b>1</b><span><strong>모양 고르기</strong> — 네모 방인지 ㄱ자 방인지 골라요</span></div>
+          <div class="gs"><b>2</b><span><strong>크기 맞추기</strong> — 블록 가장자리의 <i class="gdot"></i>를 끌거나 아래 숫자를 바꿔요</span></div>
+          <div class="gs"><b>3</b><span><strong>튀어나온 곳 붙이기</strong> — 필요하면 ‘블록 붙이기’로 이어 붙여요</span></div>
+          <p class="gtip">💡 줄자가 없다면 침대(약 1.5×2m)나 걸음 수(한 걸음 ≈ 0.6m)로 어림잡아도 충분해요.</p>
+        </details>
+        <div class="tabs" id="rmode-tabs">
+          <button class="tab on" data-m="block" onclick="setRoomMode('block')">🧱 블록으로 만들기</button>
+          <button class="tab" data-m="free" onclick="setRoomMode('free')">✏️ 직접 그리기</button>
+        </div>
         <svg id="poly" viewBox="0 0 336 336"></svg>
+        <p class="rinfo" id="rinfo"></p>
+        <div id="bpane">
+          <div class="bsize" id="bsize">
+            <div class="bsr"><span>가로</span><button onclick="bStep('w',-0.1)">−</button><input type="number" id="bw" step="0.1" min="0.5" max="8" inputmode="decimal" onchange="bSet('w',this.value)"><button onclick="bStep('w',0.1)">＋</button><em>m</em></div>
+            <div class="bsr"><span>세로</span><button onclick="bStep('d',-0.1)">−</button><input type="number" id="bd" step="0.1" min="0.5" max="8" inputmode="decimal" onchange="bSet('d',this.value)"><button onclick="bStep('d',0.1)">＋</button><em>m</em></div>
+          </div>
+          <div class="ptool">
+            <button onclick="blockPreset('rect')">▭ 네모 방</button>
+            <button onclick="blockPreset('l')">ㄱ ㄱ자 방</button>
+            <button onclick="blockAdd()">＋ 블록 붙이기</button>
+          </div>
+          <div class="ptool">
+            <button onclick="blockUndo()">↩ 되돌리기</button>
+            <button id="bdel" onclick="blockDel()">선택한 블록 삭제</button>
+          </div>
+        </div>
+        <div id="fpane" hidden>
+        <p class="hint" style="margin-top:10px">점을 눌러 벽을 그리고, 첫 점(진한 점)을 누르면 완성돼요. 점은 끌어서 옮기고, 벽을 끌면 새로 꺾여요.</p>
         <div class="ptool">
           <button onclick="polyUndo()">↩ 되돌리기</button>
           <button id="pdel" onclick="polyDel()">선택한 점 삭제</button>
@@ -383,6 +432,7 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
           <button id="pan" class="on" onclick="polyToggle('ang')">직각 맞춤</button>
         </div>
         <p class="hint" id="polyinfo"></p>
+        </div>
         <span class="label">이 방은</span>
         <div class="chips" id="rtype"></div>
       </div>
@@ -1384,10 +1434,170 @@ function polyPreset(k){
   pclosed=true; psel=-1; drawPoly();
 }
 function polyToggle(k){if(k==="snap") psnap=!psnap; else pang=!pang; drawPoly();}
+/* =========================================================
+   블록으로 방 만들기 — 네모 블록을 끌어 옮기고 손잡이로 크기 조절, 여러 블록을 합쳐 방 외곽선을 만듦
+   ========================================================= */
+let rmode="block", blocks=[], bsel=-1, bhist=[], bdrag=null;
+const BMIN=0.5, BSNAP=0.1;
+const r1=v=>Math.round(v*100)/100;
+const bsnap=v=>r1(Math.round(v/BSNAP)*BSNAP);
+function blockPresetList(k){
+  return k==="l"?[{x:1.4,y:1.6,w:3.4,d:2.0},{x:3.0,y:3.6,w:1.8,d:2.4}]:[{x:2.2,y:2.5,w:3.6,d:3.0}];
+}
+// 블록 합집합의 외곽선 → 점 목록. 실패하면 이유 문자열
+function blocksOutline(B){
+  if(!B.length) return {err:"블록이 없어요. ‘네모 방’을 눌러 시작해 주세요"};
+  const xs=[...new Set(B.flatMap(b=>[r1(b.x),r1(b.x+b.w)]))].sort((a,b)=>a-b), ys=[...new Set(B.flatMap(b=>[r1(b.y),r1(b.y+b.d)]))].sort((a,b)=>a-b);
+  const nx=xs.length-1, ny=ys.length-1, F=[];
+  for(let i=0;i<nx;i++){F[i]=[]; for(let j=0;j<ny;j++){const cx=(xs[i]+xs[i+1])/2, cy=(ys[j]+ys[j+1])/2; F[i][j]=B.some(b=>cx>b.x&&cx<b.x+b.w&&cy>b.y&&cy<b.y+b.d);}}
+  const on=(i,j)=>i>=0&&j>=0&&i<nx&&j<ny&&F[i][j];
+  // 블록이 모두 이어져 있는지 (변을 맞대야 연결)
+  let start=null, cnt=0; for(let i=0;i<nx;i++) for(let j=0;j<ny;j++) if(F[i][j]){cnt++; if(!start) start=[i,j];}
+  const seen=new Set([start+""]), st=[start];
+  while(st.length){const [i,j]=st.pop(); [[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,b])=>{const k=[i+a,j+b]; if(on(k[0],k[1])&&!seen.has(k+"")){seen.add(k+""); st.push(k);}});}
+  if(seen.size!==cnt) return {err:"떨어진 블록이 있어요. 블록끼리 벽을 맞대어 붙여 주세요"};
+  const E=[];      // 시계 방향 경계선
+  for(let i=0;i<nx;i++) for(let j=0;j<ny;j++) if(F[i][j]){
+    const X0=xs[i],X1=xs[i+1],Y0=ys[j],Y1=ys[j+1];
+    if(!on(i,j-1)) E.push([[X0,Y0],[X1,Y0]]); if(!on(i+1,j)) E.push([[X1,Y0],[X1,Y1]]);
+    if(!on(i,j+1)) E.push([[X1,Y1],[X0,Y1]]); if(!on(i-1,j)) E.push([[X0,Y1],[X0,Y0]]);
+  }
+  const key=p=>p[0]+","+p[1], out={}; E.forEach((e,k)=>{(out[key(e[0])]=out[key(e[0])]||[]).push(k);});
+  const used=new Set(), loop=[]; let k=0;
+  while(!used.has(k)){used.add(k); loop.push(E[k][0]); const nxt=(out[key(E[k][1])]||[]).find(q=>!used.has(q)); if(nxt==null) break; k=nxt;}
+  if(used.size!==E.length) return {err:"가운데가 빈 모양은 만들 수 없어요. 블록을 다시 배치해 주세요"};
+  const P=loop.filter((p,i)=>{const a=loop[(i-1+loop.length)%loop.length], c=loop[(i+1)%loop.length]; return (p[0]-a[0])*(c[1]-p[1])-(p[1]-a[1])*(c[0]-p[0])!==0;});
+  return {pts:P};
+}
+function blocksToPts(){        // ‘다음’을 누를 때 블록 → 방 외곽선
+  const o=blocksOutline(blocks);
+  if(o.err){toast(o.err); return false;}
+  pts=o.pts.map(p=>[p[0],p[1]]); pclosed=true; psel=-1;
+  if(pArea(pts)<2){toast("방이 너무 작아요 (최소 2㎡)"); return false;}
+  return true;
+}
+const bState=()=>JSON.stringify(blocks);
+function bPush(){bhist.push(bState()); if(bhist.length>60) bhist.shift();}
+function blockPreset(k){bPush(); blocks=blockPresetList(k); bsel=k==="l"?1:0; drawBlocks();}
+function blockAdd(){           // 선택한(없으면 마지막) 블록 오른쪽에 붙임, 자리가 없으면 아래
+  bPush();
+  const b=blocks[bsel>=0?bsel:blocks.length-1]||{x:2,y:2.5,w:3,d:3};
+  let n={w:1.5,d:1.5,x:b.x+b.w,y:b.y+b.d-1.5};
+  if(n.x+n.w>PG.m) n={w:1.5,d:1.5,x:b.x,y:b.y+b.d};
+  if(n.y+n.d>PG.m) n={w:1.5,d:1.5,x:Math.max(0,b.x-1.5),y:b.y};
+  n.x=bsnap(Math.max(0,Math.min(PG.m-n.w,n.x))); n.y=bsnap(Math.max(0,Math.min(PG.m-n.d,n.y)));
+  blocks.push(n); bsel=blocks.length-1; drawBlocks();
+  toast("블록을 붙였어요. 끌어서 위치를, 동그라미로 크기를 맞춰 주세요");
+}
+function blockDel(){
+  if(bsel<0) return;
+  if(blocks.length<=1){toast("블록이 최소 1개는 있어야 해요"); return;}
+  bPush(); blocks.splice(bsel,1); bsel=-1; drawBlocks();
+}
+function blockUndo(){if(!bhist.length) return; blocks=JSON.parse(bhist.pop()); bsel=Math.min(bsel,blocks.length-1); drawBlocks();}
+function bSet(k,v){
+  const b=blocks[bsel]; if(!b) return; v=parseFloat(v); if(isNaN(v)){drawBlocks(); return;}
+  bPush(); v=bsnap(Math.max(BMIN,Math.min(PG.m,v)));
+  if(k==="w"){b.w=Math.min(v,PG.m-b.x); if(b.w<v){b.x=bsnap(Math.max(0,PG.m-v)); b.w=v;}}
+  else{b.d=Math.min(v,PG.m-b.y); if(b.d<v){b.y=bsnap(Math.max(0,PG.m-v)); b.d=v;}}
+  drawBlocks();
+}
+function bStep(k,dv){const b=blocks[bsel]; if(b) bSet(k,(k==="w"?b.w:b.d)+dv);}
+// 다른 블록의 변에 0.25m 안으로 다가가면 딱 붙임
+function magnet(v,cands){let best=v,bd=0.25; cands.forEach(c=>{const d=Math.abs(c-v); if(d<bd){bd=d; best=c;}}); return best;}
+const HANDLES=[["nw",0,0],["n",.5,0],["ne",1,0],["e",1,.5],["se",1,1],["s",.5,1],["sw",0,1],["w",0,.5]];
+function blockDown(ev){
+  ev.preventDefault();
+  const [x,y,pm]=evPt(ev), svg=document.getElementById("poly"), b=blocks[bsel];
+  if(b){
+    const h=HANDLES.find(([,hx,hy])=>Math.hypot(b.x+b.w*hx-x,b.y+b.d*hy-y)<=20*pm);
+    if(h){bdrag={k:h[0],b0:{...b},sx:x,sy:y,h:bState(),moved:false}; svg.setPointerCapture(ev.pointerId); return;}
+  }
+  let hit=-1; for(let i=blocks.length-1;i>=0;i--){const q=blocks[i]; if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.d){hit=i; break;}}
+  bsel=hit;
+  if(hit>=0){bdrag={k:"move",b0:{...blocks[hit]},sx:x,sy:y,h:bState(),moved:false}; svg.setPointerCapture(ev.pointerId);}
+  drawBlocks();
+}
+function blockMove(ev){
+  if(!bdrag) return;
+  const [x,y,pm]=evPt(ev), d=bdrag, b=blocks[bsel], o=d.b0;
+  if(!d.moved&&Math.hypot(x-d.sx,y-d.sy)<5*pm) return;
+  d.moved=true;
+  const others=blocks.filter((_,i)=>i!==bsel), XS=[0,PG.m,...others.flatMap(q=>[q.x,q.x+q.w])], YS=[0,PG.m,...others.flatMap(q=>[q.y,q.y+q.d])];
+  const dx=x-d.sx, dy=y-d.sy;
+  if(d.k==="move"){
+    let nx=bsnap(Math.max(0,Math.min(PG.m-o.w,o.x+dx))), ny=bsnap(Math.max(0,Math.min(PG.m-o.d,o.y+dy)));
+    const mx=magnet(nx,XS), mx2=magnet(nx+o.w,XS)-o.w; nx=Math.abs(mx-nx)<=Math.abs(mx2-nx)?mx:mx2;
+    const my=magnet(ny,YS), my2=magnet(ny+o.d,YS)-o.d; ny=Math.abs(my-ny)<=Math.abs(my2-ny)?my:my2;
+    b.x=r1(Math.max(0,Math.min(PG.m-o.w,nx))); b.y=r1(Math.max(0,Math.min(PG.m-o.d,ny)));
+  } else {
+    let x0=o.x,x1=o.x+o.w,y0=o.y,y1=o.y+o.d;
+    if(d.k.includes("w")) x0=Math.min(x1-BMIN,Math.max(0,magnet(bsnap(o.x+dx),XS)));
+    if(d.k.includes("e")) x1=Math.max(x0+BMIN,Math.min(PG.m,magnet(bsnap(o.x+o.w+dx),XS)));
+    if(d.k.startsWith("n")) y0=Math.min(y1-BMIN,Math.max(0,magnet(bsnap(o.y+dy),YS)));
+    if(d.k.startsWith("s")) y1=Math.max(y0+BMIN,Math.min(PG.m,magnet(bsnap(o.y+o.d+dy),YS)));
+    b.x=r1(x0); b.y=r1(y0); b.w=r1(x1-x0); b.d=r1(y1-y0);
+  }
+  drawBlocks();
+}
+function blockUp(ev){
+  if(!bdrag) return;
+  try{document.getElementById("poly").releasePointerCapture(ev.pointerId);}catch(e){}
+  if(bdrag.moved){bhist.push(bdrag.h); if(bhist.length>60) bhist.shift();}
+  bdrag=null; drawBlocks();
+}
+function drawBlocks(){
+  const M=PG.m, U=PG.u, Z=M*U, f=v=>Math.round(v*U*10)/10;
+  let h=`<rect width="${Z}" height="${Z}" fill="#fff"/>`;
+  for(let i=0;i<=M*2;i++) h+=`<path d="M${i*U/2} 0V${Z}M0 ${i*U/2}H${Z}" stroke="${i%2?"#F0F4F2":"#DCE8E1"}" stroke-width="1"/>`;
+  const o=blocksOutline(blocks);
+  blocks.forEach((b,i)=>{
+    h+=`<rect x="${f(b.x)}" y="${f(b.y)}" width="${f(b.w)}" height="${f(b.d)}" fill="${o.err?"rgba(224,167,159,.35)":"rgba(168,213,186,.55)"}" stroke="${i===bsel?"#4E8C6E":"#9CC5AE"}" stroke-width="${i===bsel?2.5:1.5}" stroke-dasharray="${i===bsel?"":"5 4"}" rx="2"/>`;
+  });
+  if(!o.err) h+=`<path d="${o.pts.map((p,i)=>(i?"L":"M")+f(p[0])+" "+f(p[1])).join("")}Z" fill="none" stroke="#4E8C6E" stroke-width="3" stroke-linejoin="round"/>`;
+  const lbl=(x,y,t,big)=>`<text x="${x}" y="${y}" font-size="${big?13:11}" font-weight="800" fill="#2F5F49" text-anchor="middle" dominant-baseline="middle" stroke="#fff" stroke-width="4" paint-order="stroke">${t}</text>`;
+  blocks.forEach((b,i)=>{        // 블록마다 치수, 선택한 블록은 크게
+    if(i!==bsel&&blocks.length>2) return;
+    h+=lbl(f(b.x+b.w/2),f(b.y)+(b.y<0.6?24:-21),b.w.toFixed(1)+"m",i===bsel)+lbl(f(b.x)+(b.x<0.9?34:-32),f(b.y+b.d/2),b.d.toFixed(1)+"m",i===bsel);
+  });
+  const b=blocks[bsel];
+  if(b){
+    h+=lbl(f(b.x+b.w/2),f(b.y+b.d/2),"끌어서 이동",false).replace('font-size="11"','font-size="10" opacity=".75"');
+    HANDLES.forEach(([k,hx,hy])=>{const cx=f(b.x+b.w*hx), cy=f(b.y+b.d*hy), act=bdrag&&bdrag.k===k;
+      h+=`<circle cx="${cx}" cy="${cy}" r="${k.length===1?8:9}" fill="${act?"#4E8C6E":"#fff"}" stroke="#4E8C6E" stroke-width="2.5"/>`;});
+  }
+  document.getElementById("poly").innerHTML=h;
+  // 안내 줄 + 크기 패널
+  const info=document.getElementById("rinfo"), g=id=>document.getElementById(id);
+  if(o.err){info.textContent="⚠️ "+o.err; info.className="rinfo warn";}
+  else{
+    const A=pArea(o.pts), xs=o.pts.map(p=>p[0]), ys=o.pts.map(p=>p[1]), W=r1(Math.max(...xs)-Math.min(...xs)), D=r1(Math.max(...ys)-Math.min(...ys));
+    info.className="rinfo";
+    info.textContent=`가로 ${W.toFixed(1)}m × 세로 ${D.toFixed(1)}m · 약 ${A.toFixed(1)}㎡ (${(A/3.3058).toFixed(1)}평)`+(b?"":" · 블록을 눌러 크기를 바꿔요");
+  }
+  g("bsize").classList.toggle("off",!b); g("bdel").disabled=!b||blocks.length<=1;
+  if(document.activeElement!==g("bw")) g("bw").value=b?b.w.toFixed(1):"";
+  if(document.activeElement!==g("bd")) g("bd").value=b?b.d.toFixed(1):"";
+}
+function setRoomMode(m){
+  if(m===rmode) return;
+  if(m==="free"){        // 지금 블록 모양을 점으로 바꿔서 이어서 다듬게 함
+    const o=blocksOutline(blocks);
+    if(!o.err){phist=[]; pts=o.pts.map(p=>[p[0],p[1]]); pclosed=true; psel=-1;}
+  }
+  rmode=m;
+  document.querySelectorAll("#rmode-tabs .tab").forEach(t=>t.classList.toggle("on",t.dataset.m===m));
+  document.getElementById("bpane").hidden=m!=="block"; document.getElementById("fpane").hidden=m!=="free";
+  if(m==="block") drawBlocks(); else drawPoly();
+}
 function initPoly(){
   const svg=document.getElementById("poly");
-  svg.onpointerdown=polyDown; svg.onpointermove=polyMove; svg.onpointerup=polyUp; svg.onpointercancel=polyUp;
-  psnap=true; pang=true; pdrag=null; phist=[]; pts=[]; pclosed=false; psel=-1; drawPoly();
+  svg.onpointerdown=e=>rmode==="block"?blockDown(e):polyDown(e);
+  svg.onpointermove=e=>rmode==="block"?blockMove(e):polyMove(e);
+  svg.onpointerup=svg.onpointercancel=e=>rmode==="block"?blockUp(e):polyUp(e);
+  psnap=true; pang=true; pdrag=null; phist=[]; pts=[]; pclosed=false; psel=-1;
+  try{if(localStorage.getItem("bangku.guide")==="0") document.getElementById("rguide").open=false;}catch(e){}
+  blocks=blockPresetList("rect"); bsel=0; bhist=[]; bdrag=null; rmode="free"; setRoomMode("block");
 }
 function drawPoly(){
   const M=PG.m, U=PG.u, Z=M*U, f=v=>Math.round(v*U*10)/10;
@@ -1787,6 +1997,7 @@ document.getElementById("in-next").onclick=()=>{
     return;
   }
   if(state.step===1){
+    if(rmode==="block"&&!blocksToPts()) return;
     if(!polyDone()){ toast("점을 이어 방 모양을 완성해 주세요"); return; }
     commitPoly();
   }
@@ -2089,9 +2300,9 @@ function openResult(){
   if(!document.getElementById("pane-fs").hidden) renderFengshui();
   go("s-result");
 }
-document.querySelectorAll(".tab").forEach(t=>{
+document.querySelectorAll("#s-result .tab").forEach(t=>{
   t.onclick=()=>{
-    document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x===t));
+    document.querySelectorAll("#s-result .tab").forEach(x=>x.classList.toggle("on",x===t));
     const k=t.dataset.tab;
     document.getElementById("pane-plan").hidden=k!=="plan";
     document.getElementById("pane-d3").hidden=k!=="d3";
