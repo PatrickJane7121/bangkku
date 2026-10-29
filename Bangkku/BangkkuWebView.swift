@@ -16,6 +16,7 @@ struct BangkkuWebView: UIViewRepresentable {
         let ucc = config.userContentController
         ucc.addScriptMessageHandler(context.coordinator, contentWorld: .page, name: "share")
         ucc.addScriptMessageHandler(context.coordinator, contentWorld: .page, name: "copy")
+        ucc.addScriptMessageHandler(context.coordinator, contentWorld: .page, name: "haptic")
         ucc.addUserScript(WKUserScript(source: Self.bridgeJS, injectionTime: .atDocumentStart, forMainFrameOnly: true))
         ucc.addUserScript(WKUserScript(source: Self.appCSSJS, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
 
@@ -72,11 +73,16 @@ struct BangkkuWebView: UIViewRepresentable {
 
     final class Coordinator: NSObject, WKScriptMessageHandlerWithReply, WKNavigationDelegate, WKUIDelegate {
         weak var webView: WKWebView?
+        private let impact = UIImpactFeedbackGenerator(style: .light)
 
         func userContentController(_ userContentController: WKUserContentController,
                                    didReceive message: WKScriptMessage,
                                    replyHandler: @escaping (Any?, String?) -> Void) {
             switch message.name {
+            case "haptic":
+                impact.impactOccurred()
+                impact.prepare()
+                replyHandler(true, nil)
             case "copy":
                 UIPasteboard.general.string = message.body as? String ?? ""
                 replyHandler(true, nil)

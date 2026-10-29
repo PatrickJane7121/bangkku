@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#A8D5BA">
+<meta name="theme-color" content="#F7F2EA">
 <title>방꾸</title>
 <meta name="description" content="내 방의 기운을 바꾸는 공간 진단 — 사주와 풍수로 방 배치를 진단해요">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23A8D5BA'/%3E%3Cpath d='M12 31L32 14l20 17' fill='none' stroke='%233B6B54' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M17 29v19a2 2 0 002 2h26a2 2 0 002-2V29' fill='none' stroke='%233B6B54' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='27' y='36' width='10' height='14' rx='2' fill='%23fff'/%3E%3C/svg%3E">
@@ -358,6 +358,187 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
 .pal.mine{border-color:#CFE0D7;background:#FAFDFB}
 .pal .px{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#fff;border:1.5px solid var(--line);font-size:10px;line-height:17px;color:var(--ink-soft)}
 .pal-sep{flex:none;width:1px;background:var(--line);margin:6px 2px}
+
+/* =========================================================
+   리디자인 — 웜 베이지 무드 · 부드러운 입체감 · 매거진 타이포 · 매끄러운 인터랙션
+   ========================================================= */
+:root{
+  --bg:#F7F2EA; --card:#FFFDF9; --line:#ECE3D5; --line-2:#E3D8C7;
+  --ink:#2A2520; --ink-soft:#857A6C;
+  --deep:#46775E; --deep-dark:#2F5743; --sage:#A9C9B4; --sage-soft:#E8F0E7;
+  --gold:#A9824C; --sand:#EDE5D8; --rose:#B95F4C; --rose-soft:#F8ECE7;
+  --r:22px;
+  --sh-1:0 1px 2px rgba(84,62,36,.05),0 6px 16px -8px rgba(84,62,36,.14);
+  --sh-2:0 2px 6px rgba(84,62,36,.05),0 18px 36px -14px rgba(84,62,36,.24);
+  --ease:cubic-bezier(.2,.8,.2,1); --spring:cubic-bezier(.34,1.4,.64,1);
+  --serif:"Hiragino Mincho ProN","Songti SC","Noto Serif KR","AppleMyungjo",ui-serif,Georgia,serif;
+}
+body{
+  background:
+    radial-gradient(120% 55% at 0% 0%,#FFF8EC 0%,rgba(255,248,236,0) 60%),
+    radial-gradient(90% 50% at 100% 8%,#F0E4D2 0%,rgba(240,228,210,0) 55%),
+    linear-gradient(180deg,#F8F3EB 0%,#F1E8DA 100%);
+  background-attachment:fixed;
+  letter-spacing:-.15px;-webkit-font-smoothing:antialiased;
+}
+#app{background:transparent}
+::selection{background:#E4D5BD}
+:focus-visible{outline:2px solid var(--deep);outline-offset:2px}
+
+/* 화면 전환 */
+.screen.active{animation:scrIn .42s var(--ease) backwards}
+@keyframes scrIn{from{opacity:0;transform:translateY(12px)}}
+
+/* 글래스 상단·하단 바 */
+.nav,.nav.bordered{background:rgba(248,243,235,.72);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);border-bottom:1px solid rgba(227,216,199,.6)}
+#s-home .nav,#s-onboard .nav{border-bottom-color:transparent}
+.nav h2{font-size:16.5px;font-weight:700;letter-spacing:-.3px}
+.back{width:38px;height:38px;border-radius:50%;transition:background .2s,transform .25s var(--spring)}
+.back:active{background:rgba(42,37,32,.06);transform:scale(.9)}
+.foot{background:rgba(248,243,235,.78);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);border-top:1px solid rgba(227,216,199,.6)}
+
+/* 타이포 */
+h1{font-size:28px;font-weight:800;letter-spacing:-.9px;line-height:1.28;margin:4px 0 8px}
+.sub{font-size:14.5px;line-height:1.65;color:var(--ink-soft)}
+.label{font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--ink-soft);margin:26px 0 10px}
+.hint{color:var(--ink-soft);line-height:1.55}
+.eb{display:block;font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 6px}
+h1+.sub{margin-top:0}
+
+/* 카드 */
+.card,.space-card,.saju-box,.rec-card,.grp,.cn,.selp,.dirbar,.bsize,.guide,.fnew,#sstip{
+  background:var(--card);border:1px solid rgba(227,216,199,.7);box-shadow:var(--sh-1)}
+.card{border-radius:var(--r);padding:20px}
+.card h2{font-size:18px;font-weight:800;letter-spacing:-.5px;margin:0 0 12px}
+.space-card{border-radius:20px;padding:12px 14px;transition:transform .25s var(--spring),box-shadow .25s}
+.space-card:active{transform:scale(.98);box-shadow:var(--sh-2)}
+.space-thumb{border-radius:16px;background:linear-gradient(145deg,#F3ECE0,#E7DCC9)}
+.grp,.selp,.dirbar,.bsize,.guide,.fnew{border-radius:20px}
+.empty{background:rgba(255,253,249,.55);border:1px dashed var(--line-2);border-radius:20px}
+
+/* 버튼 */
+.btn{border-radius:18px;padding:17px 16px;font-size:16px;letter-spacing:-.3px;
+  transition:transform .28s var(--spring),box-shadow .25s,background .2s,opacity .2s}
+.btn:active{transform:scale(.965)}
+.btn-primary{background:linear-gradient(180deg,#548A6E 0%,#3E6C54 100%);color:#fff;
+  box-shadow:0 12px 24px -12px rgba(47,87,67,.7),inset 0 1px 0 rgba(255,255,255,.18)}
+.btn-primary:active{box-shadow:0 6px 14px -8px rgba(47,87,67,.7),inset 0 1px 0 rgba(255,255,255,.18)}
+.btn-primary:disabled{background:#CFC6B8;box-shadow:none}
+.btn-ghost{background:var(--sand);color:var(--deep-dark)}
+.btn-line{background:var(--card);border:1px solid var(--line-2);box-shadow:var(--sh-1)}
+.tool,.dbtn,.ptool button,.pal,.chip,.fchip,.qa,.zc,.bsr button,.fnicons button,.tab,.cn,.shape-opt{
+  transition:transform .25s var(--spring),background .2s,border-color .2s,box-shadow .2s,color .2s}
+.tool:active,.dbtn:active,.ptool button:active,.pal:active,.chip:active,.fchip:active,.zc:active,.bsr button:active,.fnicons button:active{transform:scale(.93)}
+.qa:active,.cn:active{transform:scale(.98)}
+.tool,.dbtn,.ptool button{background:var(--card);border:1px solid var(--line-2);border-radius:14px;box-shadow:0 1px 2px rgba(84,62,36,.05)}
+.tool.danger{color:var(--rose);border-color:#EED7CF}
+.tool:disabled,.ptool button:disabled{box-shadow:none}
+.ptool button.on{background:var(--sage-soft);border-color:var(--deep)}
+
+/* 입력 */
+input,select{background:var(--card);border:1px solid var(--line-2);border-radius:14px;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus{border-color:var(--deep);box-shadow:0 0 0 4px rgba(70,119,94,.13)}
+input[type=checkbox]{accent-color:var(--deep)}
+
+/* 칩·세그먼트 */
+.chip{background:var(--card);border:1px solid var(--line-2);padding:10px 16px}
+.chip.on{background:var(--deep);border-color:var(--deep);color:#fff;box-shadow:0 6px 14px -8px rgba(47,87,67,.8)}
+.tabs{background:var(--sand);border-radius:16px;padding:4px}
+.tab{border-radius:12px}
+.tab.on{background:var(--card);color:var(--deep-dark);box-shadow:0 2px 8px -2px rgba(84,62,36,.18)}
+
+/* 온보딩·스플래시 */
+.ob-art{border-radius:56px;background:linear-gradient(145deg,#FFFDF9,#EFE5D6);box-shadow:var(--sh-2),inset 0 1px 0 #fff}
+.dot{background:#DCD1C0}
+.dot.on{background:var(--deep)}
+#splash{background:radial-gradient(90% 60% at 30% 20%,#FFF9EF 0%,rgba(255,249,239,0) 60%),linear-gradient(165deg,#F8F3EB 0%,#EADFCC 100%)}
+#splash .lg{border-radius:32px;background:linear-gradient(160deg,#FFFFFF,#F6F0E6);box-shadow:0 22px 44px -18px rgba(84,62,36,.45),inset 0 1px 0 #fff}
+#splash .nm{color:var(--ink);letter-spacing:-1.5px}
+#splash .tg{color:var(--ink-soft)}
+
+/* 홈 히어로 */
+.hero,.dj{position:relative;overflow:hidden;color:#F7F2EA;
+  background:radial-gradient(120% 120% at 100% 0%,rgba(255,255,255,.18) 0%,rgba(255,255,255,0) 50%),linear-gradient(140deg,#2F5743 0%,#46775E 55%,#7FA88F 100%);
+  box-shadow:0 22px 40px -22px rgba(47,87,67,.8)}
+.hero::after,.dj::after{content:"";position:absolute;right:-40px;bottom:-60px;width:180px;height:180px;border-radius:50%;border:1px solid rgba(255,255,255,.18);box-shadow:0 0 0 22px rgba(255,255,255,.04),0 0 0 48px rgba(255,255,255,.03)}
+.hero{border-radius:26px;padding:26px 24px}
+.hero h3{font-size:22px;letter-spacing:-.6px;line-height:1.35;color:#fff}
+.hero p{opacity:.82;line-height:1.6}
+
+/* 고민 카드 */
+.cn{border-radius:20px;padding:16px 18px}
+.cn.on{background:linear-gradient(180deg,#F1F6EF,#E6EFE5);border-color:var(--deep);box-shadow:0 10px 22px -14px rgba(47,87,67,.6)}
+.cn .ck{border:1.5px solid var(--line-2);display:flex;align-items:center;justify-content:center;transition:all .25s var(--spring)}
+.cn.on .ck{transform:scale(1.08)}
+.cn.on .ck::after{content:"";width:9px;height:5px;border:2px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+
+/* 편집 화면 */
+#canvas,#canvas2{background:#FFFEFB;border-radius:10px;box-shadow:var(--sh-2)}
+#poly{background:#FFFEFB;border:1px solid var(--line);border-radius:20px;box-shadow:var(--sh-1)}
+.pal{background:var(--card);border:1px solid var(--line-2);border-radius:18px;box-shadow:0 1px 2px rgba(84,62,36,.05)}
+.pal.mine{background:#FBF7EF}
+.fchip{background:var(--card);border:1px solid var(--line-2)}
+.fchip.make{background:var(--sage-soft);border:1.5px dashed var(--deep)}
+.fsearch input{border-radius:16px;background:var(--card);box-shadow:var(--sh-1)}
+.livebar b{font-family:var(--serif);font-size:15px}
+.hd{box-shadow:0 2px 6px rgba(0,0,0,.18)}
+
+/* 바텀시트·토스트·툴팁 */
+#sheet{background:rgba(42,32,20,.32);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+#sheet.on{animation:fadeIn .25s ease}
+#sheet.on .sc{animation:sheetUp .42s var(--ease)}
+#sheet .sc{position:relative;background:linear-gradient(180deg,#FBF7F0,#F5EEE3);border-radius:28px 28px 0 0;padding-top:28px;box-shadow:0 -12px 40px -12px rgba(84,62,36,.3)}
+#sheet .sc::before{content:"";position:absolute;top:10px;left:50%;width:40px;height:5px;margin-left:-20px;border-radius:3px;background:#D9CDBA}
+#sheet h3{font-size:19px;letter-spacing:-.5px}
+@keyframes sheetUp{from{transform:translateY(100%)}}
+@keyframes fadeIn{from{opacity:0}}
+.toast{background:rgba(42,37,32,.86);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-radius:16px;box-shadow:0 12px 30px -12px rgba(0,0,0,.45);transition:opacity .25s,transform .35s var(--spring)}
+#sstip{border-radius:18px;box-shadow:var(--sh-2);animation:fadeIn .2s ease}
+
+/* 사주 리포트 */
+#s-saju h1,#rp-body h1{font-size:30px;letter-spacing:-1px}
+.dj{border-radius:26px;padding:24px 22px;margin:4px 0 16px}
+.dj span{opacity:.85;font-size:13px;letter-spacing:.02em}
+.dj b{font-family:var(--serif);font-weight:600;font-size:34px;letter-spacing:-.5px;margin:6px 0 8px;color:#fff}
+.pils{gap:10px}
+.pl{font-size:11.5px;letter-spacing:.04em}
+.pc{border-radius:16px;padding:12px 2px}
+.pc b{font-family:var(--serif);font-weight:600;font-size:30px;line-height:1.15}
+.pc small{font-size:11px;letter-spacing:.02em}
+.pil.day .pc{box-shadow:0 0 0 1.5px var(--deep) inset,0 8px 16px -10px rgba(47,87,67,.6)}
+.bar{margin:12px 0}
+.bar .n{font-size:13.5px}
+.bar .t{height:8px;background:#F1EADF}
+.bar .t i{transition:width .8s var(--ease)}
+.tag{background:var(--sand);color:var(--deep-dark);padding:5px 11px;margin:0 6px 6px 0;font-size:12px}
+.tag.warn{background:var(--rose-soft);color:var(--rose)}
+#sj-report .card p,#s-saju .card p{line-height:1.75}
+
+/* 종합 리포트 */
+#rp-body .sub{font-size:13.5px;letter-spacing:.01em}
+.card.sec{padding:22px 20px;margin-bottom:16px}
+.sec h2{display:block;font-size:19px;line-height:1.35;margin-bottom:14px}
+.sec p,.sec li{font-size:15px;line-height:1.75}
+.ring{width:64px;height:64px;border:0;background:conic-gradient(var(--deep) calc(var(--p,100)*1%),#EDE5D8 0);position:relative;font-family:var(--serif);font-size:22px;font-weight:600;color:var(--deep-dark)}
+.ring::before{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--card)}
+.ring>*,.ring{isolation:isolate}
+.ring span{position:relative}
+.fix{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--rose);border-radius:16px;padding:14px 16px;box-shadow:0 1px 2px rgba(84,62,36,.04)}
+.fix strong{font-size:14.5px;line-height:1.5}
+.fix p{font-size:14px;line-height:1.65;color:#4A4239}
+.todo li{padding:12px 0;line-height:1.6}
+.todo li:before{content:"";flex:none;width:18px;height:18px;margin-top:3px;border-radius:6px;border:1.5px solid var(--deep);background:var(--sage-soft)}
+.note{background:rgba(237,229,216,.6);border-radius:16px;line-height:1.65}
+.sumbox{background:linear-gradient(180deg,#F1F6EF,#E8F0E7);border-radius:16px;padding:14px 16px;line-height:1.7}
+.sc2 b{font-family:var(--serif);font-weight:600;font-size:36px}
+.cmpg svg{border-radius:14px;border-color:var(--line);box-shadow:var(--sh-1)}
+.cap{letter-spacing:.04em}
+.qa{border-radius:14px;background:var(--card);border:1px solid var(--line-2)}
+.qa.on.bad{background:var(--rose-soft);border-color:#E3B4A8;color:#8A3A2C}
+.zc{border-radius:14px;background:#F6F1E8;border:1px solid var(--line-2)}
+#view3d{background:radial-gradient(80% 70% at 50% 30%,#FFFDF8 0%,#EFE6D8 100%);border-radius:20px;border:1px solid var(--line);box-shadow:var(--sh-1)}
+.floor3{background:#FBF7F0;border-color:#E2D6C3}
+.row{border-bottom-color:var(--line)}
 </style>
 </head>
 <body>
@@ -632,11 +813,12 @@ input[type=range]{padding:0;border:none;background:none;accent-color:var(--deep)
       <div class="nav-spacer"></div>
     </div>
     <div class="body">
+      <span class="eb">Saju Report · 사주 리포트</span>
       <h1 id="sj-title"></h1>
       <p class="sub" id="sj-note"></p>
       <div id="sj-hero"></div>
-      <div class="card"><h2>사주 원국</h2><div class="pils" id="sj-pils"></div><p class="hint" style="margin-top:10px">밑줄 친 십성(비견·편관 등)을 누르면 뜻을 알려드려요.</p></div>
-      <div class="card"><h2>오행 분포</h2><div id="sj-bars"></div><p class="hint" id="sj-judge"></p></div>
+      <div class="card"><h2><span class="eb">Four Pillars</span>사주 원국</h2><div class="pils" id="sj-pils"></div><p class="hint" style="margin-top:10px">밑줄 친 십성(비견·편관 등)을 누르면 뜻을 알려드려요.</p></div>
+      <div class="card"><h2><span class="eb">Five Elements</span>오행 분포</h2><div id="sj-bars"></div><p class="hint" id="sj-judge"></p></div>
       <div id="sj-report"></div>
     </div>
     <div class="foot"><button class="btn btn-primary" id="sj-go" onclick="sjNext()">다음: 고민 고르기</button></div>
@@ -1058,7 +1240,7 @@ function updateFs(){
   const res=evalAll(), bad=res.filter(x=>x.bad), tot=res.length, c=state.cur;
   const nAuto=res.filter(x=>x.auto).length;
   document.getElementById("fs-head").innerHTML=tot
-    ?`<div style="display:flex;align-items:center;gap:14px"><div class="ring">${Math.round((tot-bad.length)/tot*100)}</div>
+    ?`<div style="display:flex;align-items:center;gap:14px"><div class="ring" style="--p:${Math.round((tot-bad.length)/tot*100)}"><span>${Math.round((tot-bad.length)/tot*100)}</span></div>
       <div><strong>풍수 점수</strong><p class="hint" style="margin:2px 0 0">${tot}개 중 ${tot-bad.length}개 통과 · 개선 ${bad.length}건<br>배치 자동 진단 ${nAuto}개 + 내 답변 ${tot-nAuto}개</p></div></div>`
     :`<p class="hint">점검할 항목이 아직 없어요. 가구를 배치하거나 아래 항목에 답해 보세요.</p>`;
   document.getElementById("fs-bad").innerHTML=bad.length
@@ -1260,9 +1442,9 @@ function renderSaju(p,S){
   const over=cnt.map((k,i)=>k>=3?EL[i].n:"").filter(Boolean), lack=cnt.map((k,i)=>k===0?EL[i].n:"").filter(Boolean);
   const bal=over.length||lack.length?[over.length?over.join("·")+" 과다":"",lack.length?lack.join("·")+" 없음":""].filter(Boolean).join(", "):"오행이 고르게 분포해요";
   g("sj-judge").textContent=`총 ${P.length*2}글자 기준 · ${bal}`;
-  g("sj-report").innerHTML=`<div class="card"><h2>십신 분포</h2>${ss.grp.map((k,i)=>`<span class="tag${i===rank[0]?" warn":""}">${SSG[i]} ${k}</span>`).join("")}
+  g("sj-report").innerHTML=`<div class="card"><h2><span class="eb">Ten Gods</span>십신 분포</h2>${ss.grp.map((k,i)=>`<span class="tag${i===rank[0]?" warn":""}">${SSG[i]} ${k}</span>`).join("")}
       <p class="hint" style="margin-top:10px">십신은 나(일간)와 다른 글자의 관계예요. 지지는 본기(대표 글자) 기준으로 계산했어요.</p></div>
-    <div class="card"><h2>타고난 성향과 오행 균형</h2><p style="margin:0 0 8px;font-size:14.5px"><b>${tagN(de)}</b> — ${TRAIT[de]}</p>
+    <div class="card"><h2><span class="eb">Personality</span>타고난 성향과 오행 균형</h2><p style="margin:0 0 8px;font-size:14.5px"><b>${tagN(de)}</b> — ${TRAIT[de]}</p>
       <p style="margin:0 0 8px;font-size:14.5px">${GRP[rank[0]].s}</p>
       <p style="margin:0;font-size:14.5px">오행 균형: ${bal}.</p></div>`;
 }
@@ -1384,23 +1566,24 @@ function openReport(){
   if(!tips.length) tips.push(`<b>배치</b> — 지금 배치는 큰 문제가 없어요. ${TWEAK[cs[0]].place}`);
   tips.push(`💡 <b>조명</b> — ${ADD[e1].light}`,`🪴 <b>소품</b> — ${ADD[e1].item}`,`🧵 <b>패브릭</b> — ${TWEAK[cs[0]].fabric}`);
   document.getElementById("rp-body").innerHTML=`
+    <span class="eb">Bangkku Report · 종합 리포트</span>
     <h1>${escapeHtml(p.uname)}님의 종합 리포트</h1>
     <p class="sub">${STEM[ds]}${BR[P[2][1]]}일주 · ${tagN(de)} · ${cs.map(k=>CLAB[k]).join(", ")}</p>
-    <div class="card sec"><h2>🏠 풍수 배치 진단</h2>
-      ${tot?`<div style="display:flex;align-items:center;gap:14px"><div class="ring">${score}</div><div><strong>${tot}개 규칙 중 ${tot-bad.length}개 통과</strong><p class="hint" style="margin:2px 0 0">개선이 필요한 항목 ${bad.length}건 · 현재 배치 좌표를 SRC 규칙과 대조했어요</p></div></div>`
+    <div class="card sec"><h2><span class="eb">01 · Feng Shui</span>풍수 배치 진단</h2>
+      ${tot?`<div style="display:flex;align-items:center;gap:14px"><div class="ring" style="--p:${score}"><span>${score}</span></div><div><strong>${tot}개 규칙 중 ${tot-bad.length}개 통과</strong><p class="hint" style="margin:2px 0 0">개선이 필요한 항목 ${bad.length}건 · 현재 배치 좌표를 SRC 규칙과 대조했어요</p></div></div>`
         :`<p class="hint">진단할 가구가 아직 없어요. 침대·책상·소파를 배치하면 규칙과 대조해요.</p>`}
       ${autoBad.map(x=>`<div class="fix" style="margin-top:10px"><strong>${escapeHtml(x.r.q)}</strong><p>${escapeHtml(x.r.fx)}</p></div>`).join("")}
       ${tot&&!autoBad.length?`<p style="margin:10px 0 0">배치로 확인되는 규칙은 모두 통과했어요. 👏</p>`:""}
       <button class="btn btn-ghost" style="margin-top:12px" onclick="go('s-edit')">배치 다시 수정하기</button></div>
-    <div class="card sec" id="cmp"><h2>✨ 고민에 맞는 이상적인 배치</h2><div id="cmp-body"><p class="hint">현재 배치를 점검하고 고민에 맞는 배치를 찾는 중이에요…</p></div></div>
-    <div class="card sec"><h2>1. 나의 타고난 성향과 장점</h2>
+    <div class="card sec" id="cmp"><h2><span class="eb">02 · Ideal Layout</span>고민에 맞는 이상적인 배치</h2><div id="cmp-body"><p class="hint">현재 배치를 점검하고 고민에 맞는 배치를 찾는 중이에요…</p></div></div>
+    <div class="card sec"><h2><span class="eb">03 · Personality</span>나의 타고난 성향과 장점</h2>
       <p style="margin:0 0 6px"><b>${tagN(de)}</b> — ${TRAIT[de]}</p>
       <ul class="plain"><li><b>${SSG[g0]} ${ss.grp[g0]}개</b> — ${GRP[g0].s}</li>${ss.grp[g1]?`<li><b>${SSG[g1]} ${ss.grp[g1]}개</b> — ${GRP[g1].s}</li>`:""}</ul></div>
-    <div class="card sec"><h2>2. 지금 겪는 고민의 원인과 해결책</h2>
+    <div class="card sec"><h2><span class="eb">04 · Concerns</span>지금 겪는 고민의 원인과 해결책</h2>
       ${cs.map((k,i)=>`<div class="${i?"blk":""}"><p style="margin:0 0 6px"><span class="tag">${CLAB[k]}</span></p>
         <p style="margin:0 0 6px"><b>원인</b> — ${GRP[g0].t} ${CEFF[k]}</p>
         <p style="margin:0"><b>해결책</b> — ${GRP[g0].tip} ${CTIP[k]}</p></div>`).join("")}</div>
-    <div class="card sec"><h2>3. 초간단 인테리어 팁</h2><ul class="todo">${tips.map(t=>`<li><span>${t}</span></li>`).join("")}</ul></div>
+    <div class="card sec"><h2><span class="eb">05 · Quick Tips</span>초간단 인테리어 팁</h2><ul class="todo">${tips.map(t=>`<li><span>${t}</span></li>`).join("")}</ul></div>
     <p class="note">사주와 풍수 해석은 전통 이론에 바탕을 둔 참고용 정보예요. 배치 진단은 SRC 규칙 중 배치 좌표로 판정되는 항목만 반영했고, 나머지 항목은 평면도·3D 화면의 ‘풍수 점검’ 탭에서 직접 답할 수 있어요.</p>`;
   go("s-report"); runCompare();
 }
@@ -2586,6 +2769,17 @@ function renderMy(){
       <span>${s.w}m × ${s.d}m · 가구 ${s.items.filter(i=>i.type!=="win"&&i.type!=="door").length}개</span></div>
     </div>`).join("") : `<div class="empty" style="padding:20px">저장된 공간이 없어요.</div>`;
 }
+
+/* 햅틱 피드백 */
+let hapT=0;
+function haptic(){
+  const now=Date.now(); if(now-hapT<60) return; hapT=now;
+  try{ if(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.haptic){window.webkit.messageHandlers.haptic.postMessage("light"); return;} }catch(e){}
+  try{ navigator.vibrate&&navigator.vibrate(6); }catch(e){}
+}
+document.addEventListener("pointerdown",e=>{
+  if(e.target.closest&&e.target.closest(".btn,.chip,.cn,.pal,.tab,.tool:not(:disabled),.dbtn,.fchip,.qa,.zc,.ptool button:not(:disabled),.bsr button,.back,.space-card,.fnicons button")) haptic();
+},{passive:true,capture:true});
 
 /* 화면 회전 대응 */
 window.addEventListener("resize",()=>{
