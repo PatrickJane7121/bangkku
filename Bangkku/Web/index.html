@@ -542,6 +542,16 @@ input[type=checkbox]{accent-color:var(--deep)}
 .fix p{white-space:pre-line}
 .exnote{margin:12px 0 0;padding:10px 12px;border-radius:14px;background:#F3EEE4;color:#6E6355;font-size:13px;line-height:1.6}
 #sheet .exnote{margin:0 0 12px}
+.fix.core{border-left-color:var(--rose)}
+.fix.aux{border-left-color:#D9B97E;background:#FFFCF5}
+.tier{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:2px 8px;border-radius:999px;margin:0 0 6px}
+.tier.core{background:var(--rose-soft);color:var(--rose)}
+.tier.aux{background:#F6EEDC;color:#97753F}
+.tierh{font-size:13.5px;font-weight:800;margin:14px 0 8px;letter-spacing:-.2px}
+.tierh.core{color:var(--rose)}
+.tierh.aux{color:#97753F}
+.lv-bad{color:var(--rose);font-weight:700}
+.fix .fid{display:none}
 </style>
 </head>
 <body>
@@ -1017,13 +1027,13 @@ function recommend(room,el){
    sp=적용 공간, tg=타겟, q=진단 질문, o=O(개선 필요) 조건, x=X(통과) 조건, fx=솔루션
    ========================================================= */
 const RULES=[{"id":"SRC-001","sp":"침실","tg":"창문침대","q":"침대 머리와 창문이 같은 축선상에 있고 머리 쪽이 창문을 향하나요?","o":"머리 쪽이 창문을 향하면 아쉬운 배치","x":"창문을 향하지 않으면 통과.","fx":"침대를 창문 축선에서 벗어나게 돌리거나 옮기세요. 불가피하면 침대와 창문 사이에 작은 탁자나 의자를 두세요."},{"id":"SRC-002","sp":"침실","tg":"창문침대","q":"침대가 동쪽에 배치되어 있고 창문과 충분히 떨어져 있나요?","o":"동쪽 배치가 아니거나 창문 가까이에 있으면 개선 필요","x":"두 조건을 모두 충족하면 통과.","fx":"침대를 동쪽으로 옮기고 창문에서 떨어뜨려 배치하세요."},{"id":"SRC-003","sp":"거실","tg":"소파창문","q":"소파가 창문 가까이에 있거나 등 뒤에 벽이 없나요?","o":"창문 가까이에 있거나 등 뒤가 벽으로 지지되지 않으면 개선 필요","x":"창문에서 떨어지고 벽을 등지면 통과.","fx":"소파를 창문에서 떨어뜨리고 등받이가 벽을 향하도록 배치하세요."},{"id":"SRC-004","sp":"공부방서재","tg":"벽책상","q":"책상 사용자가 벽을 등지고 앉으며 출입문에서 가장 먼 자리에 있나요? 책상이 문을 정면으로 향하나요?","o":"벽을 등지지 않거나 문에서 가장 먼 자리가 아니거나 책상이 문을 정면으로 향하면 개선 필요","x":"벽을 등지고 문에서 멀며 문과 정면 대치하지 않으면 통과.","fx":"책상을 출입문에서 가장 먼 벽 쪽으로 옮겨 벽을 등지고 앉게 하세요. 문을 정면으로 마주하지 않도록 방향을 조정하세요."},{"id":"SRC-005","sp":"방","tg":"조명","q":"휴식용의 은은한 조명과 청소·일상용의 밝은 조명을 각각 사용할 수 있나요?","o":"두 조명 모드 중 하나라도 없으면 개선 필요","x":"휴식용·활동용 조명을 모두 구분해 쓰면 통과.","fx":"휴식용 스탠드나 간접등과 청소·작업용 밝은 조명을 분리해 설치하세요."},{"id":"SRC-006","sp":"방","tg":"조명","q":"방 안의 어두운 구석에 조명이 닿나요?","o":"어두운 구석이 조명 없이 남아 있으면 개선 필요","x":"구석까지 빛이 닿으면 통과.","fx":"어두운 구석에 스탠드나 간접 조명을 추가하세요."},{"id":"SRC-007","sp":"방","tg":"조명","q":"방이 사각형이고 조명기구가 둥근 형태인가요?","o":"방이 사각형인데 조명기구가 둥글지 않으면 개선 필요","x":"둥근 조명기구를 사용하면 통과.","fx":"사각형 방에는 원형 또는 둥근 형태의 조명기구를 설치하세요."},{"id":"SRC-008","sp":"방","tg":"조명","q":"방 조명이 눈부시거나 필요 이상으로 밝나요?","o":"눈부심이 있거나 밝기를 낮춰도 과도하면 개선 필요","x":"편안하게 머물 수 있는 밝기면 통과.","fx":"전구 밝기를 낮추거나 조광기를 설치하고, 눈부심이 적은 간접등을 사용하세요."},{"id":"SRC-009","sp":"방","tg":"조명","q":"방이 일상생활에 필요한 밝기를 확보하지 못할 만큼 어둡나요?","o":"방이 지나치게 어둡거나 답답하면 개선 필요","x":"활동과 휴식에 적절한 밝기를 확보하면 통과.","fx":"창문을 가리는 물건을 치우고 밝은 일반 조명이나 간접등을 추가하세요."},{"id":"SRC-010","sp":"방","tg":"화분","q":"방에 생기 있는 녹색 식물이 하나 이상 있나요?","o":"녹색 식물이 없으면 보완 권장","x":"관리 가능한 녹색 식물이 있으면 통과.","fx":"관리하기 쉬운 초록 식물 한 화분을 채광을 막지 않는 곳에 두세요."},{"id":"SRC-011","sp":"방","tg":"금속 종풍경","q":"사람 손이 잘 닿지 않는 구석 창문에 풍경이나 종이 설치되어 있나요?","o":"손이 닿기 어려운 구석 창문에 풍경·종이 없으면 보완 권장","x":"안전하게 설치되어 있으면 통과.","fx":"창문 구석에 풍경이나 작은 종을 떨어지지 않도록 단단히 설치하세요. 방범 장치를 대신하는 용도로 사용하지 마세요."},{"id":"SRC-012","sp":"침실","tg":"풍수색채(침실)","q":"침실에서 화(火) 기운 보완이 필요하거나 강렬한 원색을 사용하고 있나요?","o":"화 기운 보완이 필요하지만 파스텔 포인트가 없거나 강렬한 원색이 과도하면 개선 필요","x":"필요한 경우 부드러운 색으로 보완하고 원색을 절제하면 통과.","fx":"필요 시 빨강·다홍·주황의 파스텔 소품을 더하고, 강렬한 원색은 줄이세요."},{"id":"SRC-013","sp":"침실","tg":"풍수색채(침실)","q":"침실에서 토(土) 기운 보완이 필요하거나 강렬한 원색을 사용하고 있나요?","o":"토 기운 보완이 필요하지만 파스텔 오렌지·노랑 소품이 없거나 원색이 과도하면 개선 필요","x":"부드러운 색으로 보완하고 원색을 절제하면 통과.","fx":"필요 시 귤색·노랑 계열 파스텔 소품을 더하고, 강렬한 원색은 줄이세요."},{"id":"SRC-014","sp":"침실","tg":"풍수색채(침실)","q":"침실에서 목(木) 기운 보완이 필요하거나 강렬한 원색을 사용하고 있나요?","o":"목 기운 보완용 파스텔 색상이 없거나 원색이 과도하면 개선 필요","x":"연두·풀색·파랑 계열을 부드럽게 쓰고 원색을 절제하면 통과.","fx":"필요 시 연두·풀색·파랑·바다색의 파스텔 소품을 더하고 강렬한 원색은 줄이세요."},{"id":"SRC-015","sp":"침실","tg":"풍수색채(침실)","q":"침실에서 금(金) 기운 보완이 필요한데 흰색 포인트가 없나요?","o":"금 기운 보완이 필요하고 흰색 소품이 없으면 개선 필요","x":"필요한 경우 흰색 소품을 활용하면 통과.","fx":"필요하면 침구나 작은 장식에 흰색 포인트를 더하세요."},{"id":"SRC-016","sp":"침실","tg":"풍수색채(침실)","q":"침실에서 수(水) 기운 보완이 필요한데 검정색 포인트가 없나요?","o":"수 기운 보완이 필요하고 검정색 소품이 없으면 개선 필요","x":"필요한 경우 검정색 소품을 활용하면 통과.","fx":"필요하면 쿠션·액자 등 작은 소품에 검정색을 더하세요."},{"id":"SRC-017","sp":"침실","tg":"풍수색채(침실)","q":"함께 침실을 쓰는 사람마다 필요한 색채가 서로 다르나요?","o":"필요 색채가 다르고 한쪽의 색만 강하게 쓰고 있으면 조정 필요","x":"차이를 고려해 색을 절제해 배치하면 통과.","fx":"주 사용자의 필요 색을 기준으로 삼되 채도를 낮춰 침구나 소품에 은은하게 반영하세요."},{"id":"SRC-018","sp":"침실","tg":"풍수색채(침실)","q":"침실에 관계운을 위한 부드러운 포인트 색이 필요하나요?","o":"분홍 계열 포인트가 필요하지만 침실에 없으면 보완 권장","x":"필요한 색을 이미 부드럽게 적용했거나 해당 목적이 없으면 통과.","fx":"원하는 경우 분홍색 쿠션·침구 등 작은 포인트를 더하세요."},{"id":"SRC-019","sp":"침실","tg":"풍수색채(침실)","q":"침실에 희망·성장 분위기를 위한 초록색 또는 밝은 파란색이 있나요?","o":"그런 분위기를 원하지만 초록·밝은 파랑 포인트가 없으면 보완 권장","x":"해당 색을 적절히 사용하거나 필요가 없으면 통과.","fx":"원한다면 초록색이나 밝은 파란색 소품을 침실에 한두 개 배치하세요."},{"id":"SRC-020","sp":"침실","tg":"풍수색채(침실)","q":"결혼을 원하거나 신혼부부가 사용하며 침대보·담요에 분홍색 또는 빨간색 포인트가 있나요?","o":"해당 사용 목적이 있는데 색 포인트가 없으면 보완 권장","x":"포인트가 있거나 해당 목적이 없으면 통과.","fx":"해당되는 경우 침대보나 담요에 분홍색 또는 빨간색 포인트를 더하세요."},{"id":"SRC-021","sp":"침실","tg":"풍수색채(침실)","q":"젊은 사용자의 자기계발을 돕는 색채 연출을 원하며 파란색·초록색 담요가 있나요?","o":"해당 목적이 있는데 파랑·초록 담요가 없으면 보완 권장","x":"색을 활용했거나 해당 목적이 없으면 통과.","fx":"해당되는 경우 파란색이나 초록색 담요를 사용하세요."},{"id":"SRC-022","sp":"공부방","tg":"풍수색채(공부방)","q":"공부방에서 학습 집중을 돕는 검정·파랑·초록 계열 색채를 사용하고 있나요?","o":"학습용 색채 연출을 원하지만 세 색 계열이 없으면 보완 권장","x":"검정·파랑·초록 중 하나 이상을 적절히 사용하면 통과.","fx":"책상 주변 소품이나 수납 가구에 검정·파랑·초록 중 한두 색을 적용하세요."},{"id":"SRC-023","sp":"공부방","tg":"풍수색채(공부방)","q":"사고력 향상을 위해 공부방 가구에 검정색을 활용하고 있나요?","o":"검정색을 활용하려는 목적이 있는데 가구에 반영되지 않으면 보완 권장","x":"검정색 가구를 사용하거나 다른 색채 계획을 유지하면 통과.","fx":"원한다면 책상·수납장 일부에 검정색을 적용하세요. 방 전체를 어둡게 칠하지는 마세요."},{"id":"SRC-024","sp":"침실","tg":"풍수색채(침실)","q":"노년층 사용자의 침실에서 노란색 담요를 사용하고 있나요?","o":"노년층 사용자가 있고 노란색 담요를 활용하지 않으면 보완 권장","x":"노란색 담요를 사용하거나 해당 사용자가 없으면 통과.","fx":"해당되는 경우 노란색 담요를 침구에 활용하세요."},{"id":"SRC-025","sp":"서재","tg":"풍수색채(공부방)","q":"서재 사용자가 깊이 생각하는 책을 선호하고 갈색 색채가 있나요?","o":"깊이 읽는 책을 선호하지만 갈색 포인트가 없으면 보완 권장","x":"갈색을 활용했거나 해당 취향이 없으면 통과.","fx":"해당되는 경우 갈색 책상 소품이나 패브릭을 추가하세요."},{"id":"SRC-026","sp":"공부방","tg":"풍수색채(공부방)","q":"안정적인 분위기가 필요한 어린이가 사용하며 흰색·검정색·갈색 가구나 벽이 있나요?","o":"차분한 분위기가 필요한데 해당 색채가 전혀 반영되지 않으면 개선 필요","x":"흰색·검정색·갈색을 일부 적용하거나 해당 조건이 없으면 통과.","fx":"책상·수납장 또는 일부 벽면에 흰색·검정색·갈색을 선택적으로 적용하세요."},{"id":"SRC-027","sp":"서재","tg":"풍수색채(공부방)","q":"서재 사용자가 가벼운 독서를 선호하고 연한 파랑·밝은 초록·분홍색 중 하나가 있나요?","o":"해당 취향인데 세 색 중 어느 것도 없으면 보완 권장","x":"세 색 중 하나를 활용하거나 해당 취향이 없으면 통과.","fx":"해당되는 경우 연한 파랑·밝은 초록·분홍색 중 하나를 소품이나 패브릭에 적용하세요."},{"id":"SRC-028","sp":"거실","tg":"풍수색채(거실)","q":"거실에 황토색·옅은 갈색·아이보리 계열이 활용되어 있나요?","o":"거실에 토(土)를 상징하는 색 계열이 거의 없으면 보완 권장","x":"세 계열 중 하나 이상을 주요 색 또는 포인트로 쓰면 통과.","fx":"거실 쿠션·러그·벽면 중 한 곳에 황토색, 옅은 갈색 또는 아이보리를 적용하세요."},{"id":"SRC-029","sp":"주방","tg":"풍수색채(주방)","q":"주방에 흰색 계열이 충분히 활용되어 있나요?","o":"주방에 흰색 계열이 거의 없으면 보완 권장","x":"수납장·벽·조리도구 등에 흰색 계열이 있으면 통과.","fx":"주방의 한 면이나 자주 쓰는 용품에 흰색 계열을 적용하세요."},{"id":"SRC-030","sp":"주방","tg":"풍수색채(주방)","q":"주방이 좁은데 짙은 색이 넓은 면적을 차지하나요?","o":"좁은 주방에서 짙은 색이 주조색이면 개선 필요","x":"밝은 색이 중심이거나 공간이 좁지 않으면 통과.","fx":"벽·수납장·커튼의 짙은 색 면적을 줄이고 밝은 색으로 바꾸세요."},{"id":"SRC-031","sp":"방위 (공통)","tg":"북동","q":"북동쪽 구역에 먼지나 정리되지 않은 물건이 쌓여 있나요?","o":"북동 구역이 지저분하거나 물건이 쌓여 있으면 개선 필요","x":"해당 구역이 깨끗하고 정돈되어 있으면 통과.","fx":"북동쪽 구역을 청소하고 바닥과 선반의 불필요한 물건을 치우세요."},{"id":"SRC-032","sp":"방위 (공통)","tg":"남동","q":"남동쪽 구역에 온화하고 따뜻한 분위기의 소품이 있나요?","o":"남동 구역이 차갑거나 무거운 느낌이고 부드러운 소품이 없으면 보완 권장","x":"온화하고 따뜻한 소품이 있으면 통과.","fx":"남동쪽에 따뜻한 색의 작고 부드러운 장식품을 배치하세요."},{"id":"SRC-033","sp":"방위 (공통)","tg":"동쪽","q":"동쪽 구역이 무겁고 중후한 장식 위주로 꾸며져 있나요?","o":"중후한 분위기가 주를 이루면 개선 필요","x":"생기 있고 가벼운 분위기면 통과.","fx":"무겁고 큰 장식 일부를 덜어내고 밝고 생기 있는 소품으로 바꾸세요."},{"id":"SRC-034","sp":"방위 (공통)","tg":"남서","q":"남서쪽 구역에 잡동사니가 쌓였거나 어둡고 흙 소재 소품이 없나요?","o":"정돈되지 않았거나 어둡고 토기·도자기 소품이 없으면 개선 필요","x":"깨끗하고 밝으며 도자기 소품을 활용하면 통과.","fx":"남서쪽을 청소하고 도자기 소품을 하나 두며 조명을 밝게 조정하세요."},{"id":"SRC-035","sp":"방위 (공통)","tg":"남쪽","q":"남쪽 구역이 어둡고 무거운 소품 위주로 꾸며져 있나요?","o":"어둡고 무거운 소품이 주를 이루면 개선 필요","x":"밝고 화사한 분위기면 통과.","fx":"어둡고 무거운 소품을 줄이고 밝은 장식이나 작은 키의 화분을 배치하세요."},{"id":"SRC-036","sp":"방위 (공통)","tg":"북쪽","q":"북쪽 구역이 차갑고 어두우며 따뜻한 조명·색감이 부족하나요?","o":"차갑고 어두운 느낌이 강하면 개선 필요","x":"따뜻하고 밝은 분위기를 확보하면 통과.","fx":"따뜻한 색의 스탠드를 켜고 밝은 색 매트나 온화한 소품을 더하세요."},{"id":"SRC-037","sp":"방위 (공통)","tg":"서쪽","q":"서쪽 구역에 둥근 형태의 소품이나 황금색 계열이 있나요?","o":"서쪽 공간을 꾸미려는데 두 특징이 모두 없으면 보완 권장","x":"둥근 소품 또는 황금색 계열을 활용하면 통과.","fx":"둥근 장식품이나 황금색 계열 소품을 한두 개 배치하세요."},{"id":"SRC-038","sp":"거실","tg":"소파","q":"소파가 거실 규모에 비해 지나치게 커서 동선이나 다른 가구를 압도하나요?","o":"소파가 공간을 과도하게 차지하거나 동선을 막으면 개선 필요","x":"거실 규모와 동선에 맞으면 통과.","fx":"작은 규격의 소파로 바꾸거나 위치를 조정해 통로와 다른 가구 공간을 확보하세요."},{"id":"SRC-039","sp":"방위 (공통)","tg":"북서","q":"북서쪽 구역의 소품이 가볍고 허술해 중후한 포인트가 부족하나요?","o":"북서 구역에 단단하고 품질 좋은 포인트가 없으면 보완 권장","x":"공간에 맞는 중후한 소품이 있으면 통과.","fx":"북서쪽에 크기와 공간에 맞는 견고하고 품질 좋은 소품 하나를 두세요."},{"id":"SRC-040","sp":"거실","tg":"벽소파","q":"소파가 벽을 등지지 않거나 현관을 마주하거나, 창문을 등지거나, 화장실이 보이나요?","o":"나열한 배치 중 하나라도 해당하면 개선 필요","x":"벽을 등지고 출입문·창문·화장실과 불리하게 마주하지 않으면 통과.","fx":"소파 등받이를 벽에 붙이고 현관 정면·창문 등짐·화장실 시야를 피하도록 위치를 조정하세요."},{"id":"SRC-041","sp":"방위(주방)","tg":"주방(북쪽)","q":"북쪽 주방이 어둡거나 물기가 남고, 목재 용품이 부족하나요?","o":"조명이 어둡거나 물기가 고이거나 목재 용품이 거의 없으면 개선 필요","x":"밝고 건조하며 청결하면 통과.","fx":"밝은 조명을 사용하고 물기를 바로 닦아 건조하게 유지하세요. 자주 쓰는 용품 일부를 목재로 바꾸세요."},{"id":"SRC-042","sp":"방위(주방)","tg":"주방(북동)","q":"북동쪽 주방에 쓰레기가 남거나 식후 설거지를 미루나요?","o":"쓰레기·설거지가 방치되면 개선 필요","x":"불필요한 쓰레기를 바로 버리고 식후 설거지를 하면 통과.","fx":"쓰레기는 즉시 비우고 식사 후 바로 설거지하세요."},{"id":"SRC-043","sp":"방위(주방)","tg":"주방(동쪽)","q":"동쪽 주방 조리대에 사용하지 않는 가전이나 플라스틱 제품이 과도하게 놓여 있나요?","o":"가전·플라스틱 제품이 조리 공간을 과도하게 차지하면 개선 필요","x":"필요한 제품만 정돈해 두면 통과.","fx":"사용하지 않는 가전을 치우고 조리대의 플라스틱 제품을 줄이세요."},{"id":"SRC-044","sp":"방위(주방)","tg":"주방(남동)","q":"남동쪽 주방의 환기가 원활하나요?","o":"조리 후 냄새와 습기가 빠지지 않으면 개선 필요","x":"창문이나 환풍기로 공기가 배출되면 통과.","fx":"조리 중 환풍기를 켜고 가능한 경우 창문을 열어 공기를 순환시키세요."},{"id":"SRC-045","sp":"방위(주방)","tg":"주방(남쪽)","q":"남쪽 주방에 금속 제품이 과도하거나 흙·도자기 소품이 없나요?","o":"금속 제품이 주를 이루고 토기·도자기 소품이 없으면 개선 필요","x":"금속 제품을 절제하고 도자기류를 활용하면 통과.","fx":"불필요한 금속 장식을 줄이고 흙으로 만든 그릇이나 도자기 소품을 두세요."},{"id":"SRC-046","sp":"방위(주방)","tg":"주방(남서)","q":"남서쪽 주방에 잡동사니가 있거나 실용적인 정리 방식이 부족하나요?","o":"주방이 어수선하거나 실용적으로 정돈되지 않으면 개선 필요","x":"깨끗하고 쓰기 편하게 정리되어 있으면 통과.","fx":"조리대와 수납장을 정리하고 자주 쓰는 실용적인 도구만 손 닿는 곳에 두세요."},{"id":"SRC-047","sp":"방위(주방)","tg":"주방(서쪽)","q":"서쪽 주방의 식기가 어지럽거나 붉은색 계열이 주조색인가요?","o":"식기가 어지럽거나 붉은색이 주조색이면 개선 필요","x":"식기가 정돈되고 붉은색이 과도하지 않으면 통과.","fx":"식기를 정리하고 붉은색 면적을 줄인 뒤 황금색 계열 소품을 더하세요."},{"id":"SRC-048","sp":"방위(주방)","tg":"주방(북서)","q":"북서쪽 주방의 인테리어나 주방용품이 낡고 허술하나요?","o":"주방용품이 낡았거나 전체가 허술해 보이면 개선 필요","x":"정돈되고 품질이 유지되면 통과.","fx":"자주 쓰는 주방용품부터 상태 좋은 제품으로 교체하고 고풍스러운 소품을 소량 더하세요."},{"id":"SRC-049","sp":"방위(침실)","tg":"침실(북쪽)","q":"북쪽 침실이 차갑거나 습하고 금속 가구가 주를 이루나요?","o":"냉기·습기가 있거나 금속 가구가 중심이면 개선 필요","x":"따뜻하고 건조하며 목재 가구를 활용하면 통과.","fx":"환기와 제습으로 건조하게 유지하고 따뜻한 패브릭을 더하세요. 가능하면 금속 가구 일부를 목재 가구로 바꾸세요."},{"id":"SRC-050","sp":"방위(침실)","tg":"침실(북동)","q":"북동쪽 침실에 잡동사니가 쌓여 있거나 정돈되지 않았나요?","o":"물건이 쌓이거나 지저분하면 개선 필요","x":"단순하고 깨끗하게 정돈되어 있으면 통과.","fx":"불필요한 물건을 치우고 침실을 단순하게 정리하세요. 원하면 갓등·크리스탈·종 중 하나를 안전하게 설치하세요."},{"id":"SRC-051","sp":"방위(침실)","tg":"침실(동쪽)","q":"동쪽 침실의 커튼이 아침 햇살을 완전히 차단하거나 가전제품이 과도하나요?","o":"완전 차광 커튼을 쓰거나 가전제품이 과도하면 개선 필요","x":"아침 햇살을 일부 들이고 가전제품을 절제하면 통과.","fx":"완전 차광 커튼을 빛 조절이 가능한 커튼으로 바꾸고 사용하지 않는 가전을 침실 밖으로 옮기세요."},{"id":"SRC-052","sp":"방위(침실)","tg":"침실(남쪽)","q":"남쪽 침실이 지나치게 밝아 잠을 방해하며 황토색·도자기 포인트가 없나요?","o":"과도한 밝음이 있고 이를 누그러뜨릴 토(土) 계열 포인트가 없으면 개선 필요","x":"수면에 적절한 밝기이고 부드러운 색채를 쓰면 통과.","fx":"조명을 낮춰 수면 환경을 만들고 황토색 계열 패브릭이나 도자기 소품을 더하세요."},{"id":"SRC-053","sp":"방위(침실)","tg":"침실(남동)","q":"남동쪽 침실의 통로가 막히거나 어둡고 금속 제품이 주를 이루나요?","o":"동선이 막히거나 어둡거나 금속 제품이 과도하면 개선 필요","x":"동선이 열려 있고 밝으며 목재 가구가 중심이면 통과.","fx":"통로의 물건을 치우고 조명을 보완하세요. 목재 가구를 우선하고 불필요한 금속 제품은 줄이세요."},{"id":"SRC-054","sp":"방위(침실)","tg":"침실(남서)","q":"남서쪽 침실에 먼지·잡동사니·낡은 장식이 있거나 침구와 커튼이 칙칙하고 더럽나요?","o":"청결 문제나 낡고 바랜 침구·장식이 있으면 개선 필요","x":"깨끗하고 산뜻하며 포근한 분위기면 통과.","fx":"침구와 커튼을 세탁하고 낡은 장식을 치우세요. 바닥과 모서리를 청소하고 따뜻한 색의 패브릭을 사용하세요."},{"id":"SRC-055","sp":"방위(침실)","tg":"침실(서쪽)","q":"서쪽 침실이 어수선하거나 황금색 계열 포인트가 없나요?","o":"침실이 정돈되지 않았거나 황금색 포인트가 없으면 개선 필요","x":"깔끔하고 황금색 계열을 적절히 쓰면 통과.","fx":"침실을 청소하고 황금색 포인트를 침구나 작은 소품에 더하세요. 가구는 가능한 경우 모서리가 둥근 형태를 선택하세요."},{"id":"SRC-056","sp":"방위(침실)","tg":"침실(북서)","q":"북서쪽 침실에 공간 규모에 맞는 크고 품질 좋은 가구나 소품이 있나요?","o":"북서쪽 침실의 가구·소품이 공간에 비해 지나치게 작거나 허술하면 보완 권장","x":"공간에 맞는 견고한 포인트가 있으면 통과.","fx":"북서쪽에 방 크기에 맞는 튼튼하고 품질 좋은 가구나 소품 하나를 배치하세요."},{"id":"SRC-057","sp":"침실","tg":"벽침대","q":"침대와 벽 사이 간격이 30cm 미만인가요? 침대가 없다면 이부자리를 방 중앙에 펴나요?","o":"침대가 벽에서 30cm 미만이거나 침대가 없는데 이부자리가 중앙에 있지 않으면 개선 필요","x":"침대 간격이 30cm 이상이거나 이부자리가 중앙에 있으면 통과.","fx":"침대를 벽에서 30cm 이상 띄우세요. 침대가 없다면 이부자리를 방 중앙에 펴세요."},{"id":"SRC-058","sp":"침실","tg":"침대","q":"침대 머리 부분이 방문과 일직선상에 있거나 침대가 문에서 대각선 위치가 아닌가요?","o":"침대 머리가 방문 축선에 놓이거나 대각선 배치가 아니면 개선 필요","x":"문을 비껴 보는 대각선 위치이고 머리가 문과 일치하지 않으면 통과.","fx":"침대를 문에서 비껴 보이는 대각선 위치로 옮기고 침대 머리가 방문과 일직선이 되지 않게 하세요."},{"id":"SRC-059","sp":"침실","tg":"풍수 인테리어","q":"침실 분위기가 평안하고 안락하며 침대커버가 따뜻한 느낌의 면제품인가요?","o":"침실이 불편하거나 침대커버가 차갑고 거친 느낌이면 개선 필요","x":"평안하고 안락하며 면 소재 커버를 쓰면 통과.","fx":"침실의 시각적 잡음을 줄이고 부드러운 면 소재의 따뜻한 색 침대커버를 사용하세요."},{"id":"SRC-060","sp":"침실","tg":"풍수 인테리어","q":"침실 조명이 지나치게 어둡거나 밝아 긴장을 풀고 잠들기 어렵나요?","o":"너무 어둡거나 눈부실 정도로 밝으면 개선 필요","x":"편안하게 쉴 수 있는 적절한 밝기면 통과.","fx":"조광 가능한 전구나 스탠드를 사용하세요. 잠들기 전에는 눈부심을 줄이되 안전하게 움직일 밝기는 유지하세요."},{"id":"SRC-061","sp":"침실","tg":"풍수 인테리어","q":"TV를 켠 채 자거나 화분·꽃병·어항을 침실에 두고 있나요?","o":"취침 중 TV가 켜져 있거나 화분·꽃병·어항이 침실에 있으면 개선 필요","x":"TV를 끄고 해당 물건을 침실 밖에 두면 통과.","fx":"취침 전에 TV를 끄고 화분·꽃병·어항을 침실 밖으로 옮기세요."},{"id":"SRC-062","sp":"침실","tg":"풍수 인테리어","q":"침실 창문에 커튼이 없거나 외풍 때문에 실내 온도가 유지되지 않나요?","o":"커튼이 없거나 외풍·온도 변화가 불편하면 개선 필요","x":"커튼과 기밀 상태로 적정 온도를 유지하면 통과.","fx":"창문에 커튼을 설치하고 틈새를 막아 외풍을 줄이세요."},{"id":"SRC-063","sp":"침실","tg":"풍수 인테리어","q":"침대에서 거울에 비친 자신의 모습이 보이거나 침실 공기가 환기되지 않나요?","o":"침대에서 거울상이 보이거나 공기가 답답하면 개선 필요","x":"거울 반사가 없고 주기적으로 환기하면 통과.","fx":"거울을 침대가 비치지 않는 위치로 옮기거나 가리세요. 매일 창문을 열어 환기하고, 원하면 편안한 풍경화를 시야에 두세요."},{"id":"SRC-064","sp":"침실","tg":"풍수 인테리어","q":"외출복을 침실에서 갈아입거나 벗은 옷을 열린 채로 두나요?","o":"외출복을 침실에서 갈아입거나 벗은 옷을 밖에 두면 개선 필요","x":"침실 밖에서 갈아입고 옷을 닫힌 옷장에 넣으면 통과.","fx":"외출복은 침실 밖에서 갈아입고 벗은 옷은 문이 달린 옷장에 넣으세요."},{"id":"SRC-065","sp":"화장실","tg":"비보풍수","q":"욕실이나 화장실 문이 사용하지 않을 때도 열려 있나요?","o":"사용 후 문을 열어 두면 개선 필요","x":"사용 후 문을 닫아 두면 통과.","fx":"욕실과 화장실을 사용한 뒤 문을 닫아 두세요."},{"id":"SRC-066","sp":"화장실","tg":"비보풍수","q":"북동쪽 화장실이 구석까지 청소되지 않았거나 환기가 부족하고 조명이 차갑나요?","o":"청결·환기·따뜻한 조명 중 하나라도 부족하면 개선 필요","x":"깨끗하고 환기되며 온화한 조명이면 통과.","fx":"모서리까지 청소하고 환풍기를 사용하세요. 따뜻하고 온화한 색온도의 조명을 설치하세요."},{"id":"SRC-067","sp":"화장실","tg":"변기세면대","q":"세면대와 변기가 서로 떨어져 있나요? 떨어뜨릴 수 없다면 서로 마주 보게 배치되어 있나요?","o":"가깝게 설치되어 있으면서 서로 마주 보지 않으면 개선 필요","x":"떨어져 있거나 불가피한 경우 서로 마주 보면 통과.","fx":"가능하면 세면대와 변기를 떨어뜨려 배치하세요. 불가피하게 가까우면 설치 여건이 허용하는 범위에서 서로 마주 보게 조정하세요."},{"id":"SRC-068","sp":"화장실","tg":"비보풍수","q":"화장실 문이나 개구부가 계단 또는 주방 쪽을 향하나요?","o":"화장실이 계단이나 주방을 향하면 개선 필요","x":"두 공간을 향하지 않으면 통과.","fx":"가능하면 화장실 출입 방향을 조정하세요. 구조 변경이 어렵다면 문을 닫고 시야를 가리는 가림막을 설치하세요."},{"id":"SRC-069","sp":"실내 공간(공통)","tg":"좌측 상단","q":"좌측 상단 구역에 먼지나 불필요한 물건이 쌓여 있나요?","o":"해당 구역이 지저분하거나 물건이 쌓여 있으면 개선 필요","x":"깨끗하고 정돈되어 있으면 통과.","fx":"좌측 상단 구역을 청소하고 불필요한 물건을 치운 뒤 필요한 물건만 분류해 보관하세요."},{"id":"SRC-070","sp":"실내 공간(공통)","tg":"중앙 상단","q":"중앙 상단 구역에 먼지나 불필요한 물건이 쌓여 있나요?","o":"해당 구역이 지저분하거나 물건이 쌓여 있으면 개선 필요","x":"깨끗하고 정돈되어 있으면 통과.","fx":"중앙 상단 구역을 닦고 쌓인 물건을 치우세요. 자주 쓰지 않는 물건은 수납장에 넣으세요."},{"id":"SRC-071","sp":"실내 공간(공통)","tg":"좌측 중간","q":"좌측 중간 구역에 먼지나 불필요한 물건이 쌓여 있나요?","o":"해당 구역이 지저분하거나 물건이 쌓여 있으면 개선 필요","x":"깨끗하고 정돈되어 있으면 통과.","fx":"좌측 중간 구역을 청소하고 바닥·선반의 불필요한 물건을 정리하세요."},{"id":"SRC-072","sp":"실내 공간(공통)","tg":"우측 상단","q":"우측 상단 구역에 먼지나 불필요한 물건이 쌓여 있나요?","o":"해당 구역이 지저분하거나 물건이 쌓여 있으면 개선 필요","x":"깨끗하고 정돈되어 있으면 통과.","fx":"우측 상단 구역을 닦고 물건을 종류별로 정리해 표면을 비우세요."},{"id":"SRC-073","sp":"실내 공간(공통)","tg":"중앙","q":"중앙 구역에 먼지나 불필요한 물건이 쌓여 있나요?","o":"해당 구역이 지저분하거나 물건이 쌓여 있으면 개선 필요","x":"깨끗하고 정돈되어 있으면 통과.","fx":"중앙 구역의 바닥과 표면을 비우고 청소하세요. 필요한 물건은 가장자리나 수납장으로 옮기세요."},{"id":"SRC-074","sp":"실내 공간(공통)","tg":"좌측 하단","q":"좌측 하단 구역에 먼지나 불필요한 물건이 쌓여 있나요?","o":"해당 구역이 지저분하거나 물건이 쌓여 있으면 개선 필요","x":"깨끗하고 정돈되어 있으면 통과.","fx":"좌측 하단 구역을 청소하고 사용하지 않는 물건을 버리거나 수납하세요."},{"id":"SRC-075","sp":"실내 공간(공통)","tg":"우측 중간","q":"우측 중간 구역에 먼지나 불필요한 물건이 쌓여 있나요?","o":"해당 구역이 지저분하거나 물건이 쌓여 있으면 개선 필요","x":"깨끗하고 정돈되어 있으면 통과.","fx":"우측 중간 구역의 잡동사니를 정리하고 자주 쓰는 물건만 손 닿는 곳에 두세요."},{"id":"SRC-076","sp":"실내 공간(공통)","tg":"중앙 하단","q":"중앙 하단 구역에 먼지나 불필요한 물건이 쌓여 있나요?","o":"해당 구역이 지저분하거나 물건이 쌓여 있으면 개선 필요","x":"깨끗하고 정돈되어 있으면 통과.","fx":"중앙 하단 구역을 청소하고 바닥에 놓인 물건을 정리해 통로를 확보하세요."},{"id":"SRC-077","sp":"실내 공간(공통)","tg":"우측 하단","q":"우측 하단 구역에 먼지나 불필요한 물건이 쌓여 있나요?","o":"해당 구역이 지저분하거나 물건이 쌓여 있으면 개선 필요","x":"깨끗하고 정돈되어 있으면 통과.","fx":"우측 하단 구역을 청소하고 물건을 필요한 것만 남겨 수납하세요."},{"id":"SRC-078","sp":"침실","tg":"풍수 인테리어","q":"침대커버·커튼·이불이 깨끗하고 보송보송한 상태인가요?","o":"침구나 커튼이 더럽거나 눅눅하면 개선 필요","x":"깨끗하고 완전히 건조되어 있으면 통과.","fx":"침대커버·커튼·이불을 정기적으로 세탁하고 완전히 말린 뒤 사용하세요."}];
-RULES.push({id:"DX-FLOW",sp:"방",tg:"동선",q:"가구와 가구, 가구와 벽 사이에 편하게 지나다닐 틈이 있나요?",
-  o:"30cm보다 좁은 어정쩡한 틈, 겹친 가구, 막힌 문 앞, 좁은 의자·침대 진입 공간이 있으면 개선 필요",
-  x:"가구 사이가 딱 붙어 있거나 30cm 이상 떨어져 있고, 문 앞·의자 뒤·침대 옆이 열려 있으면 통과.",
-  fx:"가구를 서로(또는 벽에) 딱 붙이거나 30cm 이상 띄워 지나다닐 공간을 만들어 주세요."});
+RULES.push(
+  {id:"DX-BLOCK",sp:"방",tg:"동선",q:"문 앞 통로가 열려 있고 가구끼리 겹치지 않나요?",o:"문 앞 1m를 가구가 막거나 가구가 서로 겹치면 개선 필요",x:"문 앞이 비어 있고 겹친 가구가 없으면 통과.",fx:"문 앞 1m를 비우고 겹친 가구를 떼어 놓아 주세요."},
+  {id:"DX-ACCESS",sp:"방",tg:"동선",q:"책상 의자를 빼고 앉을 공간과 침대에 오르내릴 공간이 있나요?",o:"의자 쪽 공간이 60cm 미만이거나 침대 양옆이 모두 50cm 미만이면 개선 필요",x:"의자 뒤 60cm, 침대 한쪽 50cm 이상이 비어 있으면 통과.",fx:"책상 의자 쪽은 60cm, 침대 한쪽은 50cm 이상 비워 주세요."},
+  {id:"DX-GAP",sp:"방",tg:"동선",q:"가구와 가구, 가구와 벽 사이에 어정쩡한 틈(2~30cm)이 없나요?",o:"30cm보다 좁은 틈이 있으면 청소·통행이 불편해 개선 권장",x:"딱 붙어 있거나 30cm 이상 떨어져 있으면 통과.",fx:"가구를 서로(또는 벽에) 딱 붙이거나 30cm 이상 띄워 주세요."});
 const R=id=>RULES.find(r=>r.id===id);
 // 배치로 자동 판정하는 규칙 (나머지는 사용자가 O/X로 답변)
-const AUTO_IDS=["SRC-001","SRC-002","SRC-003","SRC-004","SRC-038","SRC-040","SRC-057","SRC-058","DX-FLOW"];
+const AUTO_IDS=["SRC-001","SRC-002","SRC-003","SRC-004","SRC-038","SRC-040","SRC-057","SRC-058","DX-BLOCK","DX-ACCESS","DX-GAP"];
 const WALLS=[["N","북"],["E","동"],["S","남"],["W","서"]];
 const DIRS=[["북","북"],["북동","북동"],["동","동"],["남동","남동"],["남","남"],["남서","남서"],["서","서"],["북서","북서"],["?","모름"]];
 const OPP={N:"S",S:"N",E:"W",W:"E"}, SD=["N","E","S","W"];
@@ -1105,6 +1115,35 @@ const dir8=b=>DIR8[Math.round((((b%360)+360)%360)/45)%8];
 function scrVec(b,r){const a=(b-headOf(r))*Math.PI/180; return [Math.sin(a),-Math.cos(a)];}   // 방위 b가 화면에서 가리키는 방향 (x 오른쪽, y 아래)
 function bearingAt(cx,cy,r){return ((Math.atan2(cx/r.w-0.5,-(cy/r.d-0.5))*180/Math.PI+headOf(r))%360+360)%360;}
 const sideName=(sd,r)=>dir8(SIDE_B[sd]+headOf(r))+"쪽";        // 화면 기준 N/E/S/W 면 → 실제 방위 이름
+/* =========================================================
+   배치 룰북 — 핵심(필수, 가중치 3) / 보조(선택, 가중치 1)
+   치명적인 흉살·생활 불편은 핵심, 미세한 간격·인테리어 팁은 보조로 두어 점수가 과하게 깎이지 않게 함
+   ========================================================= */
+const RULEBOOK={
+  "SRC-058":  {tier:"core",w:3,t:"bed", label:"침대와 문 (일직선·대각선)"},
+  "SRC-001":  {tier:"core",w:3,t:"bed", label:"침대 머리와 창문"},
+  "SRC-004":  {tier:"core",w:3,t:"desk",label:"책상 자리"},
+  "SRC-040":  {tier:"core",w:3,t:"sofa",label:"소파 자리"},
+  "DX-BLOCK": {tier:"core",w:3,         label:"문 앞 통로·가구 겹침"},
+  "DX-ACCESS":{tier:"core",w:3,         label:"의자·침대 진입 공간"},
+  "SRC-002":  {tier:"aux", w:1,t:"bed", label:"침대 위치 (동쪽)"},
+  "SRC-003":  {tier:"aux", w:1,t:"sofa",label:"소파와 창문"},
+  "SRC-038":  {tier:"aux", w:1,t:"sofa",label:"소파 크기"},
+  "SRC-057":  {tier:"aux", w:1,t:"bed", label:"침대와 벽 간격"},
+  "DX-GAP":   {tier:"aux", w:1,         label:"가구 사이 어정쩡한 틈"}
+};
+const tierOf=id=>RULEBOOK[id]?RULEBOOK[id].tier:"aux";       // 사용자 답변(인테리어 팁)은 보조
+const weightOf=id=>RULEBOOK[id]?RULEBOOK[id].w:1;
+const labelOf=id=>RULEBOOK[id]?RULEBOOK[id].label:(R(id)?R(id).tg:"배치");
+const TIER_NAME={core:"필수",aux:"보조"};
+// 가중 점수: 통과한 가중치 / 판정한 가중치. entries=[{id,bad}]
+function weighScore(entries){
+  const o={tot:0,pass:0,coreTot:0,corePass:0,auxTot:0,auxPass:0,coreBad:0,auxBad:0};
+  entries.forEach(({id,bad})=>{const w=weightOf(id), core=tierOf(id)==="core"; o.tot+=w; if(!bad) o.pass+=w;
+    if(core){o.coreTot++; if(bad) o.coreBad++; else o.corePass++;} else {o.auxTot++; if(bad) o.auxBad++; else o.auxPass++;}});
+  o.pct=o.tot?Math.round(o.pass/o.tot*100):null;
+  return o;
+}
 /* 침대 이격(SRC-057) 적용 기준 — 방이 넉넉할 때만 침대를 벽에서 띄우도록 권함 */
 const BEDGAP={minArea:11.5, gap:0.3, walk:0.6};    // 최소 면적(㎡, ≈3.5평), 벽과 띄울 거리(m), 침대 옆 통로(m)
 function bedGapCheck(bed,room){
@@ -1116,44 +1155,101 @@ function bedGapNote(items,room){
   const bed=items.map(withBB).find(i=>i.type==="bed"); if(!bed) return "";
   const g=bedGapCheck(bed,room); if(g.ok) return "";
   const why=g.area<BEDGAP.minArea?`방이 약 ${g.area.toFixed(1)}㎡(${(g.area/3.3058).toFixed(1)}평)로 아담해서`:`침대 옆 폭이 ${g.across.toFixed(1)}m로 좁아서`;
-  return `ℹ️ ${why} ‘침대를 벽에서 30cm 띄우기’ 규칙은 적용하지 않았어요. 좁은 방은 침대를 벽에 붙이는 편이 동선에 더 좋아요.`;
+  return `${why} 벽에 붙이는 편이 동선에 더 좋아요`;
 }
 /* 가구 간 최소 동선(인체공학) — 어정쩡한 틈·겹침·막힌 문 앞·의자/침대 진입 공간 */
 const FLOW={min:0.3, flush:0.02, chair:0.6, bedSide:0.5};
+const SOFA_BACK=0.1;          // 소파 등받이가 '벽에 기댄' 것으로 보는 최대 거리 (벽 긁힘 방지용 10cm까지 허용)
 const fname=it=>FURN[it.type]?FURN[it.type].name:"가구";
 const cm=v=>Math.round(v*100)+"cm";
+const eul=w=>{const c=String(w).charCodeAt(String(w).length-1); return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28?"을":"를";};
 const iga=w=>{const c=String(w).charCodeAt(String(w).length-1); return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28?"이":"가";};   // 받침에 따라 이/가
 function flowIssues(items0,room){
+  const skip=room.flowSkip||{};
   const all=items0.map(withBB), furn=all.filter(i=>!isOpen(i)&&(FURN[i.type]?FURN[i.type].h:1)>=0.1);   // 러그처럼 납작한 건 제외
   const doors=items0.filter(i=>i.type==="door"), out=[];
   for(let i=0;i<furn.length;i++) for(let j=i+1;j<furn.length;j++){          // 가구 ↔ 가구
     const a=furn[i], b=furn[j];
     const gx=Math.max(b.x-(a.x+a.w),a.x-(b.x+b.w)), gy=Math.max(b.y-(a.y+a.d),a.y-(b.y+b.d));
-    if(gx<-0.05&&gy<-0.05) out.push({k:"overlap",t:`${fname(a)} ↔ ${fname(b)}: 서로 겹쳐 있어요 — 겹치지 않게 옮겨 주세요`});
+    if(gx<-0.05&&gy<-0.05) out.push({k:"overlap",ids:[a.id,b.id],t:`${fname(a)} ↔ ${fname(b)}: 서로 겹쳐 있어요 — 겹치지 않게 옮겨 주세요`});
     else{const g=(gx>=-0.05&&gy<0)?gx:(gy>=-0.05&&gx<0)?gy:null;
-      if(g!=null&&g>FLOW.flush&&g<FLOW.min) out.push({k:"gap",t:`${fname(a)} ↔ ${fname(b)} 사이 ${cm(g)} — 딱 붙이거나 ${cm(FLOW.min)} 이상 띄워 주세요`});}
+      if(g!=null&&g>FLOW.flush&&g<FLOW.min) out.push({k:"gap",ids:[a.id,b.id],g,t:`${fname(a)} ↔ ${fname(b)} 사이 ${cm(g)} — 딱 붙이거나 ${cm(FLOW.min)} 이상 띄워 주세요`});}
   }
   furn.forEach(it=>{                                                        // 가구 ↔ 벽
-    const near=["N","E","S","W"].map(sd=>[sd,gap(it,sd,room)]).filter(([,g])=>g>FLOW.flush&&g<FLOW.min).sort((a,b)=>a[1]-b[1])[0];
-    if(near) out.push({k:"wall",t:`${fname(it)} ↔ ${sideName(near[0],room)} 벽 ${cm(near[1])} — 벽에 딱 붙이거나 ${cm(FLOW.min)} 이상 띄워 주세요`});
+    const back=it.type==="sofa"?dirOf(it):null;
+    const near=["N","E","S","W"].map(sd=>[sd,gap(it,sd,room)]).filter(([sd,g])=>g>FLOW.flush&&g<FLOW.min&&!(sd===back&&g<=SOFA_BACK)).sort((a,b)=>a[1]-b[1])[0];
+    if(near) out.push({k:"wall",ids:[it.id],g:near[1],side:near[0],t:`${fname(it)} ↔ ${sideName(near[0],room)} 벽 ${cm(near[1])} — 벽에 딱 붙이거나 ${cm(FLOW.min)} 이상 띄워 주세요`});
   });
   const raw=items0.filter(i=>!isOpen(i)&&(FURN[i.type]?FURN[i.type].h:1)>=0.1);
-  doors.forEach(d=>{const z=doorZone(d,room); raw.forEach(it=>{if(overlap(it,z)) out.push({k:"door",t:`${fname(it)}${iga(fname(it))} 문 앞 통로를 막아요 — 문 앞 1m는 비워 주세요`});});});
-  const free=(it,sd)=>{                                                     // 한쪽 면 앞으로 벽·가구까지 남은 거리
-    let g=gap(it,sd,room); const h=sd==="N"||sd==="S";
+  doors.forEach(d=>{const z=doorZone(d,room); raw.forEach(it=>{if(overlap(it,z)) out.push({k:"door",ids:[it.id],t:`${fname(it)}${iga(fname(it))} 문 앞 통로를 막아요 — 문 앞 1m는 비워 주세요`});});});
+  const free=(it,sd)=>{                                                     // 한쪽 면 앞으로 벽·가구까지 남은 거리 (+막은 가구)
+    let g=gap(it,sd,room), by=null; const h=sd==="N"||sd==="S";
     furn.forEach(o=>{ if(o===it) return;
       const ov=h?(o.x<it.x+it.w&&o.x+o.w>it.x):(o.y<it.y+it.d&&o.y+o.d>it.y); if(!ov) return;
       const d=sd==="N"?it.y-(o.y+o.d):sd==="S"?o.y-(it.y+it.d):sd==="W"?it.x-(o.x+o.w):o.x-(it.x+it.w);
-      if(d>=-0.05&&d<g) g=Math.max(0,d);});
-    return g;
+      if(d>=-0.05&&d<g){g=Math.max(0,d); by=o.id;}});
+    return {g,by};
   };
-  furn.filter(i=>i.type==="desk").forEach(dk=>{const sd=dirOf(dk), g=free(dk,sd);
-    if(g<FLOW.chair) out.push({k:"chair",t:`책상 의자 쪽 공간이 ${cm(g)}뿐이에요 — 의자를 빼고 앉을 수 있게 ${cm(FLOW.chair)} 이상 비워 주세요`});});
-  furn.filter(i=>i.type==="bed").forEach(bd=>{const hd=dirOf(bd), sides=(hd==="N"||hd==="S")?["W","E"]:["N","S"], g=Math.max(...sides.map(sd=>free(bd,sd)));
-    if(g<FLOW.bedSide) out.push({k:"bed",t:`침대 양옆이 모두 막혀 있어요(최대 ${cm(g)}) — 한쪽은 ${cm(FLOW.bedSide)} 이상 비워 오르내리기 편하게 해 주세요`});});
+  if(!skip.chair) furn.filter(i=>i.type==="desk").forEach(dk=>{const f=free(dk,dirOf(dk));
+    if(f.g<FLOW.chair) out.push({k:"chair",ids:[dk.id].concat(f.by?[f.by]:[]),t:`책상 의자 쪽 공간이 ${cm(f.g)}뿐이에요 — 의자를 빼고 앉을 수 있게 ${cm(FLOW.chair)} 이상 비워 주세요`});});
+  if(!skip.bed) furn.filter(i=>i.type==="bed").forEach(bd=>{const hd=dirOf(bd), fs=((hd==="N"||hd==="S")?["W","E"]:["N","S"]).map(sd=>free(bd,sd)), g=Math.max(...fs.map(f=>f.g));
+    if(g<FLOW.bedSide) out.push({k:"bed",ids:[bd.id].concat(fs.map(f=>f.by).filter(Boolean)),t:`침대 양옆이 모두 막혀 있어요(최대 ${cm(g)}) — 한쪽은 ${cm(FLOW.bedSide)} 이상 비워 오르내리기 편하게 해 주세요`});});
   return out;
 }
-function flowText(items,room){const f=flowIssues(items,room); return f.length?f.slice(0,6).map(x=>"• "+x.t).join("\n")+(f.length>6?`\n• 그 밖에 ${f.length-6}건`:""):R("DX-FLOW").fx;}
+const FLOW_KIND={"DX-BLOCK":["overlap","door"],"DX-ACCESS":["chair","bed"],"DX-GAP":["gap","wall"]};
+const kindRule=k=>Object.keys(FLOW_KIND).find(id=>FLOW_KIND[id].includes(k));
+function flowText(items,room,id){const f=flowIssues(items,room).filter(x=>FLOW_KIND[id].includes(x.k)); return f.length?f.slice(0,6).map(x=>"• "+x.t).join("\n")+(f.length>6?`\n• 그 밖에 ${f.length-6}건`:""):R(id).fx;}
+/* ---------- 공간 협소 예외 — 정책 예외 + 물리적으로 불가능한 규칙 자동 판정 ---------- */
+const _feas={};
+function feasibleIds(type,items,room){      // 빈 방(문·창문만)에서 이 가구를 어디에 놓아야 통과할 수 있는 규칙들
+  const proto=items.find(i=>i.type===type); if(!proto) return null;
+  const openings=items.filter(isOpen), poly=polyOf(room), obst=openings.filter(o=>o.type==="door").map(o=>doorZone(o,room));
+  const key=JSON.stringify([type,proto.w,proto.d,proto.rot||0,poly,headOf(room),openings.map(o=>[o.type,+o.x.toFixed(2),+o.y.toFixed(2),+o.w.toFixed(2),+o.d.toFixed(2),o.ang||0])]);
+  if(_feas[key]) return _feas[key];
+  const want=Object.keys(RULEBOOK).filter(id=>RULEBOOK[id].t===type).concat(type==="bed"||type==="desk"?["DX-ACCESS"]:[]), ok=new Set();
+  const rm={...room,flowSkip:{}};
+  for(const a of [0,90,180,270]){
+    const b0={...proto,ang:a}, q=ext(b0);
+    for(let x=q.hw;x<=room.w-q.hw+1e-9&&ok.size<want.length;x+=0.25) for(let y=q.hd;y<=room.d-q.hd+1e-9;y+=0.25){
+      const c={...b0,x:x-b0.w/2,y:y-b0.d/2}; if(!inRoom(c,poly)||obst.some(z=>overlap(c,z))) continue;
+      const r=autoEval([...openings,c],rm); want.forEach(id=>{if(id in r&&!r[id]) ok.add(id);});
+    }
+  }
+  return _feas[key]={want,ok};
+}
+function ruleExceptions(items,room){         // → {ex:{id:사유}, skip:{bed,chair}}
+  const ex={}, skip={}, has=t=>items.some(i=>i.type===t);
+  if(has("bed")){const n=bedGapNote(items,room); if(n) ex["SRC-057"]=n;}
+  ["bed","desk","sofa"].forEach(t=>{
+    if(!has(t)) return; const f=feasibleIds(t,items,room);
+    f.want.forEach(id=>{ if(f.ok.has(id)) return;
+      if(id==="DX-ACCESS"){skip[t==="bed"?"bed":"chair"]=true; return;}
+      if(!ex[id]) ex[id]=`이 방 크기·구조에서는 ${FURN[t].name}${eul(FURN[t].name)} 어디에 놓아도 지킬 수 없어요`;});
+  });
+  if(skip.bed) ex["DX-ACCESS:bed"]="방 폭이 좁아 침대 옆 50cm 진입 공간을 만들 수 없어요";
+  if(skip.chair) ex["DX-ACCESS:chair"]="방이 좁아 책상 의자 뒤 60cm를 확보할 수 없어요";
+  return {ex,skip};
+}
+// 예외를 뺀 최종 진단: res={id:개선필요?}, ex={id:사유}
+function diagnose(items,room){
+  const {ex,skip}=ruleExceptions(items,room), raw=autoEval(items,{...room,flowSkip:skip}), res={};
+  Object.entries(raw).forEach(([id,v])=>{if(!ex[id]) res[id]=v;});
+  return {res,ex,skip};
+}
+function exHtml(ex){
+  const ks=Object.keys(ex); if(!ks.length) return "";
+  const lab=k=>k.startsWith("DX-ACCESS:")?(k.endsWith("bed")?"침대 진입 공간":"책상 의자 공간"):labelOf(k);
+  return `<div class="exnote"><b>📐 공간 협소 예외 ${ks.length}건</b> — 방 크기상 지키기 어려운 규칙이라 점수에서 뺐어요${ks.map(k=>`<br>· <b>${lab(k)}</b>: ${escapeHtml(ex[k])}`).join("")}</div>`;
+}
+function fixCard(x,extra){
+  const t=x.auto?tierOf(x.r.id):"aux";
+  return `<div class="fix ${t}"${extra||""}><span class="tier ${t}">${TIER_NAME[t]}${x.auto?"":" · 내 답변"}</span><strong>${escapeHtml(x.r.q)}</strong><p>${escapeHtml(fxOf(x.r))}</p></div>`;
+}
+function tierGroups(bad){                    // 핵심 먼저, 보조는 뒤에
+  const core=bad.filter(x=>x.auto&&tierOf(x.r.id)==="core"), aux=bad.filter(x=>!(x.auto&&tierOf(x.r.id)==="core"));
+  return (core.length?`<div class="tierh core">🚨 꼭 고쳐야 할 핵심 규칙 ${core.length}건</div>`+core.map(x=>fixCard(x)).join(""):"")
+    +(aux.length?`<div class="tierh aux">💡 여유 있을 때 챙길 보조 팁 ${aux.length}건</div>`+aux.map(x=>fixCard(x)).join(""):"");
+}
 // 자동 판정: true=개선 필요(위반), false=통과. 해당 가구가 없으면 판정하지 않음.
 function autoEval(items0,room){
   const items=items0.map(withBB);
@@ -1166,13 +1262,14 @@ function autoEval(items0,room){
     out["SRC-001"]=wins.some(w=>w.side===hd&&aligned(bed,w));
     const [ex,ey]=scrVec(90,room), east=(cx/W-0.5)*ex+(cy/D-0.5)*ey>=0.05;   // 실제 동쪽 절반에 있는지
     out["SRC-002"]=!(east&&wins.every(w=>ptDist(bed,w.pt)>=1.0));
-    if(bedGapCheck(bed,room).ok) out["SRC-057"]=((hd==="N"||hd==="S")?["W","E"]:["N","S"]).some(s=>gap(bed,s,room)<BEDGAP.gap);   // 넉넉한 방에서만
-    if(door){const diag=Math.abs(cx-door.pt.x)>0.35*W&&Math.abs(cy-door.pt.y)>0.35*D; out["SRC-058"]=(door.side===hd&&aligned(bed,door))||!diag;}
+    out["SRC-057"]=((hd==="N"||hd==="S")?["W","E"]:["N","S"]).some(s=>gap(bed,s,room)<BEDGAP.gap);   // 좁은 방은 diagnose()에서 예외 처리
+    if(door){const hz=door.side==="N"||door.side==="S", lat=hz?Math.abs(cx-door.pt.x)/W:Math.abs(cy-door.pt.y)/D, dep=hz?Math.abs(cy-door.pt.y)/D:Math.abs(cx-door.pt.x)/W;
+      const diag=lat>=0.25&&dep>=0.35; out["SRC-058"]=(door.side===hd&&aligned(bed,door))||!diag;}   // 문 축에서 비켜나고 방 안쪽 깊이 있으면 대각선
   }
   if(sofa){
     const bk=dirOf(sofa), fr=OPP[bk], bg=gap(sofa,bk,room);
-    out["SRC-003"]=wins.some(w=>ptDist(sofa,w.pt)<0.8)||bg>0.3;
-    out["SRC-040"]=bg>0.3||(!!door&&door.side===fr&&aligned(sofa,door))||wins.some(w=>w.side===bk&&aligned(sofa,w));
+    out["SRC-003"]=wins.some(w=>ptDist(sofa,w.pt)<0.8)||bg>SOFA_BACK;
+    out["SRC-040"]=bg>SOFA_BACK||(!!door&&door.side===fr&&aligned(sofa,door))||wins.some(w=>w.side===bk&&aligned(sofa,w));
     out["SRC-038"]=(sofa.a0||sofa.w*sofa.d)>0.16*W*D;
   }
   if(desk){
@@ -1181,7 +1278,10 @@ function autoEval(items0,room){
     const dc=door?Math.hypot(desk.x+desk.w/2-door.pt.x,desk.y+desk.d/2-door.pt.y):1e9;
     out["SRC-004"]=gap(desk,sd,room)>1.1||dc<0.6*far||(!!door&&door.side===fd&&aligned(desk,door));
   }
-  if(items.some(i=>!isOpen(i))) out["DX-FLOW"]=flowIssues(items0,room).length>0;
+  if(items.some(i=>!isOpen(i))){
+    const fl=flowIssues(items0,room);
+    Object.keys(FLOW_KIND).forEach(id=>{out[id]=fl.some(f=>FLOW_KIND[id].includes(f.k));});
+  }
   return out;
 }
 // 창문은 가구처럼 끌어서 놓는 아이템(type:"win"). 가장 가까운 벽에 붙여서 판정에 사용
@@ -1208,11 +1308,11 @@ function initWins(room){
     x:h?o.pt.x-L/2:(o.side==="W"?0:room.w-T), y:h?(o.side==="N"?0:room.d-T):o.pt.y-L/2}];
 }
 function checkRules(){
-  const bad=evalAll().filter(x=>x.auto&&x.bad), sh=document.getElementById("sheet");
-  const note=bedGapNote(state.cur.items,state.cur), noteH=note?`<p class="exnote">${note}</p>`:"";
-  sh.querySelector(".sb").innerHTML=noteH+(bad.length
-    ?`<h3>⚠️ 고치면 좋은 배치 ${bad.length}건</h3>`+bad.map(x=>`<div class="fix"><strong>${escapeHtml(x.r.q)}</strong><p>${escapeHtml(fxOf(x.r))}</p></div>`).join("")
-    :`<h3>✨ 멋진 배치예요!</h3><p class="hint">배치로 확인할 수 있는 아쉬운 배치가 없어요. 나머지는 결과 화면의 ‘풍수 점검’ 탭에서 확인해 보세요.</p>`);
+  const all=evalAll(), bad=all.filter(x=>x.auto&&x.bad), sh=document.getElementById("sheet"), sc=weighScore(all.filter(x=>x.auto).map(x=>({id:x.r.id,bad:x.bad})));
+  const head=sc.coreBad?`<h3>⚠️ 핵심 규칙 ${sc.coreBad}건을 먼저 고쳐 주세요</h3>`:`<h3>${bad.length?"👍 핵심 규칙은 모두 통과했어요":"✨ 멋진 배치예요!"}</h3>`;
+  sh.querySelector(".sb").innerHTML=(bad.length
+    ?head+`<p class="hint" style="margin:-4px 0 12px">핵심 ${sc.corePass}/${sc.coreTot} · 보조 ${sc.auxPass}/${sc.auxTot} 통과 · 점수 ${sc.pct}점</p>`+tierGroups(bad)
+    :`<h3>✨ 멋진 배치예요!</h3><p class="hint">배치로 확인할 수 있는 아쉬운 배치가 없어요. 나머지는 결과 화면의 ‘풍수 점검’ 탭에서 확인해 보세요.</p>`)+exHtml(state.lastEx||{});
   sh.classList.add("on");
 }
 function autoScore(items,room){
@@ -1220,17 +1320,18 @@ function autoScore(items,room){
   return {pass:v.filter(x=>!x).length,fail:v.filter(Boolean).length};
 }
 function evalAll(){
-  const c=state.cur, res=[];
-  R("DX-FLOW").fxNow=flowText(c.items,c);
-  Object.entries(autoEval(c.items,c)).forEach(([id,bad])=>res.push({r:R(id),bad,auto:true}));
+  const c=state.cur, res=[], dg=diagnose(c.items,c), rm={...c,flowSkip:dg.skip};
+  Object.keys(FLOW_KIND).forEach(id=>{R(id).fxNow=flowText(c.items,rm,id);});
+  state.lastEx=dg.ex;
+  Object.entries(dg.res).sort((a,b)=>DX_ORDER.indexOf(a[0])-DX_ORDER.indexOf(b[0])).forEach(([id,bad])=>res.push({r:R(id),bad,auto:true}));
   Object.entries(c.answers||{}).forEach(([id,a])=>res.push({r:R(id),bad:a==="O",auto:false}));
   return res;
 }
-const fxOf=r=>r.id==="DX-FLOW"&&r.fxNow?r.fxNow:r.fx;
+const fxOf=r=>FLOW_KIND[r.id]&&r.fxNow?r.fxNow:r.fx;
 function liveScore(){
   const el=document.getElementById("live"); if(!el||!state.cur) return;
-  const r=evalAll(), bad=r.filter(x=>x.bad).length;
-  el.innerHTML=r.length?`풍수 점수 <b>${Math.round((r.length-bad)/r.length*100)}</b>점 · 개선 ${bad}건`:"";
+  const r=evalAll(), sc=weighScore(r.map(x=>({id:x.r.id,bad:x.bad})));
+  el.innerHTML=r.length?`풍수 점수 <b>${sc.pct}</b>점 · 핵심 ${sc.corePass}/${sc.coreTot}${sc.coreBad?` <span class="lv-bad">(${sc.coreBad}건 고치기)</span>`:" ✓"} · 보조 ${sc.auxPass}/${sc.auxTot}`:"";
 }
 function mark(el,it){
   if(it.type==="win"||it.type==="door"){el.classList.add("win"); if(it.type==="door") el.classList.add("dr"); if(it.ang) el.style.transform=`rotate(${it.ang}deg)`; return;}
@@ -1297,15 +1398,13 @@ function renderFengshui(){
   updateFs();
 }
 function updateFs(){
-  const res=evalAll(), bad=res.filter(x=>x.bad), tot=res.length, c=state.cur;
-  const nAuto=res.filter(x=>x.auto).length;
-  document.getElementById("fs-head").innerHTML=tot
-    ?`<div style="display:flex;align-items:center;gap:14px"><div class="ring" style="--p:${Math.round((tot-bad.length)/tot*100)}"><span>${Math.round((tot-bad.length)/tot*100)}</span></div>
-      <div><strong>풍수 점수</strong><p class="hint" style="margin:2px 0 0">${tot}개 중 ${tot-bad.length}개 통과 · 개선 ${bad.length}건<br>배치 자동 진단 ${nAuto}개 + 내 답변 ${tot-nAuto}개</p></div></div>`
-    :`<p class="hint">점검할 항목이 아직 없어요. 가구를 배치하거나 아래 항목에 답해 보세요.</p>`;
-  const note=bedGapNote(c.items,c); if(note) document.getElementById("fs-head").insertAdjacentHTML("beforeend",`<p class="exnote">${note}</p>`);
+  const res=evalAll(), bad=res.filter(x=>x.bad), tot=res.length, c=state.cur, sc=weighScore(res.map(x=>({id:x.r.id,bad:x.bad})));
+  document.getElementById("fs-head").innerHTML=(tot
+    ?`<div style="display:flex;align-items:center;gap:14px"><div class="ring" style="--p:${sc.pct}"><span>${sc.pct}</span></div>
+      <div><strong>풍수 점수</strong><p class="hint" style="margin:2px 0 0">핵심 규칙 ${sc.corePass}/${sc.coreTot} 통과 · 보조 규칙·팁 ${sc.auxPass}/${sc.auxTot} 통과<br>핵심 규칙은 3배, 보조 규칙은 1배로 반영해요</p></div></div>`
+    :`<p class="hint">점검할 항목이 아직 없어요. 가구를 배치하거나 아래 항목에 답해 보세요.</p>`)+exHtml(state.lastEx||{});
   document.getElementById("fs-bad").innerHTML=bad.length
-    ?`<span class="label">이렇게 바꿔보세요</span>`+bad.map(x=>`<div class="fix"><span class="fid">${x.auto?"배치 자동 진단":"내 답변"}</span><strong>${escapeHtml(x.r.q)}</strong><p>${escapeHtml(fxOf(x.r))}</p></div>`).join("")
+    ?`<span class="label">이렇게 바꿔보세요</span>`+tierGroups(bad)
     :(tot?`<div class="card" style="margin-top:12px">개선이 필요한 항목이 없어요.</div>`:"");
   document.querySelectorAll("#pane-fs details.grp").forEach(d=>{
     const n=d.querySelectorAll(".qa.on,.zc.bad,.zc.ok").length;
@@ -1552,7 +1651,7 @@ const CLAB={학업:"학업·시험",연애:"연애",인간관계:"인간관계",
 const CEFF={학업:"공부와 시험처럼 평가받는 상황에서 이 성향이 더 도드라져요.",연애:"가까운 관계에서는 감정 표현의 속도 차이로 나타나기 쉬워요.",인간관계:"여러 사람 사이에서 거리를 조절할 때 긴장감으로 느껴질 수 있어요.",재물:"돈을 모으고 쓰는 결정에서 이 성향이 그대로 드러나기 쉬워요.",건강:"몸이 지칠 때 이 성향이 수면·식사 리듬의 흔들림으로 나타나기 쉬워요.",직장:"일의 속도와 책임이 커질 때 이 성향이 성과와 스트레스 양쪽으로 드러나요."};
 const CTIP={학업:"공부는 25분 집중 + 5분 휴식으로 끊고, 시험 전 할 일은 하루 3가지로 줄여 보세요.",연애:"감정이 올라온 날은 10분 뒤에 답하고, 서운함은 ‘나는 ~해서 서운했어’로 전해 보세요.",인간관계:"모든 관계에 같은 에너지를 쓰기보다 가까운 사람 2~3명에게 먼저 안부를 건네 보세요.",재물:"지출은 일주일에 한 번 몰아서 정리하고, 이번 달에 고정비 1가지를 줄여 보세요.",건강:"잠드는 시간을 매일 30분 안쪽으로 맞추고, 하루 10분 햇빛 산책부터 시작해 보세요.",직장:"하루를 시작할 때 가장 중요한 일 1가지를 먼저 끝내고, 퇴근 후에는 업무 알림을 꺼 두세요."};
 const primC=p=>(p&&p.concerns&&p.concerns[0])||(p&&p.concern)||"학업";
-const DX_ORDER=["SRC-001","SRC-002","SRC-057","SRC-058","SRC-004","SRC-003","SRC-040","SRC-038","DX-FLOW"];
+const DX_ORDER=["SRC-058","SRC-001","SRC-004","SRC-040","DX-BLOCK","DX-ACCESS","SRC-002","SRC-003","SRC-038","SRC-057","DX-GAP"];
 
 function pillarHtml2(lbl,p,isDay,o){
   if(!p) return pillarHtml(lbl,p,isDay);
@@ -1621,8 +1720,8 @@ function openReport(){
   state.S=S; saveSpace();
   const c=state.cur, P=S.P, ss=sipsin(P), ds=P[2][0], de=SE[ds], rank=[0,1,2,3,4].sort((a,b)=>ss.grp[b]-ss.grp[a]||a-b), g0=rank[0], g1=rank[1];
   const cs=(p.concerns&&p.concerns.length)?p.concerns:["학업"], m=focusOf(S.cnt,cs[0]).main, e1=m.s==="over"?CTRL[m.e]:m.e;
-  const res=evalAll(), bad=res.filter(x=>x.bad), tot=res.length, score=tot?Math.round((tot-bad.length)/tot*100):null;
-  const autoBad=bad.filter(x=>x.auto).sort((a,b)=>DX_ORDER.indexOf(a.r.id)-DX_ORDER.indexOf(b.r.id));
+  const res=evalAll(), bad=res.filter(x=>x.bad), tot=res.length, wsc=weighScore(res.map(x=>({id:x.r.id,bad:x.bad}))), score=wsc.pct;
+  const autoBad=bad.filter(x=>x.auto).sort((a,b)=>(tierOf(a.r.id)==="core"?0:1)-(tierOf(b.r.id)==="core"?0:1)||DX_ORDER.indexOf(a.r.id)-DX_ORDER.indexOf(b.r.id));
   const tips=autoBad.slice(0,3).map(x=>escapeHtml(fxOf(x.r)).replace(/\n/g,"<br>"));
   if(!tips.length) tips.push(`<b>배치</b> — 지금 배치는 큰 문제가 없어요. ${TWEAK[cs[0]].place}`);
   tips.push(`💡 <b>조명</b> — ${ADD[e1].light}`,`🪴 <b>소품</b> — ${ADD[e1].item}`,`🧵 <b>패브릭</b> — ${TWEAK[cs[0]].fabric}`);
@@ -1631,10 +1730,10 @@ function openReport(){
     <h1>${escapeHtml(p.uname)}님의 종합 리포트</h1>
     <p class="sub">${STEM[ds]}${BR[P[2][1]]}일주 · ${tagN(de)} · ${cs.map(k=>CLAB[k]).join(", ")}</p>
     <div class="card sec"><h2><span class="eb">01 · Feng Shui</span>풍수 배치 진단</h2>
-      ${tot?`<div style="display:flex;align-items:center;gap:14px"><div class="ring" style="--p:${score}"><span>${score}</span></div><div><strong>${tot}개 규칙 중 ${tot-bad.length}개 통과</strong><p class="hint" style="margin:2px 0 0">개선이 필요한 항목 ${bad.length}건 · 현재 배치 좌표를 SRC 풍수 규칙·동선 기준과 대조했어요</p></div></div>`
+      ${tot?`<div style="display:flex;align-items:center;gap:14px"><div class="ring" style="--p:${score}"><span>${score}</span></div><div><strong>${wsc.coreBad?`핵심 규칙 ${wsc.coreBad}건을 먼저 고쳐 주세요`:"핵심 규칙은 모두 통과했어요"}</strong><p class="hint" style="margin:2px 0 0">핵심 ${wsc.corePass}/${wsc.coreTot} · 보조 ${wsc.auxPass}/${wsc.auxTot} 통과 · 핵심 규칙 3배 가중 점수</p></div></div>`
         :`<p class="hint">진단할 가구가 아직 없어요. 침대·책상·소파를 배치하면 규칙과 대조해요.</p>`}
-      ${bedGapNote(c.items,c)?`<p class="exnote">${bedGapNote(c.items,c)}</p>`:""}
-      ${autoBad.map(x=>`<div class="fix" style="margin-top:10px"><strong>${escapeHtml(x.r.q)}</strong><p>${escapeHtml(fxOf(x.r))}</p></div>`).join("")}
+      <div style="margin-top:12px">${tierGroups(autoBad)}</div>
+      ${exHtml(state.lastEx||{})}
       ${tot&&!autoBad.length?`<p style="margin:10px 0 0">배치로 확인되는 규칙은 모두 통과했어요. 👏</p>`:""}
       <button class="btn btn-ghost" style="margin-top:12px" onclick="go('s-edit')">배치 다시 수정하기</button></div>
     <div class="card sec" id="cmp"><h2><span class="eb">02 · Ideal Layout</span>고민에 맞는 이상적인 배치</h2><div id="cmp-body"><p class="hint">현재 배치를 점검하고 고민에 맞는 배치를 찾는 중이에요…</p></div></div>
@@ -2033,18 +2132,17 @@ async function optimize(items0,room,ctx,progress){
       if(c.type==="sofa") s+=1.5*dirFit(cx,cy,"center",room);
       if(c.type==="table"){const sf=others.find(q=>q.type==="sofa"); if(sf) s+=1.5*(1-Math.min(3,Math.hypot(cx-(sf.x+sf.w/2),cy-(sf.y+sf.d/2)))/3);}
     }
-    const a=bb(c);
-    others.forEach(q=>{                                                         // 가구 사이 어정쩡한 틈 감점 (동선 기준)
-      const b=bb(q), gx=Math.max(b.x-(a.x+a.w),a.x-(b.x+b.w)), gy=Math.max(b.y-(a.y+a.d),a.y-(b.y+b.d));
-      const g=(gx>0&&gy<=0)?gx:(gy>0&&gx<=0)?gy:null; if(g!=null&&g>FLOW.flush&&g<FLOW.min) s-=1.5; else if(g!=null&&g>=FLOW.min&&g<0.4) s-=0.3;
-    });
-    ["N","S","W","E"].forEach(d=>{const g=gap(c,d,room); if(g>FLOW.flush&&g<FLOW.min) s-=1.5;});   // 벽과 어정쩡한 틈 감점
     return s;
   };
+  const ex=ctx.ex||{}, rm={...room,flowSkip:ctx.skip||{}};
+  const FCOST={overlap:40,door:40,chair:12,bed:12,gap:10,wall:10};       // 틈(10)은 보조 규칙(4)보다 크고 핵심 규칙(12)보다 작게             // 동선 비용: 핵심(막힘·진입) > 보조(틈)
+  const flowCost=(arr,id)=>flowIssues([...openings,...arr],rm).reduce((t,f)=>t+(!id||(f.ids||[]).includes(id)?FCOST[f.k]:0),0);
+  const ruleCost=arr=>Object.entries(autoEval([...openings,...arr],rm)).reduce((t,[id,v])=>t+(v&&!ex[id]&&!FLOW_KIND[id]?4*weightOf(id):0),0);
   const score=(c,others)=>{
     let s=soft(c,others);
     if(primary[c.type]===c.id&&(c.type==="bed"||c.type==="desk"||c.type==="sofa"))
-      Object.values(autoEval([...openings,c],room)).forEach(v=>{s+=v?-10:10;});   // SRC 규칙: 통과 +10, 위반 -10
+      Object.entries(autoEval([...openings,c],rm)).forEach(([id,v])=>{ if(ex[id]||FLOW_KIND[id]) return; s+=(v?-4:4)*weightOf(id); });   // 룰북 가중치: 핵심 ±12, 보조 ±4
+    s-=flowCost([c,...others],c.id);                                           // 이 가구가 만든 동선 문제
     return s;
   };
   const at=(c,cx,cy)=>({...c,x:cx-c.w/2,y:cy-c.d/2});
@@ -2058,7 +2156,18 @@ async function optimize(items0,room,ctx,progress){
       edges.forEach(e=>{                                                                                    // 벽에 붙인 위치 탐색
         if(Math.abs(e.ux)<0.99&&Math.abs(e.uy)<0.99) return;
         const off=Math.abs(e.ny)>0.5?q.hd:q.hw;
-        for(let t=0;t<=e.len+1e-9;t+=0.25) tryC(at(b0,e.p[0]+e.ux*t+e.nx*off,e.p[1]+e.uy*t+e.ny*off));
+        for(let t=0;t<=e.len+1e-9;t+=0.25){
+          tryC(at(b0,e.p[0]+e.ux*t+e.nx*off,e.p[1]+e.uy*t+e.ny*off));
+          tryC(at(b0,e.p[0]+e.ux*t+e.nx*(off+FLOW.min+0.01),e.p[1]+e.uy*t+e.ny*(off+FLOW.min+0.01)));   // 벽에서 딱 30cm
+        }
+      });
+      others.forEach(o=>{                                                                                   // 다른 가구에 딱 붙이거나 딱 30cm 띄운 위치
+        const ob=bb(o), cy0=it.y+it.d/2, cx0=it.x+it.w/2;
+        [0,FLOW.min+0.01].forEach(sp=>{
+          const ys=[ob.y+q.hd,ob.y+ob.d-q.hd,ob.y+ob.d/2,cy0], xs=[ob.x+q.hw,ob.x+ob.w-q.hw,ob.x+ob.w/2,cx0];
+          ys.forEach(y=>{tryC(at(b0,ob.x+ob.w+sp+q.hw,y)); tryC(at(b0,ob.x-sp-q.hw,y));});
+          xs.forEach(x=>{tryC(at(b0,x,ob.y+ob.d+sp+q.hd)); tryC(at(b0,x,ob.y-sp-q.hd));});
+        });
       });
     });
     if(best){const c0=best.c, cx=c0.x+c0.w/2, cy=c0.y+c0.d/2; for(const dx of [-0.25,0,0.25]) for(const dy of [-0.25,0,0.25]) tryC(at(c0,cx+dx,cy+dy));}
@@ -2073,6 +2182,41 @@ async function optimize(items0,room,ctx,progress){
       if(c){it.x=c.x; it.y=c.y; it.ang=c.ang;}
       if(pass===0) placed.push(it);
     }
+  }
+  // 안착 보정 — 2~30cm 어정쩡한 틈이 남은 가구를 딱 붙이거나(≤2cm) 30cm 이상 띄움. 다른 규칙이 나빠지지 않을 때만 적용
+  if(progress) progress("가구 사이 간격을 다듬는 중…");
+  const total=()=>flowCost(furn)+ruleCost(furn);
+  const DIRV={N:[0,-1],S:[0,1],W:[-1,0],E:[1,0]};
+  for(let round=0;round<4;round++){
+    let moved=false;
+    for(const f of furn){
+      const issues=flowIssues([...openings,...furn],rm).filter(x=>(x.k==="gap"||x.k==="wall")&&x.ids.includes(f.id)); if(!issues.length) continue;
+      const others=furn.filter(o=>o!==f), before=total(), b0={x:f.x,y:f.y}; let best=null;
+      const dists=[...new Set(issues.flatMap(x=>[x.g,FLOW.min-x.g+0.01]).map(v=>Math.round(v*100)/100))];
+      const offs=[]; Object.values(DIRV).forEach(([dx,dy])=>dists.forEach(d=>offs.push([dx*d,dy*d])));   // 틈을 딱 맞게 닫거나 여는 이동
+      for(let ox=-0.45;ox<=0.45+1e-9;ox+=0.05) for(let oy=-0.45;oy<=0.45+1e-9;oy+=0.05) if(Math.abs(ox)>1e-9||Math.abs(oy)>1e-9) offs.push([ox,oy]);   // 주변 5cm 격자
+      offs.forEach(([dx,dy])=>{
+        const c={...f,x:b0.x+dx,y:b0.y+dy}; if(!fits(c,others)) return;
+        f.x=c.x; f.y=c.y; const t=total(); f.x=b0.x; f.y=b0.y; const d=Math.hypot(dx,dy);
+        if(t<before-1e-9&&(!best||t<best.t-1e-9||(Math.abs(t-best.t)<1e-9&&d<best.d))) best={t,d,x:c.x,y:c.y};
+      });
+      if(best){f.x=Math.round(best.x*1000)/1000; f.y=Math.round(best.y*1000)/1000; moved=true;}
+      else{                                                                    // 혼자 못 움직이면 맞닿은 가구와 한 덩어리로 이동
+        const touch=(p,q)=>{const A=bb(p),B=bb(q), gx=Math.max(B.x-(A.x+A.w),A.x-(B.x+B.w)), gy=Math.max(B.y-(A.y+A.d),A.y-(B.y+B.d)); return gx<=FLOW.flush+1e-6&&gy<=FLOW.flush+1e-6;};
+        const ids=new Set(issues.flatMap(x=>x.ids)); furn.forEach(q=>{ if([...ids].some(id=>{const r=furn.find(z=>z.id===id); return r&&r!==q&&touch(r,q);})) ids.add(q.id); });
+        const grp=furn.filter(q=>ids.has(q.id)), rest=furn.filter(q=>!ids.has(q.id)), saved=grp.map(q=>({x:q.x,y:q.y}));
+        let bestG=null;
+        offs.forEach(([dx,dy])=>{
+          const moved2=grp.map((q,i)=>({...q,x:saved[i].x+dx,y:saved[i].y+dy}));
+          if(!moved2.every((c,i)=>fits(c,[...rest,...moved2.filter((_,j)=>j!==i)]))) return;
+          grp.forEach((q,i)=>{q.x=moved2[i].x; q.y=moved2[i].y;}); const t=total(); grp.forEach((q,i)=>{q.x=saved[i].x; q.y=saved[i].y;});
+          const d=Math.hypot(dx,dy); if(t<before-1e-9&&(!bestG||t<bestG.t-1e-9||(Math.abs(t-bestG.t)<1e-9&&d<bestG.d))) bestG={t,d,dx,dy};
+        });
+        if(bestG){grp.forEach((q,i)=>{q.x=Math.round((saved[i].x+bestG.dx)*1000)/1000; q.y=Math.round((saved[i].y+bestG.dy)*1000)/1000;}); moved=true;}
+      }
+      await new Promise(r=>setTimeout(r,0));
+    }
+    if(!moved) break;
   }
   return items0.map(o=>isOpen(o)?o:furn.find(f=>f.id===o.id));
 }
@@ -2142,15 +2286,17 @@ async function runCompare(){
   const p=state.profile||{}, cs=(p.concerns&&p.concerns.length)?p.concerns:["학업"];
   const ctx={dir:ELEMENTS[c.el]?ELEMENTS[c.el].dir:"center",study:cs.includes("학업")||cs.includes("직장"),love:cs.includes("연애")||cs.includes("건강"),social:cs.includes("인간관계")};
   const room={w:c.w,d:c.d,poly:polyOf(c),heading:headOf(c)};
+  const dg0=diagnose(base,room); ctx.ex=dg0.ex; ctx.skip=dg0.skip;
   const ideal=await optimize(base,room,ctx,t=>{if(tok===cmpTok) box.innerHTML=`<p class="hint">${t}</p>`;});
   if(tok!==cmpTok) return;
   idealItems=ideal;
-  const A0=autoEval(base,room), A1=autoEval(ideal,room), ids=Object.keys(A1), tot=ids.length;
-  const pct=A=>tot?Math.round(ids.filter(id=>!A[id]).length/tot*100):null, s0=pct(A0), s1=pct(A1);
+  const A0=dg0.res, A1=diagnose(ideal,room).res, ids=Object.keys(A1), tot=ids.length;
+  const pct=A=>weighScore(ids.map(id=>({id,bad:!!A[id]}))).pct, s0=pct(A0), s1=pct(A1);
   const fixed=ids.filter(id=>A0[id]&&!A1[id]), still=ids.filter(id=>A1[id]), worse=ids.filter(id=>A0[id]===false&&A1[id]);
   const hl0={}, hl1={}, mv={}, moves=[], bF=base.filter(i=>!isOpen(i));
   const firstOf=t=>bF.find(i=>i.type===t);
   ids.filter(id=>A0[id]).forEach(id=>{const it=firstOf(RULE_TYPE[id]); if(it) hl0[it.id]="#D2705B";});
+  flowIssues(base,{...room,flowSkip:dg0.skip}).forEach(f=>(f.ids||[]).forEach(i=>{hl0[i]="#D2705B";}));
   bF.forEach(a=>{
     const b=ideal.find(i=>i.id===a.id), x0=a.x+a.w/2, y0=a.y+a.d/2, x1=b.x+b.w/2, y1=b.y+b.d/2, dd=Math.hypot(x1-x0,y1-y0);
     let da=(((b.ang||0)-(a.ang||0))%360+360)%360; if(da>180) da-=360;
@@ -2159,15 +2305,18 @@ async function runCompare(){
       moves.push(`<li><b>${FURN[a.type].name}</b> ${zoneOf(a,room)} → ${zoneOf(b,room)}${dd>0.15?` · ${dd.toFixed(1)}m 이동`:""}${Math.abs(da)>1?` · ${da>0?"시계":"반시계"} 방향 ${Math.abs(Math.round(da))}° 회전`:""}${d0&&d0!==d1?` · ${FACEL[a.type]} ${sideName(d0,room)}→${sideName(d1,room)}`:""}</li>`);
     }
   });
-  const FL={"DX-FLOW":"가구 사이 동선","SRC-001":"침대 머리와 창문","SRC-002":"침대 위치","SRC-003":"소파와 창문","SRC-004":"책상 자리","SRC-038":"소파 크기","SRC-040":"소파 자리","SRC-057":"침대와 벽 간격","SRC-058":"침대와 문"}, tg=a=>[...new Set(a.map(id=>FL[id]||"배치"))].join(", "), up=(s1!=null)?s1-s0:0;
+  const FL=Object.fromEntries(Object.keys(RULEBOOK).map(k=>[k,labelOf(k)])), tg=a=>[...new Set(a.map(id=>FL[id]||"배치"))].join(", "), up=(s1!=null)?s1-s0:0;
   const sum=[];
   sum.push(moves.length?`가구 ${moves.length}개의 위치·방향을 바꿨어요.${s1!=null?` 배치 진단 점수는 ${s0}점 → ${s1}점(${up>=0?"+":""}${up})이에요.`:""}`:"지금 배치가 이미 좋아서 바꿀 가구가 없었어요.");
   if(fixed.length) sum.push(`✔ 해결된 항목 ${fixed.length}건: ${tg(fixed)}`);
   if(worse.length) sum.push(`↘ 새로 생긴 주의 항목 ${worse.length}건: ${tg(worse)}`);
-  if(still.length) sum.push(`⚠️ 방 구조·가구 크기 때문에 남은 항목 ${still.length}건: ${tg(still)} — 직접 조정해 보세요.`);
+  const stillCore=still.filter(id=>tierOf(id)==="core"), stillAux=still.filter(id=>tierOf(id)!=="core");
+  if(stillCore.length) sum.push(`⚠️ 남은 핵심 규칙 ${stillCore.length}건: ${tg(stillCore)} — 직접 조정해 보세요.`);
+  if(stillAux.length) sum.push(`💡 남은 보조 팁 ${stillAux.length}건: ${tg(stillAux)} — 점수 영향이 작아요.`);
+  if(Object.keys(dg0.ex).length) sum.push(`📐 공간 협소 예외 ${Object.keys(dg0.ex).length}건은 점수에서 뺐어요.`);
   if(!fixed.length&&!still.length&&tot) sum.push("자동 진단 규칙을 모두 통과해요.");
   cs.forEach(k=>sum.push(concernNote(k,{A1,store:base.some(i=>i.type==="wardrobe"||i.type==="shelf")})));
-  const rest=still.map(id=>`<li><b>${FL[id]||"배치"}</b> — ${escapeHtml(id==="DX-FLOW"?flowText(ideal,room):R(id).fx).replace(/\n/g,"<br>")}</li>`).join("");
+  const rest=still.map(id=>`<li><b>${FL[id]||"배치"}</b> — ${escapeHtml(FLOW_KIND[id]?flowText(ideal,{...room,flowSkip:dg0.skip},id):R(id).fx).replace(/\n/g,"<br>")}</li>`).join("");
   box.innerHTML=`<p class="hint" style="margin:0">현재 배치를 점검한 뒤 ${cs.map(k=>CLAB[k]).join("·")} 고민과 오행(${ELEMENTS[c.el]?ELEMENTS[c.el].name:""}) 방향에 맞춰 가구를 자동으로 다시 놓았어요.</p>
     <div class="cmpg"><div><div class="cap">기존 배치</div>${planSvg(base,room,hl0,null)}</div><div><div class="cap">수정 후 (제안)</div>${planSvg(ideal,room,hl1,mv)}</div></div>
     <p class="hint">빨간 테두리 = 아쉬운 배치 · 주황 테두리 = 이동한 가구 · 점선 = 이동 경로 · 진한 띠 = 침대 머리/소파 등받이, 동그라미 = 의자</p>
