@@ -552,6 +552,12 @@ input[type=checkbox]{accent-color:var(--deep)}
 .tierh.aux{color:#97753F}
 .lv-bad{color:var(--rose);font-weight:700}
 .fix .fid{display:none}
+.fnstd{margin:2px 0 8px;font-size:12.5px;line-height:1.5;color:var(--ink-soft);background:#F6F1E8;border-radius:12px;padding:8px 10px}
+.fnstd.on{background:var(--sage-soft);color:var(--deep-dark)}
+.fnstd button,.stdbtn{border:1px solid var(--line-2);background:var(--card);border-radius:999px;padding:3px 10px;font:inherit;font-size:12px;font-weight:700;color:var(--deep-dark);cursor:pointer;margin-left:4px}
+.selp .sh{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.selp .sh small{color:var(--ink-soft);font-size:12px}
+.stdbtn{margin-left:auto}
 </style>
 </head>
 <body>
@@ -723,9 +729,9 @@ input[type=checkbox]{accent-color:var(--deep)}
         <button class="tool" onclick="clearItems()">전체 비우기</button>
       </div>
       <div class="selp" id="selpanel" hidden>
-        <div class="sh"><b id="sp-name"></b></div>
-        <div class="sr" id="sr-w"><span id="sp-lw">가로</span><input type="range" id="sp-w" min="0.3" max="3" step="0.05" oninput="panelSet('w',this.value)"><i id="sp-wv"></i></div>
-        <div class="sr" id="sr-d"><span>세로</span><input type="range" id="sp-d" min="0.3" max="3" step="0.05" oninput="panelSet('d',this.value)"><i id="sp-dv"></i></div>
+        <div class="sh"><b id="sp-name"></b><small id="sp-std"></small><button type="button" class="stdbtn" id="sp-reset" onclick="resetStdSize()" hidden>↺ 표준 크기로</button></div>
+        <div class="sr" id="sr-w"><span id="sp-lw">가로</span><input type="range" id="sp-w" min="0.3" max="5" step="0.05" oninput="panelSet('w',this.value)"><i id="sp-wv"></i></div>
+        <div class="sr" id="sr-d"><span>세로</span><input type="range" id="sp-d" min="0.3" max="5" step="0.05" oninput="panelSet('d',this.value)"><i id="sp-dv"></i></div>
         <div class="sr" id="sr-a"><span>회전</span><input type="range" id="sp-a" min="0" max="359" step="1" oninput="panelSet('a',this.value)"><i id="sp-av"></i></div>
       </div>
       <div class="fsearch">
@@ -736,11 +742,12 @@ input[type=checkbox]{accent-color:var(--deep)}
       <div class="fres" id="fres"></div>
       <div class="fnew" id="fnew" hidden>
         <div class="fnh">새 가구 만들기</div>
-        <div class="fnr"><span>이름</span><input type="text" id="fn-name" maxlength="12" placeholder="예: 캣타워"></div>
+        <div class="fnr"><span>이름</span><input type="text" id="fn-name" maxlength="12" placeholder="예: 캣타워" oninput="applyStd()"></div>
+        <p class="fnstd" id="fn-std"></p>
         <div class="fnr3">
-          <label>가로<input type="number" id="fn-w" step="0.1" min="0.2" max="5" value="1.0" inputmode="decimal"><em>m</em></label>
-          <label>세로<input type="number" id="fn-d" step="0.1" min="0.2" max="5" value="0.6" inputmode="decimal"><em>m</em></label>
-          <label>높이<input type="number" id="fn-h" step="0.1" min="0.05" max="3" value="1.0" inputmode="decimal"><em>m</em></label>
+          <label>가로<input type="number" id="fn-w" step="0.1" min="0.2" max="5" value="1.0" inputmode="decimal" oninput="fnDirty=true"><em>m</em></label>
+          <label>세로<input type="number" id="fn-d" step="0.1" min="0.2" max="5" value="1.0" inputmode="decimal" oninput="fnDirty=true"><em>m</em></label>
+          <label>높이<input type="number" id="fn-h" step="0.1" min="0.05" max="3" value="1.0" inputmode="decimal" oninput="fnDirty=true"><em>m</em></label>
         </div>
         <div class="fnr"><span>아이콘</span><div class="fnicons" id="fn-icons"></div></div>
         <div class="btn-row" style="margin-top:10px"><button class="btn btn-line" onclick="closeFNew()">취소</button><button class="btn btn-primary" onclick="createCustom()">추가하기</button></div>
@@ -882,36 +889,79 @@ const FURN = {
   door:     {name:"문",    w:0.9, d:0.15,h:2.0,  color:"#C9A27A", icon:"🚪"}
 };
 const BASE_TYPES=Object.keys(FURN);   // 기본 가구 (팔레트에 항상 표시)
-/* 검색으로 추가하는 가구 카탈로그 — 크기는 일반적인 제품 기준(m), al=검색 별칭 */
+/* =========================================================
+   품목별 표준 사이즈 데이터맵 — 국내에서 흔한 제품 규격 기준 (단위 m, 가로×세로(깊이)×높이)
+   al = 검색·자동 인식 키워드. 직접 입력한 이름에 키워드가 들어 있으면 그 표준 규격을 기본값으로 씀
+   ========================================================= */
 const FURN_CAT={
-  x_dresser:  {name:"화장대",     w:0.9, d:0.45,h:1.4, icon:"💄", al:["드레스룸","메이크업","거울 달린"]},
-  x_aircon:   {name:"에어컨",     w:0.5, d:0.4, h:1.8, icon:"❄️", al:["스탠드 에어컨","냉방기","냉난방기","에어콘"]},
-  x_aircon_w: {name:"벽걸이 에어컨",w:0.9, d:0.25,h:0.3, icon:"🌬️", al:["에어컨","벽걸이","에어콘"]},
-  x_washer:   {name:"세탁기",     w:0.65,d:0.7, h:1.0, icon:"🧺", al:["드럼세탁기","통돌이","빨래"]},
-  x_dryer:    {name:"건조기",     w:0.65,d:0.7, h:1.0, icon:"🌀", al:["의류건조기","빨래 건조","드라이어"]},
-  x_fridge:   {name:"냉장고",     w:0.9, d:0.75,h:1.8, icon:"🧊", al:["김치냉장고","양문형"]},
-  x_tv:       {name:"TV장",       w:1.6, d:0.4, h:0.5, icon:"📺", al:["티비","텔레비전","tv","거실장","티비장"]},
-  x_night:    {name:"협탁",       w:0.45,d:0.4, h:0.55,icon:"🛋", al:["사이드테이블","침대 옆","나이트스탠드"]},
-  x_drawer:   {name:"서랍장",     w:0.8, d:0.45,h:1.0, icon:"🗄️", al:["수납장","체스트","서랍"]},
-  x_cabinet:  {name:"수납장",     w:0.8, d:0.4, h:1.2, icon:"🗃️", al:["캐비닛","선반장","수납"]},
-  x_hanger:   {name:"행거",       w:1.2, d:0.45,h:1.6, icon:"👔", al:["옷걸이","드레스룸 행거"]},
-  x_mirror:   {name:"전신거울",   w:0.5, d:0.1, h:1.6, icon:"🪞", al:["거울","스탠드 거울"]},
-  x_chair:    {name:"의자",       w:0.5, d:0.5, h:0.9, icon:"🪑", al:["체어","책상 의자"]},
-  x_armchair: {name:"1인 소파",   w:0.8, d:0.8, h:0.8, icon:"🛋", al:["암체어","안락의자","리클라이너"]},
-  x_ldesk:    {name:"ㄱ자 책상",  w:1.6, d:1.4, h:0.75,icon:"🖥️", al:["코너 책상","L자 책상","컴퓨터 책상"]},
-  x_bunk:     {name:"2층 침대",   w:1.0, d:2.0, h:1.6, icon:"🛏", al:["벙커침대","이층침대","2단 침대"]},
-  x_sbed:     {name:"싱글 침대",  w:1.0, d:2.0, h:0.45,icon:"🛏", al:["침대","1인 침대"]},
-  x_piano:    {name:"피아노",     w:1.5, d:0.6, h:1.2, icon:"🎹", al:["전자피아노","디지털피아노"]},
-  x_treadmill:{name:"러닝머신",   w:0.8, d:1.8, h:1.3, icon:"🏃", al:["트레드밀","운동기구"]},
-  x_plant:    {name:"화분",       w:0.4, d:0.4, h:1.0, icon:"🪴", al:["식물","나무"]},
-  x_lamp:     {name:"스탠드 조명",w:0.35,d:0.35,h:1.6, icon:"💡", al:["조명","장스탠드","플로어 램프"]},
-  x_purifier: {name:"공기청정기", w:0.35,d:0.35,h:0.7, icon:"🍃", al:["청정기","가습기"]},
-  x_rug:      {name:"러그",       w:1.6, d:1.2, h:0.02,icon:"🟫", al:["카펫","매트"]},
-  x_vanity:   {name:"세면대",     w:0.6, d:0.45,h:0.85,icon:"🚰", al:["세면기"]},
-  x_shoe:     {name:"신발장",     w:0.9, d:0.35,h:1.2, icon:"👟", al:["현관장"]},
-  x_kitchen:  {name:"싱크대",     w:1.8, d:0.6, h:0.85,icon:"🍳", al:["주방","조리대"]},
-  x_pc:       {name:"컴퓨터",     w:0.6, d:0.3, h:0.5, icon:"💻", al:["PC","본체","모니터"]}
+  // 침실
+  x_sbed:     {name:"싱글 침대",     w:1.0, d:2.0, h:0.45,icon:"🛏", al:["싱글","1인 침대","싱글침대"]},
+  x_ssbed:    {name:"슈퍼싱글 침대", w:1.1, d:2.0, h:0.45,icon:"🛏", al:["슈퍼싱글","ss침대","슈퍼 싱글"]},
+  x_dbed:     {name:"더블 침대",     w:1.4, d:2.0, h:0.45,icon:"🛏", al:["더블","더블침대"]},
+  x_qbed:     {name:"퀸 침대",       w:1.5, d:2.0, h:0.45,icon:"🛏", al:["퀸","퀸사이즈","퀸침대"]},
+  x_kbed:     {name:"킹 침대",       w:1.6, d:2.0, h:0.45,icon:"🛏", al:["킹","킹사이즈","킹침대","라지킹"]},
+  x_bunk:     {name:"2층 침대",      w:1.0, d:2.0, h:1.6, icon:"🛏", al:["벙커침대","이층침대","2단 침대","벙커"]},
+  x_night:    {name:"협탁",          w:0.45,d:0.4, h:0.55,icon:"🛋", al:["사이드테이블","침대 옆","나이트스탠드","침대협탁"]},
+  x_dresser:  {name:"화장대",        w:1.0, d:0.5, h:1.4, icon:"💄", al:["메이크업","거울 달린","화장대세트","드레서"]},
+  x_vstool:   {name:"화장대 의자",   w:0.4, d:0.4, h:0.45,icon:"🪑", al:["스툴","화장대스툴"]},
+  x_drawer:   {name:"서랍장",        w:0.8, d:0.45,h:1.0, icon:"🗄️", al:["체스트","서랍","5단 서랍장"]},
+  x_hanger:   {name:"행거",          w:1.2, d:0.45,h:1.6, icon:"👔", al:["옷걸이","드레스룸 행거","스탠드 행거"]},
+  x_mirror:   {name:"전신거울",      w:0.5, d:0.1, h:1.6, icon:"🪞", al:["거울","스탠드 거울","전신 거울"]},
+  x_styler:   {name:"의류관리기",    w:0.45,d:0.6, h:1.85,icon:"🧥", al:["스타일러","에어드레서","슈케어"]},
+  // 공부·작업
+  x_ldesk:    {name:"ㄱ자 책상",     w:1.6, d:1.4, h:0.75,icon:"🖥️", al:["코너 책상","l자 책상","컴퓨터 책상","엘자 책상"]},
+  x_sdesk:    {name:"1인 책상",      w:1.0, d:0.6, h:0.75,icon:"✏️", al:["학생 책상","작은 책상","컴퓨터책상"]},
+  x_chair:    {name:"의자",          w:0.5, d:0.5, h:0.9, icon:"🪑", al:["체어","책상 의자","사무용 의자"]},
+  x_gchair:   {name:"게이밍 의자",   w:0.7, d:0.7, h:1.3, icon:"🎮", al:["게이밍체어","게이밍"]},
+  x_pc:       {name:"컴퓨터",        w:0.6, d:0.3, h:0.5, icon:"💻", al:["pc","본체","모니터","데스크탑"]},
+  x_cabinet:  {name:"수납장",        w:0.8, d:0.4, h:1.2, icon:"🗃️", al:["캐비닛","선반장","수납","수납선반"]},
+  x_printer:  {name:"프린터",        w:0.45,d:0.4, h:0.25,icon:"🖨️", al:["복합기"]},
+  // 거실
+  x_sofa2:    {name:"2인 소파",      w:1.5, d:0.85,h:0.8, icon:"🛋", al:["2인용 소파","러브시트","2인소파"]},
+  x_sofa3:    {name:"3인 소파",      w:2.1, d:0.9, h:0.8, icon:"🛋", al:["3인용 소파","3인소파"]},
+  x_sofabed:  {name:"소파베드",      w:1.9, d:0.9, h:0.8, icon:"🛋", al:["소파 베드","접이식 소파"]},
+  x_armchair: {name:"1인 소파",      w:0.8, d:0.8, h:0.8, icon:"🛋", al:["암체어","안락의자","리클라이너","1인소파"]},
+  x_ctable:   {name:"거실 테이블",   w:1.0, d:0.5, h:0.4, icon:"☕", al:["좌식 테이블","커피 테이블","소파 테이블","티테이블"]},
+  x_tv:       {name:"TV장",          w:1.6, d:0.4, h:0.5, icon:"📺", al:["티비","텔레비전","tv","거실장","티비장"]},
+  x_tvstand:  {name:"TV 스탠드",     w:0.8, d:0.6, h:1.5, icon:"📺", al:["티비스탠드","이동식 tv","스탠바이미"]},
+  x_piano:    {name:"피아노",        w:1.5, d:0.6, h:1.2, icon:"🎹", al:["전자피아노","디지털피아노","업라이트"]},
+  x_rug:      {name:"러그",          w:1.6, d:1.2, h:0.02,icon:"🟫", al:["카펫","매트","거실매트"]},
+  x_plant:    {name:"화분",          w:0.4, d:0.4, h:1.0, icon:"🪴", al:["식물","나무","대형 화분"]},
+  x_lamp:     {name:"스탠드 조명",   w:0.35,d:0.35,h:1.6, icon:"💡", al:["조명","장스탠드","플로어 램프","스탠드"]},
+  x_shoe:     {name:"신발장",        w:0.9, d:0.35,h:1.2, icon:"👟", al:["현관장"]},
+  // 가전
+  x_aircon:   {name:"에어컨",        w:0.5, d:0.5, h:1.8, icon:"❄️", al:["스탠드 에어컨","냉방기","냉난방기","에어콘","스탠드에어컨"]},
+  x_aircon_w: {name:"벽걸이 에어컨", w:0.9, d:0.25,h:0.3, icon:"🌬️", al:["벽걸이","벽걸이에어컨"]},
+  x_washer:   {name:"세탁기",        w:0.6, d:0.6, h:0.85,icon:"🧺", al:["드럼세탁기","통돌이","빨래","드럼"]},
+  x_dryer:    {name:"건조기",        w:0.6, d:0.6, h:0.85,icon:"🌀", al:["의류건조기","빨래 건조기","드라이어"]},
+  x_washtower:{name:"워시타워",      w:0.7, d:0.8, h:1.9, icon:"🧺", al:["세탁건조기","원바디","워시콤보"]},
+  x_fridge:   {name:"냉장고",        w:0.9, d:0.75,h:1.8, icon:"🧊", al:["양문형","양문형 냉장고","4도어"]},
+  x_kfridge:  {name:"김치냉장고",    w:0.7, d:0.7, h:1.0, icon:"🥬", al:["김냉","김치 냉장고"]},
+  x_minifridge:{name:"미니 냉장고",  w:0.45,d:0.5, h:0.85,icon:"🧊", al:["소형 냉장고","원룸 냉장고"]},
+  x_purifier: {name:"공기청정기",    w:0.35,d:0.35,h:0.7, icon:"🍃", al:["청정기"]},
+  x_humid:    {name:"가습기",        w:0.3, d:0.3, h:0.4, icon:"💧", al:["가습"]},
+  x_dehumid:  {name:"제습기",        w:0.35,d:0.3, h:0.6, icon:"💨", al:["제습"]},
+  x_fan:      {name:"선풍기",        w:0.4, d:0.4, h:1.1, icon:"🌀", al:["서큘레이터","타워팬"]},
+  x_robot:    {name:"로봇청소기 스테이션",w:0.4,d:0.45,h:0.45,icon:"🤖", al:["로봇청소기","로청","스테이션"]},
+  x_water:    {name:"정수기",        w:0.3, d:0.5, h:0.5, icon:"🚰", al:["냉온정수기"]},
+  // 주방·욕실
+  x_kitchen:  {name:"싱크대",        w:1.8, d:0.6, h:0.85,icon:"🍳", al:["주방","조리대","싱크"]},
+  x_dish:     {name:"식기세척기",    w:0.6, d:0.6, h:0.85,icon:"🍽", al:["식세기"]},
+  x_mwave:    {name:"전자레인지장",  w:0.6, d:0.45,h:1.8, icon:"📦", al:["렌지대","주방 수납장","레인지대"]},
+  x_dtable2:  {name:"2인 식탁",      w:0.8, d:0.8, h:0.75,icon:"🍽", al:["2인용 식탁","작은 식탁"]},
+  x_dtable4:  {name:"4인 식탁",      w:1.4, d:0.8, h:0.75,icon:"🍽", al:["4인용 식탁","큰 식탁"]},
+  x_vanity:   {name:"세면대",        w:0.6, d:0.45,h:0.85,icon:"🚰", al:["세면기"]},
+  // 취미·생활
+  x_treadmill:{name:"러닝머신",      w:0.8, d:1.8, h:1.3, icon:"🏃", al:["트레드밀","운동기구"]},
+  x_bike:     {name:"실내 자전거",   w:0.5, d:1.1, h:1.2, icon:"🚲", al:["스피닝","사이클","자전거"]},
+  x_cattower: {name:"캣타워",        w:0.6, d:0.6, h:1.5, icon:"🐈", al:["캣폴","고양이 타워"]},
+  x_dogbed:   {name:"반려동물 하우스",w:0.6,d:0.5, h:0.5, icon:"🐕", al:["강아지 집","개집","펫하우스","방석"]},
+  x_drying:   {name:"빨래건조대",    w:1.4, d:0.6, h:1.0, icon:"👕", al:["건조대","빨래대"]},
+  x_storage:  {name:"수납함",        w:0.45,d:0.35,h:0.3, icon:"📦", al:["리빙박스","정리함"]}
 };
+const DEFAULT_SIZE={w:1.0,d:1.0,h:1.0};
+const m1=v=>{const r=Math.round(v*100)/100; return Math.round(r*10)===r*10?r.toFixed(1):String(r);};   // 1 → "1.0", 0.45 → "0.45"
+const msz=(w,d)=>`${m1(w)}×${m1(d)}m`;       // 표준 데이터맵에 없는 새 가구의 기본값
 const CUST_COLORS=["#D9CFE6","#CFE3E0","#E8D9C4","#D7E4C6","#E6CFCF","#CFD8E8","#E3E0C6","#D3D3DC"];
 const colorFor=k=>CUST_COLORS[[...k].reduce((a,c)=>a+c.charCodeAt(0),0)%CUST_COLORS.length];
 Object.entries(FURN_CAT).forEach(([k,f])=>{FURN[k]={name:f.name,w:f.w,d:f.d,h:f.h,icon:f.icon,color:colorFor(k)};});
@@ -920,6 +970,19 @@ let customFurn={}, myFurn=[];
 try{customFurn=JSON.parse(store.get("bangku.customFurn")||"{}"); myFurn=JSON.parse(store.get("bangku.myFurn")||"[]");}catch(e){}
 Object.entries(customFurn).forEach(([k,f])=>{FURN[k]=f;});
 myFurn=myFurn.filter(k=>FURN[k]);
+// 이름 → 표준 사이즈. 정확한 이름 > 별칭 > 이름에 포함된 키워드(가장 구체적인 것) 순으로 찾음
+function stdSizeFor(name){
+  const n=String(name).toLowerCase().replace(/\s+/g,""); if(!n) return null;
+  let best=null;
+  const cand=[...Object.entries(FURN_CAT).map(([k,f])=>[k,f,[f.name,...(f.al||[])]]),
+    ...BASE_TYPES.filter(k=>k!=="win"&&k!=="door").map(k=>[k,FURN[k],[FURN[k].name]])];
+  cand.forEach(([k,f,terms])=>terms.forEach(t=>{
+    const tn=t.toLowerCase().replace(/\s+/g,""); if(tn.length<2&&tn!==n) return;
+    const sc=tn===n?1000+tn.length:n.includes(tn)?tn.length*10+(t===f.name?5:0):0;
+    if(sc&&(!best||sc>best.sc)) best={sc,k,name:f.name,w:f.w,d:f.d,h:f.h,icon:f.icon};
+  }));
+  return best;
+}
 function saveFurnPrefs(){store.set("bangku.customFurn",JSON.stringify(customFurn)); store.set("bangku.myFurn",JSON.stringify(myFurn));}
 
 /* =========================================================
@@ -2713,6 +2776,16 @@ function syncPanel(){
   const sw=g("sp-w"); sw.min=op?0.5:0.3; sw.value=wv;
   g("sp-d").value=it.d; g("sp-a").value=a;
   g("sp-wv").textContent=wv.toFixed(2)+"m"; g("sp-dv").textContent=it.d.toFixed(2)+"m"; g("sp-av").textContent=Math.round(a)+"°";
+  const f=FURN[it.type], st=!op&&f?stdOf(it):null, changed=st&&(Math.abs(it.w-st.w)>0.01||Math.abs(it.d-st.d)>0.01);
+  g("sp-std").textContent=st?` · ${f.custom?"기본":"표준"} ${msz(st.w,st.d)}`:"";
+  g("sp-reset").hidden=!changed;
+}
+function stdOf(it){const f=FURN[it.type]; return (it.rot||0)%180===0?{w:f.w,d:f.d}:{w:f.d,d:f.w};}   // 예전 방식 90° 회전은 가로·세로가 바뀌어 저장됨
+function resetStdSize(){
+  const it=state.cur.items.find(i=>i.id===sel); if(!it) return;
+  const st=stdOf(it), c=[it.x+it.w/2,it.y+it.d/2];
+  it.w=st.w; it.d=st.d; it.x=c[0]-st.w/2; it.y=c[1]-st.d/2;
+  positionItem(document.querySelector(`#canvas .item[data-id="${it.id}"]`),it); select(it.id); liveScore(); toast("표준 크기로 되돌렸어요");
 }
 function panelSet(k,v){
   const it=state.cur.items.find(i=>i.id===sel); if(!it) return; v=+v;
@@ -2753,7 +2826,7 @@ function renderPalette(){       // 기본 가구 + 내가 추가한 가구(× �
   document.getElementById("palette").innerHTML=BASE_TYPES.map(pal).join("")+(myFurn.length?`<span class="pal-sep"></span>`+myFurn.map(pal).join(""):"");
 }
 function pinFurn(k){if(!BASE_TYPES.includes(k)&&!myFurn.includes(k)){myFurn.unshift(k); saveFurnPrefs();} renderPalette();}
-function unpinFurn(k){myFurn=myFurn.filter(x=>x!==k); saveFurnPrefs(); renderPalette(); toast(`‘${FURN[k].name}’을(를) 목록에서 뺐어요. 검색하면 다시 추가할 수 있어요`);}
+function unpinFurn(k){myFurn=myFurn.filter(x=>x!==k); saveFurnPrefs(); renderPalette(); toast(`‘${FURN[k].name}’${eul(FURN[k].name)} 목록에서 뺐어요. 검색하면 다시 추가할 수 있어요`);}
 /* ---------- 가구 검색 · 직접 추가 ---------- */
 const POPULAR=["x_dresser","x_aircon","x_washer","x_dryer","x_fridge","x_tv","x_ldesk","x_bunk"];
 const norm=t=>String(t).toLowerCase().replace(/\s+/g,"");
@@ -2765,27 +2838,41 @@ function searchFurn(q){
     if(al.some(a=>a===n)) return 55; if(al.some(a=>a.includes(n)||n.includes(a)&&a.length>=2)) return 40; return 0;};
   return all.map(k=>[k,sc(k)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).map(x=>x[0]).slice(0,8);
 }
-function fchip(k){const f=FURN[k]; return `<button class="fchip" onclick="pickFurn('${k}')">${f.icon} ${escapeHtml(f.name)} <small>${f.w}×${f.d}m</small></button>`;}
+function fchip(k){const f=FURN[k]; return `<button class="fchip" onclick="pickFurn('${k}')">${f.icon} ${escapeHtml(f.name)} <small>${msz(f.w,f.d)}</small></button>`;}
 function renderFSearch(){
   const q=document.getElementById("fq").value.trim(), box=document.getElementById("fres");
   document.getElementById("fq-x").hidden=!q;
   if(!q){box.innerHTML=`<span class="fcap">자주 찾는 가구</span>`+POPULAR.filter(k=>!myFurn.includes(k)).slice(0,6).map(fchip).join(""); return;}
   const r=searchFurn(q), exact=r.some(k=>norm(FURN[k].name)===norm(q));
   box.innerHTML=(r.length?`<span class="fcap">검색 결과 · 누르면 방에 놓여요</span>`+r.map(fchip).join(""):`<span class="fcap">‘${escapeHtml(q)}’ 은(는) 목록에 없어요. 직접 만들어 보세요</span>`)
-    +(exact?"":`<button class="fchip make" onclick="openFNew()">＋ ‘${escapeHtml(q)}’ 직접 만들기</button>`);
+    +(exact?"":(()=>{const st=stdSizeFor(q), sz=st||DEFAULT_SIZE; return `<button class="fchip make" onclick="openFNew()">＋ ‘${escapeHtml(q)}’ 직접 만들기 <small>${st?"표준":"기본"} ${msz(sz.w,sz.d)}</small></button>`;})());
 }
 function fqEnter(){const q=document.getElementById("fq").value.trim(); if(!q) return; const r=searchFurn(q); if(r.length&&norm(FURN[r[0]].name)===norm(q)) pickFurn(r[0]); else if(r.length===0) openFNew();}
 function clearFSearch(){const i=document.getElementById("fq"); i.value=""; document.getElementById("fres").innerHTML=""; document.getElementById("fq-x").hidden=true; closeFNew();}
 function pickFurn(k){
   pinFurn(k); clearFSearch(); document.getElementById("fq").blur();
-  if(addItem(k)) toast(`‘${FURN[k].name}’을(를) 놓았어요. 끌어서 옮기고 모서리로 크기를 맞춰요`);
+  if(addItem(k)) toast(`‘${FURN[k].name}’${eul(FURN[k].name)} ${msz(FURN[k].w,FURN[k].d)}로 놓았어요. 모서리나 슬라이더로 크기를 바꿀 수 있어요`);
 }
 const FN_ICONS=["📦","🪑","🛋","🗄️","🧺","📺","🖥️","🎮","🐈","🪴","🎸","🧸","🏋️","🧳","🪞","💡"];
-let fnIcon="📦";
+let fnIcon="📦", fnDirty=false, fnIconPicked=false;
+function renderFnIcons(){
+  const g=document.getElementById("fn-icons"), list=FN_ICONS.includes(fnIcon)?FN_ICONS:[fnIcon,...FN_ICONS];
+  g.innerHTML=list.map(e=>`<button type="button" class="${e===fnIcon?"on":""}" onclick="fnIcon='${e}';fnIconPicked=true;renderFnIcons()">${e}</button>`).join("");
+}
+function applyStd(){            // 이름이 바뀔 때마다 표준 규격을 찾아 가로·세로·높이 기본값으로 채움 (직접 고친 뒤에는 유지)
+  const g=id=>document.getElementById(id), std=stdSizeFor(g("fn-name").value.trim()), sz=std||DEFAULT_SIZE;
+  if(!fnDirty){g("fn-w").value=sz.w.toFixed(2).replace(/0$/,""); g("fn-d").value=sz.d.toFixed(2).replace(/0$/,""); g("fn-h").value=sz.h.toFixed(2).replace(/0$/,"");}
+  if(std&&!fnIconPicked){fnIcon=std.icon; renderFnIcons();}
+  const box=g("fn-std");
+  box.className="fnstd "+(std?"on":"");
+  box.innerHTML=!g("fn-name").value.trim()?"이름을 입력하면 표준 규격을 찾아 자동으로 채워요"
+    :std?`📏 <b>${escapeHtml(std.name)}</b> 표준 규격 ${msz(std.w,std.d)} (높이 ${m1(std.h)}m)${fnDirty?" · 직접 고친 값 유지 중 <button type='button' onclick='fnDirty=false;applyStd()'>표준으로</button>":" 자동 적용"}`
+    :`📦 표준 규격에 없는 가구라 기본 ${msz(DEFAULT_SIZE.w,DEFAULT_SIZE.d)}로 설정했어요${fnDirty?" · 직접 고친 값 유지 중":""}`;
+}
 function openFNew(){
   const q=document.getElementById("fq").value.trim(), g=id=>document.getElementById(id);
-  g("fn-name").value=q.slice(0,12); g("fn-w").value="1.0"; g("fn-d").value="0.6"; g("fn-h").value="1.0"; fnIcon="📦";
-  g("fn-icons").innerHTML=FN_ICONS.map(e=>`<button type="button" class="${e===fnIcon?"on":""}" onclick="fnIcon='${e}';this.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===this))">${e}</button>`).join("");
+  g("fn-name").value=q.slice(0,12); fnIcon="📦"; fnDirty=false; fnIconPicked=false;
+  renderFnIcons(); applyStd();
   g("fnew").hidden=false; g("fres").innerHTML=""; g("fnew").scrollIntoView({block:"nearest",behavior:"smooth"});
 }
 function closeFNew(){document.getElementById("fnew").hidden=true;}
@@ -2796,7 +2883,8 @@ function createCustom(){
   const same=Object.keys(FURN).find(k=>norm(FURN[k].name)===norm(name)&&k!=="win"&&k!=="door");
   if(same){closeFNew(); pickFurn(same); return;}
   const k="c_"+Date.now().toString(36);
-  customFurn[k]={name,w:num("fn-w",0.2,5,1),d:num("fn-d",0.2,5,0.6),h:num("fn-h",0.05,3,1),icon:fnIcon,color:colorFor(k),custom:true};
+  const std=stdSizeFor(name)||DEFAULT_SIZE;      // 비었거나 잘못 입력한 칸은 표준(없으면 1.0×1.0m)으로
+  customFurn[k]={name,w:num("fn-w",0.2,5,std.w),d:num("fn-d",0.2,5,std.d),h:num("fn-h",0.05,3,std.h),icon:fnIcon,color:colorFor(k),custom:true};
   FURN[k]=customFurn[k]; saveFurnPrefs(); closeFNew(); pickFurn(k);
 }
 function addItem(type){
