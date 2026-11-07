@@ -381,6 +381,7 @@ body{
   background-attachment:fixed;
   letter-spacing:-.15px;-webkit-font-smoothing:antialiased;
 }
+html{background:#F1E8DA}
 #app{background:transparent}
 ::selection{background:#E4D5BD}
 :focus-visible{outline:2px solid var(--deep);outline-offset:2px}
@@ -558,6 +559,7 @@ input[type=checkbox]{accent-color:var(--deep)}
 .selp .sh{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .selp .sh small{color:var(--ink-soft);font-size:12px}
 .stdbtn{margin-left:auto}
+.btn-danger{background:var(--rose-soft);color:var(--rose);border:1px solid #EBC9BF}
 </style>
 </head>
 <body>
@@ -616,7 +618,7 @@ input[type=checkbox]{accent-color:var(--deep)}
       <div class="step-pane" data-step="1" hidden>
         <h1>방 모양을 만들어 주세요</h1>
         <p class="sub">네모 블록을 끌어서 내 방과 비슷한 모양·크기로 맞추면 돼요. 정확하지 않아도 괜찮아요.</p>
-        <details class="guide" id="rguide" open ontoggle="try{localStorage.setItem('bangku.guide',this.open?'1':'0')}catch(e){}">
+        <details class="guide" id="rguide" open ontoggle="try{if(this.open) localStorage.removeItem('bangku.guide'); else localStorage.setItem('bangku.guide','0');}catch(e){}">
           <summary>처음이라면 이렇게 따라 해 보세요</summary>
           <div class="gs"><b>1</b><span><strong>모양 고르기</strong> — 네모 방인지 ㄱ자 방인지 골라요</span></div>
           <div class="gs"><b>2</b><span><strong>크기 맞추기</strong> — 블록 가장자리의 <i class="gdot"></i>를 끌거나 아래 숫자를 바꿔요</span></div>
@@ -855,6 +857,12 @@ input[type=checkbox]{accent-color:var(--deep)}
       <div class="card" id="my-saju" style="margin-bottom:16px"></div>
       <span class="label">저장된 공간</span>
       <div id="my-list"></div>
+      <span class="label">데이터 관리</span>
+      <div class="card">
+        <p class="hint" style="margin:0 0 12px">입력한 사주 정보, 그리던 방, 가구 배치는 이 기기에 자동으로 저장되고, 앱을 다시 열면 하던 화면으로 바로 이어져요.</p>
+        <p class="hint" id="my-saved" style="margin:0 0 12px"></p>
+        <button class="btn btn-danger" onclick="resetAll()">🔄 데이터 초기화하고 처음부터 시작</button>
+      </div>
     </div>
   </section>
 
@@ -872,7 +880,8 @@ input[type=checkbox]{accent-color:var(--deep)}
 const mem = {};
 const store = {
   get(k){ try{ return localStorage.getItem(k); }catch(e){ return mem[k] ?? null; } },
-  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){ mem[k]=v; } }
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){ mem[k]=v; } },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} delete mem[k]; }
 };
 
 /* =========================================================
@@ -2426,6 +2435,8 @@ function go(id){
   window.scrollTo(0,0);
   if(id==="s-home") renderHome();
   if(id==="s-my") renderMy();
+  if(id!=="s-onboard") store.set("bangku.onboarded","1");
+  autosave();
 }
 function toast(msg){
   const t=document.getElementById("toast");
@@ -3061,6 +3072,8 @@ function renderMy(){
     <button class="btn btn-ghost" style="margin-top:10px" onclick="startNew()">사주 정보 다시 입력</button>`
     : `<div class="empty" style="padding:20px">아직 사주 정보가 없어요.</div>`;
 
+  let snap=null; try{snap=JSON.parse(store.get(SESSION_KEY)||"null");}catch(e){}
+  document.getElementById("my-saved").textContent=snap&&snap.ts?`마지막 자동 저장: ${new Date(snap.ts).toLocaleString("ko-KR",{month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"})}`:"";
   const box=document.getElementById("my-list");
   box.innerHTML = state.spaces.length ? state.spaces.map(s=>`
     <div class="space-card" onclick="openSpace('${s.id}')">
@@ -3068,6 +3081,84 @@ function renderMy(){
       <div class="space-meta"><strong>${escapeHtml(s.name)}</strong>
       <span>${s.w}m × ${s.d}m · 가구 ${s.items.filter(i=>i.type!=="win"&&i.type!=="door").length}개</span></div>
     </div>`).join("") : `<div class="empty" style="padding:20px">저장된 공간이 없어요.</div>`;
+}
+
+/* =========================================================
+   이전 상태 유지 — 작업 상태를 자동 저장하고, 다시 열면 하던 화면으로 바로 진입
+   ========================================================= */
+const SESSION_KEY="bangku.session";
+const ALL_KEYS=["bangku.spaces","bangku.profile","bangku.session","bangku.customFurn","bangku.myFurn","bangku.guide","bangku.onboarded"];
+let resetting=false;
+const curScreen=()=>{const el=document.querySelector(".screen.active"); return el?el.id:"s-onboard";};
+function persistCur(){            // 편집 중인 공간을 '저장된 공간'에 바로 반영
+  const c=state.cur; if(!c||!c.items) return;
+  const rec={...c, items:c.items.map(i=>({...i,name:FURN[i.type]?FURN[i.type].name:i.name}))};
+  const i=state.spaces.findIndex(x=>x.id===rec.id); if(i>=0) state.spaces[i]=rec; else state.spaces.unshift(rec);
+  store.set("bangku.spaces",JSON.stringify(state.spaces));
+}
+function saveSession(){
+  if(resetting) return;
+  try{
+    const scr=curScreen(); if(scr==="s-onboard") return;
+    const v=id=>{const el=document.getElementById(id); return el?(el.type==="checkbox"?el.checked:el.value):null;};
+    const snap={v:1,ts:Date.now(),screen:scr,step:state.step,sjMode,
+      draft:{...draft,photo:null},
+      form:{uname:v("uname"),birth:v("birth"),btime:v("btime"),unk:v("unk"),leap:v("leap")},
+      room:{rmode,blocks,bsel,pts,pclosed},
+      curId:state.cur?state.cur.id:null};
+    if(["s-edit","s-result","s-report"].includes(scr)&&state.cur) persistCur();
+    store.set(SESSION_KEY,JSON.stringify(snap));
+  }catch(e){}
+}
+let saveT=0;
+function autosave(){clearTimeout(saveT); saveT=setTimeout(saveSession,400);}
+["pointerup","input","change","keyup"].forEach(ev=>document.addEventListener(ev,autosave,{passive:true,capture:true}));
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden") saveSession();});   // 앱을 내리거나 탭을 닫을 때 즉시 저장
+window.addEventListener("pagehide",saveSession);
+function restoreSession(){       // 저장된 데이터가 있으면 온보딩을 건너뛰고 이전 화면으로
+  let snap=null; try{snap=JSON.parse(store.get(SESSION_KEY)||"null");}catch(e){}
+  if(!(snap||state.profile||state.spaces.length||store.get("bangku.onboarded"))) return null;   // 첫 방문 → 온보딩
+  if(state.profile&&state.profile.birth){const S=calcSaju(state.profile); if(!S.err) state.S=S;}
+  try{
+    if(snap&&snap.draft) draft={...draft,...snap.draft};
+    const scr=snap&&snap.screen, space=snap&&snap.curId&&state.spaces.find(x=>x.id===snap.curId);
+    if(["s-edit","s-result","s-report"].includes(scr)&&space){
+      openSpace(space.id);
+      if(scr==="s-result") openResult();
+      if(scr==="s-report"&&state.profile) openReport();
+      return "배치하던 방";
+    }
+    if(scr==="s-input"){
+      startNew();
+      const f=snap.form||{}, g=id=>document.getElementById(id);
+      if(f.uname!=null) g("uname").value=f.uname; if(f.birth) g("birth").value=f.birth; if(f.btime!=null) g("btime").value=f.btime;
+      g("unk").checked=!!f.unk; g("btime").disabled=!!f.unk; g("leap").checked=!!f.leap;
+      if(snap.draft&&snap.draft.cal){draft.cal=snap.draft.cal; chips("calc",[["solar","양력"],["lunar","음력"]],draft.cal,v=>{draft.cal=v; g("leapw").hidden=v!=="lunar";}); g("leapw").hidden=draft.cal!=="lunar";}
+      if(snap.draft) draft={...draft,...snap.draft};
+      if(snap.step===1){
+        const r=snap.room||{};
+        if(r.blocks&&r.blocks.length){blocks=r.blocks; bsel=Math.min(r.bsel==null?-1:r.bsel,blocks.length-1);}
+        pts=r.pts||[]; pclosed=!!r.pclosed; rmode=r.rmode==="free"?"free":"block";
+        document.querySelectorAll("#rmode-tabs .tab").forEach(t=>t.classList.toggle("on",t.dataset.m===rmode));
+        g("bpane").hidden=rmode!=="block"; g("fpane").hidden=rmode!=="free";
+        if(rmode==="block") drawBlocks(); else drawPoly();
+        chips("rtype",[["bed","침실"],["living","거실"],["study","공부방·서재"]],draft.rtype,v=>draft.rtype=v);
+        setStep(1);
+        return "그리던 방 모양";
+      }
+      return "입력하던 사주 정보";
+    }
+    if(scr==="s-concern"&&state.profile){draft.concerns=draft.concerns||[]; renderConcern(); go("s-concern"); return "고민 선택";}
+    if(scr==="s-saju"&&state.profile){openSaju(snap.sjMode||"input",state.profile); return "사주 리포트";}
+  }catch(e){}
+  go("s-home"); return "";
+}
+function resetAll(){
+  if(!confirm("모든 데이터를 지우고 처음부터 시작할까요?\n사주 정보, 저장된 공간, 직접 만든 가구가 모두 삭제되며 되돌릴 수 없어요.")) return;
+  resetting=true; clearTimeout(saveT);
+  ALL_KEYS.forEach(k=>store.del(k));
+  try{Object.keys(localStorage).filter(k=>k.startsWith("bangku.")).forEach(k=>localStorage.removeItem(k));}catch(e){}
+  location.reload();
 }
 
 /* 햅틱 피드백 */
@@ -3086,7 +3177,9 @@ window.addEventListener("resize",()=>{
   if(document.getElementById("s-edit").classList.contains("active")) renderCanvas();
   if(document.getElementById("s-result").classList.contains("active")){ drawPlan(); build3D(); }
 });
-setTimeout(()=>{const sp=document.getElementById("splash"); if(!sp) return; sp.classList.add("off"); setTimeout(()=>sp.remove(),500);},1600);
+const restored=restoreSession();
+setTimeout(()=>{const sp=document.getElementById("splash"); if(!sp) return; sp.classList.add("off"); setTimeout(()=>sp.remove(),500);
+  if(restored) setTimeout(()=>toast(`${restored} 화면을 이어서 불러왔어요`),450);},1600);
 </script>
 </body>
 </html>
