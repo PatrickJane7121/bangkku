@@ -560,6 +560,36 @@ input[type=checkbox]{accent-color:var(--deep)}
 .selp .sh small{color:var(--ink-soft);font-size:12px}
 .stdbtn{margin-left:auto}
 .btn-danger{background:var(--rose-soft);color:var(--rose);border:1px solid #EBC9BF}
+.f3g{position:absolute;left:0;top:0;transform-style:preserve-3d;transform-origin:0 0}
+.sh3{background:#3A2A18;border-radius:6px}
+.wall3,.op3{transition:opacity .25s}
+.wall3.wall-hide{opacity:0;pointer-events:none}
+.op3.wall-hide{opacity:.18}
+.leaf3{border-radius:50%}
+#view3d{background:radial-gradient(90% 70% at 50% 25%,#FFFDF8 0%,#EFE5D5 70%,#E4D7C3 100%)}
+#view3d::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 40%,rgba(0,0,0,0) 55%,rgba(60,40,20,.10) 100%)}
+.floor3{border:none;box-shadow:0 0 0 1px rgba(120,90,50,.15)}
+.cvhead{display:flex;flex-direction:column;gap:2px;margin:-4px 0 12px}
+.cvhead b{font-size:16px;color:var(--deep-dark)}
+.cvhead span{font-size:13.5px;color:var(--ink-soft);line-height:1.5}
+.cv3d{position:relative;height:280px;border-radius:18px;overflow:hidden;perspective:1100px;background:radial-gradient(90% 80% at 35% 15%,#FFF8EA 0%,#EADCC6 75%,#DCCBB1 100%);box-shadow:inset 0 0 0 1px rgba(160,130,90,.15)}
+.cvscene{position:absolute;left:50%;top:55%;transform-style:preserve-3d}
+.cvlight{position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,rgba(255,236,200,.42) 0%,rgba(255,236,200,0) 45%),radial-gradient(120% 90% at 50% 45%,rgba(0,0,0,0) 55%,rgba(70,45,20,.18) 100%);mix-blend-mode:soft-light}
+.cvseg{position:absolute;right:10px;top:10px;display:flex;gap:4px;background:rgba(255,253,249,.8);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:12px;padding:3px}
+.cvseg button{border:none;background:none;font:inherit;font-size:12px;font-weight:700;color:var(--ink-soft);padding:6px 10px;border-radius:9px;cursor:pointer}
+.cvseg button.on{background:var(--card);color:var(--deep-dark);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.cvpal{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 4px}
+.cvpal span{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-soft)}
+.cvpal i{width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.cvdl{margin:10px 0 0}.cvdl dt{font-size:12.5px;font-weight:700;color:var(--deep-dark);margin-top:8px}.cvdl dd{margin:2px 0 0;font-size:14px;line-height:1.65}
+.cvready{margin-top:14px;padding:14px;border-radius:16px;background:#F6F1E8;border:1px dashed var(--line-2)}
+.cvready b{font-size:14px}.cvready p{font-size:13px;line-height:1.6;color:var(--ink-soft);margin:6px 0 10px}
+.cvready .btn{padding:12px;font-size:13.5px}
+.cvgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.cvimg{display:block;position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/3;background:#EEE6D8}
+.cvimg img{width:100%;height:100%;object-fit:cover;display:block}
+.cvimg small{position:absolute;left:6px;bottom:4px;font-size:10px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.cvgen{width:100%;border-radius:16px;margin-top:14px;display:block}
 </style>
 </head>
 <body>
@@ -1809,16 +1839,18 @@ function openReport(){
       ${tot&&!autoBad.length?`<p style="margin:10px 0 0">배치로 확인되는 규칙은 모두 통과했어요. 👏</p>`:""}
       <button class="btn btn-ghost" style="margin-top:12px" onclick="go('s-edit')">배치 다시 수정하기</button></div>
     <div class="card sec" id="cmp"><h2><span class="eb">02 · Ideal Layout</span>고민에 맞는 이상적인 배치</h2><div id="cmp-body"><p class="hint">현재 배치를 점검하고 고민에 맞는 배치를 찾는 중이에요…</p></div></div>
-    <div class="card sec"><h2><span class="eb">03 · Personality</span>나의 타고난 성향과 장점</h2>
+    <div class="card sec" id="concept"><h2><span class="eb">03 · Concept View</span>이 배치가 완성된 모습</h2><div id="concept-body"></div></div>
+    <div class="card sec"><h2><span class="eb">04 · Personality</span>나의 타고난 성향과 장점</h2>
       <p style="margin:0 0 6px"><b>${tagN(de)}</b> — ${TRAIT[de]}</p>
       <ul class="plain"><li><b>${SSG[g0]} ${ss.grp[g0]}개</b> — ${GRP[g0].s}</li>${ss.grp[g1]?`<li><b>${SSG[g1]} ${ss.grp[g1]}개</b> — ${GRP[g1].s}</li>`:""}</ul></div>
-    <div class="card sec"><h2><span class="eb">04 · Concerns</span>지금 겪는 고민의 원인과 해결책</h2>
+    <div class="card sec"><h2><span class="eb">05 · Concerns</span>지금 겪는 고민의 원인과 해결책</h2>
       ${cs.map((k,i)=>`<div class="${i?"blk":""}"><p style="margin:0 0 6px"><span class="tag">${CLAB[k]}</span></p>
         <p style="margin:0 0 6px"><b>원인</b> — ${GRP[g0].t} ${CEFF[k]}</p>
         <p style="margin:0"><b>해결책</b> — ${GRP[g0].tip} ${CTIP[k]}</p></div>`).join("")}</div>
-    <div class="card sec"><h2><span class="eb">05 · Quick Tips</span>초간단 인테리어 팁</h2><ul class="todo">${tips.map(t=>`<li><span>${t}</span></li>`).join("")}</ul></div>
+    <div class="card sec"><h2><span class="eb">06 · Quick Tips</span>초간단 인테리어 팁</h2><ul class="todo">${tips.map(t=>`<li><span>${t}</span></li>`).join("")}</ul></div>
     <p class="note">사주와 풍수 해석은 전통 이론에 바탕을 둔 참고용 정보예요. 배치 진단은 SRC 규칙 중 배치 좌표로 판정되는 항목만 반영했고, 나머지 항목은 평면도·3D 화면의 ‘풍수 점검’ 탭에서 직접 답할 수 있어요.</p>`;
-  go("s-report"); runCompare();
+  idealItems=null; conceptState={key:KEYS[e1],concerns:cs,which:"now"};
+  go("s-report"); renderConcept(); runCompare();
 }
 async function copyReport(){
   try{await navigator.clipboard.writeText(document.getElementById("rp-body").innerText); toast("리포트를 복사했어요");}
@@ -2362,6 +2394,7 @@ async function runCompare(){
   const ideal=await optimize(base,room,ctx,t=>{if(tok===cmpTok) box.innerHTML=`<p class="hint">${t}</p>`;});
   if(tok!==cmpTok) return;
   idealItems=ideal;
+  if(conceptState){conceptState.which="ideal"; renderConcept();}
   const A0=dg0.res, A1=diagnose(ideal,room).res, ids=Object.keys(A1), tot=ids.length;
   const pct=A=>weighScore(ids.map(id=>({id,bad:!!A[id]}))).pct, s0=pct(A0), s1=pct(A1);
   const fixed=ids.filter(id=>A0[id]&&!A1[id]), still=ids.filter(id=>A1[id]), worse=ids.filter(id=>A0[id]===false&&A1[id]);
@@ -2958,58 +2991,172 @@ function drawPlan(){
     cv.appendChild(el); mark(el,it);
   });
 }
-/* --- CSS 3D: 바닥 + 벽 + 가구 박스 --- */
+/* --- CSS 3D: 재질감(우드·패브릭·가전·유리) + 부드러운 그림자 --- */
 let rotZ=0, rotX=58, zoom=1;
-function build3D(){
-  const scene=document.getElementById("scene3d");
-  const {w:W,d:D}=state.cur;
-  const S=Math.min(230/Math.max(W,D), 46);   // m → px
-  const pw=W*S, pd=D*S;
-  const poly=polyOf(state.cur), ox=-pw/2, oy=-pd/2;
+function build3D(){ render3D(document.getElementById("scene3d"),state.cur.items,state.cur,{}); apply3D(); }
+// 색 유틸
+const hexRgb=h=>{const n=parseInt(h.slice(1),16); return [n>>16,(n>>8)&255,n&255];};
+const mixHex=(a,b,t)=>{const A=hexRgb(a),B=hexRgb(b); return "#"+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,"0")).join("");};
+function shade(hex,amt){const [r,g,b]=hexRgb(hex).map(v=>Math.max(0,Math.min(255,v+amt))); return `rgb(${r},${g},${b})`;}
+/* 재질 텍스처 (CSS 배경) */
+const TEX={
+  wood:c=>`repeating-linear-gradient(91deg,rgba(255,255,255,.07) 0 2px,rgba(60,35,10,.05) 2px 3px,transparent 3px 11px),repeating-linear-gradient(89deg,rgba(60,35,10,.05) 0 1px,transparent 1px 23px),linear-gradient(180deg,${shade(c,10)},${c})`,
+  fabric:c=>`repeating-linear-gradient(45deg,rgba(255,255,255,.08) 0 1px,transparent 1px 4px),repeating-linear-gradient(-45deg,rgba(40,30,20,.06) 0 1px,transparent 1px 4px),linear-gradient(180deg,${shade(c,8)},${c})`,
+  linen:c=>`repeating-linear-gradient(0deg,rgba(255,255,255,.12) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(40,30,20,.04) 0 1px,transparent 1px 3px),linear-gradient(180deg,${shade(c,6)},${c})`,
+  matte:c=>`linear-gradient(180deg,${shade(c,12)},${c})`,
+  appliance:()=>`linear-gradient(100deg,rgba(255,255,255,.65) 0%,rgba(255,255,255,0) 38%,rgba(0,0,0,.04) 100%),linear-gradient(180deg,#F8F8F6,#E6E5E1)`,
+  dark:()=>`linear-gradient(100deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,0) 35%),linear-gradient(180deg,#3B3733,#26231F)`,
+  glass:()=>`linear-gradient(125deg,rgba(255,255,255,.7) 0 14%,rgba(255,255,255,.08) 26%,rgba(255,255,255,.38) 40%,rgba(255,255,255,.04) 56%),linear-gradient(180deg,rgba(186,220,240,.75),rgba(150,196,226,.6))`,
+  terracotta:()=>`linear-gradient(180deg,#C98A63,#A9673F)`,
+  leaf:()=>`radial-gradient(circle at 35% 30%,#9CC584 0%,#5F8F4E 55%,#3F6B36 100%)`,
+  rug:c=>`repeating-linear-gradient(90deg,rgba(255,255,255,.12) 0 2px,transparent 2px 9px),repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 5px),linear-gradient(180deg,${shade(c,6)},${c})`
+};
+const WOOD={oak:"#C9A57A",light:"#D9BE97",walnut:"#8E6B4E",white:"#EDE8DF"};
+// 빛은 북서쪽 위에서 — 면 방향별 어둡기
+const FACE_DARK={N:.26,E:.2,S:.06,W:.1};
+/* 상자 하나: 4개의 옆면 + 윗면, 바닥에서 z0만큼 띄움. side 텍스처, 앞면 장식(det) */
+function box3(x,y,w,d,h,z0,tex,det){
+  if(w<=0||d<=0||h<=0) return "";
+  const sides=[{k:"N",px:x,py:y,len:w,a:0},{k:"E",px:x+w,py:y,len:d,a:90},{k:"S",px:x+w,py:y+d,len:w,a:180},{k:"W",px:x,py:y+d,len:d,a:270}];
+  const ov=a=>`linear-gradient(rgba(40,25,10,${a}),rgba(40,25,10,${a}))`;
+  let h3=`<div class="f3g" style="transform:translateZ(${z0}px)">`;
+  sides.forEach(f=>{ const extra=det&&det[f.k]?det[f.k]+",":"";
+    h3+=`<div class="f3" style="left:${f.px}px;top:${f.py}px;width:${f.len}px;height:${h}px;background:${extra}${ov(FACE_DARK[f.k])},${tex};transform:rotate(${f.a}deg) rotateX(90deg)"></div>`; });
+  const top=det&&det.top?det.top+",":"";
+  h3+=`<div class="f3" style="left:${x}px;top:${y}px;width:${w}px;height:${d}px;background:${top}radial-gradient(120% 120% at 20% 10%,rgba(255,255,255,.22),rgba(255,255,255,0) 60%),${tex};transform:translateZ(${h}px);box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)"></div>`;
+  return h3+"</div>";
+}
+// 바닥에 떨어지는 부드러운 그림자 (빛 반대쪽으로 살짝 밀림)
+function shadow3(x,y,w,d,hgt,S){
+  const off=Math.min(14,4+hgt*0.06), blur=Math.min(14,3+hgt*0.05);
+  return `<div class="f3 sh3" style="left:${x+off*0.6}px;top:${y+off}px;width:${w}px;height:${d}px;filter:blur(${blur}px);opacity:${Math.min(.42,.18+hgt/S*0.12)}"></div>`
+    +`<div class="f3 sh3" style="left:${x-1}px;top:${y-1}px;width:${w+2}px;height:${d+2}px;filter:blur(2px);opacity:.28"></div>`;
+}
+// 가구 종류 → 모델 종류
+const MODEL_OF=t=>{
+  if(["bed","x_sbed","x_ssbed","x_dbed","x_qbed","x_kbed"].includes(t)) return "bed";
+  if(t==="x_bunk") return "bunk";
+  if(["sofa","x_sofa2","x_sofa3","x_sofabed","x_armchair"].includes(t)) return "sofa";
+  if(["desk","table","x_sdesk","x_ctable","x_dtable2","x_dtable4","x_night"].includes(t)) return "table";
+  if(["wardrobe","x_hanger","x_styler"].includes(t)) return "wardrobe";
+  if(["shelf","x_cabinet","x_drawer","x_shoe","x_mwave","x_tv","x_dresser"].includes(t)) return "cabinet";
+  if(["x_washer","x_dryer","x_washtower","x_dish"].includes(t)) return "washer";
+  if(["x_fridge","x_kfridge","x_minifridge","x_aircon","x_purifier","x_humid","x_dehumid","x_water","x_robot","x_aircon_w"].includes(t)) return "appliance";
+  if(["x_pc","x_tvstand","x_piano","x_printer","x_gchair"].includes(t)) return "dark";
+  if(t==="x_plant") return "plant";
+  if(t==="x_rug") return "rug";
+  if(t==="win") return "win";
+  if(t==="door") return "door";
+  const n=FURN[t]?FURN[t].name:"";
+  if(/침대/.test(n)) return "bed"; if(/소파|의자|쿠션/.test(n)) return "sofa"; if(/냉장|세탁|건조|에어컨|청정|가전/.test(n)) return "appliance";
+  if(/화분|식물|나무/.test(n)) return "plant"; if(/러그|카펫|매트/.test(n)) return "rug"; if(/책상|테이블|식탁/.test(n)) return "table";
+  return "matte";
+};
+// 국소 좌표(회전 전)에서 앞/머리 방향: rot(옛 방식 90° 단위)을 반영
+const localSide=(it,base)=>SD[(SD.indexOf(base)+Math.round((it.rot||0)/90))%4];
+/* 모델 하나 그리기 (x,y = 국소 좌상단 px, w,d px, S = 1m 당 px) */
+function model3(it,x,y,w,d,S,mood){
+  const f=FURN[it.type]||{h:1,color:"#D8D2C8"}, H=f.h*S, m=MODEL_OF(it.type);
+  const fab=mood.fabric, fab2=mood.fabric2, U=v=>v*S;
+  const sideRect=(sd,t)=>sd==="N"?[x,y,w,t]:sd==="S"?[x,y+d-t,w,t]:sd==="W"?[x,y,t,d]:[x+w-t,y,t,d];
+  if(m==="bed"||m==="bunk"){
+    const hs=localSide(it,"N"), frame=U(0.25), mat=U(0.2), hbT=Math.min(U(0.08),Math.min(w,d)*0.1);
+    const ins=Math.min(w,d)*0.03, [hx,hy,hw,hd]=sideRect(hs,hbT);
+    const inner=hs==="N"?[x+ins,y+hbT,w-2*ins,d-hbT-ins]:hs==="S"?[x+ins,y+ins,w-2*ins,d-hbT-ins]:hs==="W"?[x+hbT,y+ins,w-hbT-ins,d-2*ins]:[x+ins,y+ins,w-hbT-ins,d-2*ins];
+    const [ix,iy,iw,idd]=inner, vert=hs==="N"||hs==="S";
+    // 이불은 발치 쪽 65%, 베개는 머리 쪽
+    const dv=vert?[ix,hs==="N"?iy+idd*0.35:iy,iw,idd*0.65]:[hs==="W"?ix+iw*0.35:ix,iy,iw*0.65,idd];
+    const pl=vert?(i=>[ix+iw*(i?0.53:0.07),hs==="N"?iy+idd*0.05:iy+idd*0.78,iw*0.4,idd*0.17]):(i=>[hs==="W"?ix+iw*0.05:ix+iw*0.78,iy+idd*(i?0.53:0.07),iw*0.17,idd*0.4]);
+    let h3=box3(x,y,w,d,frame,0,TEX.wood(WOOD.oak))+box3(ix,iy,iw,idd,mat,frame,TEX.linen("#F4F1EA"))
+      +box3(dv[0],dv[1],dv[2],dv[3],U(0.05),frame+mat,TEX.fabric(fab))
+      +[0,1].map(i=>{const q=pl(i); return box3(q[0],q[1],q[2],q[3],U(0.07),frame+mat,TEX.linen("#FBFAF6"));}).join("")
+      +box3(hx,hy,hw,hd,U(0.95),0,TEX.wood(WOOD.walnut));
+    if(m==="bunk"){ const up=U(1.15);
+      h3+=box3(x,y,w,d,U(0.08),up,TEX.wood(WOOD.oak))+box3(ix,iy,iw,idd,U(0.15),up+U(0.08),TEX.linen("#F4F1EA"))+box3(dv[0],dv[1],dv[2],dv[3],U(0.04),up+U(0.23),TEX.fabric(fab2));
+      const pp=Math.min(w,d)*0.07; [[x,y],[x+w-pp,y],[x,y+d-pp],[x+w-pp,y+d-pp]].forEach(([px,py])=>{h3+=box3(px,py,pp,pp,U(1.6),0,TEX.wood(WOOD.walnut));}); }
+    return h3;
+  }
+  if(m==="sofa"){
+    const bs=localSide(it,"N"), seat=Math.min(H,U(0.42)), backT=Math.min(w,d)*0.22, armT=Math.min(w,d)*0.16;
+    const [bx,by,bw,bd]=sideRect(bs,backT), vert=bs==="N"||bs==="S";
+    const arms=vert?[[x,y,armT,d],[x+w-armT,y,armT,d]]:[[x,y,w,armT],[x,y+d-armT,w,armT]];
+    const base=box3(x,y,w,d,U(0.12),0,TEX.wood(WOOD.walnut));
+    const cushion=vert?[x+armT,bs==="N"?y+backT:y,w-2*armT,d-backT]:[bs==="W"?x+backT:x,y+armT,w-backT,d-2*armT];
+    return base+box3(cushion[0],cushion[1],cushion[2],cushion[3],seat-U(0.12),U(0.12),TEX.fabric(fab))
+      +box3(bx,by,bw,bd,H-U(0.12),U(0.12),TEX.fabric(shade(fab,-10)))
+      +arms.map(a=>box3(a[0],a[1],a[2],a[3],seat+U(0.12)-U(0.12),U(0.12),TEX.fabric(shade(fab,-6)))).join("");
+  }
+  if(m==="table"){
+    const top=U(0.04), leg=Math.max(3,Math.min(w,d)*0.06), wood=it.type==="x_ctable"?WOOD.walnut:WOOD.oak;
+    return [[x,y],[x+w-leg,y],[x,y+d-leg],[x+w-leg,y+d-leg]].map(([px,py])=>box3(px,py,leg,leg,H-top,0,TEX.wood(shade(wood,-14)))).join("")
+      +box3(x,y,w,d,top,H-top,TEX.wood(wood));
+  }
+  if(m==="wardrobe"||m==="cabinet"){
+    const fr=localSide(it,"S");
+    const seam=m==="wardrobe"?`linear-gradient(90deg,transparent calc(50% - 1px),rgba(40,25,10,.35) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),radial-gradient(circle at 46% 50%,rgba(40,25,10,.45) 0 1.5px,transparent 2px),radial-gradient(circle at 54% 50%,rgba(40,25,10,.45) 0 1.5px,transparent 2px)`
+      :`repeating-linear-gradient(0deg,transparent 0 calc(25% - 1px),rgba(40,25,10,.28) calc(25% - 1px) 25%)`;
+    const tone=m==="wardrobe"?WOOD.white:it.type==="shelf"?WOOD.light:WOOD.oak;
+    return box3(x,y,w,d,H,0,m==="wardrobe"?TEX.matte(tone):TEX.wood(tone),{[fr]:seam});
+  }
+  if(m==="washer"){
+    const fr=localSide(it,"S"), door=`radial-gradient(circle at 50% 58%,#B9C6CF 0 22%,#5B666E 23% 26%,transparent 27%),linear-gradient(180deg,rgba(0,0,0,.06) 0 14%,transparent 14%)`;
+    return box3(x,y,w,d,H,0,TEX.appliance(),{[fr]:door});
+  }
+  if(m==="appliance"){ const z=it.type==="x_aircon_w"?U(1.9):0; return box3(x,y,w,d,H,z,TEX.appliance()); }
+  if(m==="dark") return box3(x,y,w,d,H,0,TEX.dark());
+  if(m==="plant"){
+    const pot=Math.min(H*0.35,U(0.35)), ins=Math.min(w,d)*0.15;
+    return box3(x+ins,y+ins,w-2*ins,d-2*ins,pot,0,TEX.terracotta())
+      +`<div class="f3g" style="transform:translateZ(${pot}px)"><div class="f3 leaf3" style="left:${x}px;top:${y}px;width:${w}px;height:${d}px;background:${TEX.leaf()};transform:translateZ(${H-pot}px)"></div>`
+      +[0,90].map(a=>`<div class="f3 leaf3" style="left:${x}px;top:${y+d/2}px;width:${w}px;height:${H-pot}px;background:${TEX.leaf()};transform:rotateX(90deg) rotateY(${a}deg);transform-origin:50% 0"></div>`).join("")+`</div>`;
+  }
+  if(m==="rug") return box3(x,y,w,d,Math.max(1,U(0.02)),0,TEX.rug(fab2));
+  if(m==="win"){ const T=Math.max(2,Math.min(w,d)); return box3(x,y,w,d,U(1.2),U(0.9),TEX.glass())+box3(x,y,w,d,U(0.04),U(0.86),TEX.matte("#F4F1EC")); }
+  if(m==="door") return box3(x,y,w,d,U(2.0),0,TEX.wood(WOOD.walnut));
+  return box3(x,y,w,d,H,0,TEX.matte(mixHex(f.color||"#D8D2C8","#FFFFFF",0.15)));
+}
+/* 오행 처방 색을 패브릭에 반영 — 3D·콘셉트 뷰 공통 */
+function moodOf(room){
+  const el=ELEMENTS[room.el]?room.el:"earth", base=ELEMENTS[el].color;
+  return {el,fabric:mixHex(base,"#F3EEE6",0.55),fabric2:mixHex(base,"#E9E1D4",0.35),accent:base};
+}
+function render3D(scene,items,room,opts){
+  const {w:W,d:D}=room, S=Math.min((opts.fit||230)/Math.max(W,D),46), pw=W*S, pd=D*S;
+  const poly=polyOf(room), ox=-pw/2, oy=-pd/2, mood=opts.mood||moodOf(room);
   const clip=poly.map(p=>`${p[0]*S}px ${p[1]*S}px`).join(",");
-  let html=`<div class="floor3" style="left:${ox}px;top:${oy}px;width:${pw}px;height:${pd}px;clip-path:polygon(${clip})"></div>`;
-  edgesOf(poly).forEach(e=>{      // 북쪽·서쪽 방향 벽만 세워서 안이 보이게
-    if(e.side==="N"||e.side==="W") html+=wall(ox+e.p[0]*S,oy+e.p[1]*S,e.len*S,Math.atan2(e.uy,e.ux)*180/Math.PI,2.4*S,e.side==="N"?"#E6EFEA":"#EDF4F0");
+  const plank=Math.max(6,0.18*S);
+  let html=`<div class="floor3" style="left:${ox}px;top:${oy}px;width:${pw}px;height:${pd}px;clip-path:polygon(${clip});background:repeating-linear-gradient(90deg,rgba(90,60,30,.10) 0 1px,transparent 1px ${plank}px),repeating-linear-gradient(0deg,transparent 0 ${plank*4.3}px,rgba(90,60,30,.07) ${plank*4.3}px ${plank*4.3+1}px),repeating-linear-gradient(91deg,rgba(255,255,255,.05) 0 2px,transparent 2px 7px),linear-gradient(160deg,#E6D3B5,#D7BF9B)"></div>`;
+  edgesOf(poly).forEach(e=>{      // 모든 벽을 세우고, 카메라 쪽을 향한 벽은 apply3D에서 숨김(인형의 집 시점)
+    html+=wall(ox+e.p[0]*S,oy+e.p[1]*S,e.len*S,Math.atan2(e.uy,e.ux)*180/Math.PI,2.4*S,Math.abs(e.ny)>Math.abs(e.nx)?"#F3ECE2":"#EEE6DA",S,-e.nx,-e.ny);
   });
-
-  // 가구
-  state.cur.items.forEach(it=>{
-    const f=FURN[it.type];
-    html+=`<div style="position:absolute;left:0;top:0;transform-style:preserve-3d;transform-origin:${ox+(it.x+it.w/2)*S}px ${oy+(it.y+it.d/2)*S}px;transform:rotate(${it.ang||0}deg)">`+box(ox+it.x*S, oy+it.y*S, it.w*S, it.d*S, f.h*S, f.color, f.name)+`</div>`;
+  const sorted=items.slice().sort((a,b)=>(MODEL_OF(a.type)==="rug"?-1:0)-(MODEL_OF(b.type)==="rug"?-1:0));
+  sorted.forEach(it=>{
+    const f=FURN[it.type]||{h:1}, m=MODEL_OF(it.type), x=ox+it.x*S, y=oy+it.y*S, w=it.w*S, d=it.d*S;
+    const flat=m==="rug"||m==="win"||m==="door";
+    let wn="";                    // 문·창문은 붙은 벽과 함께 숨김
+    if(m==="win"||m==="door"){const e=nearEdge(it.x+it.w/2,it.y+it.d/2,poly); wn=` data-wx="${-e.nx}" data-wy="${-e.ny}"`;}
+    html+=`<div class="f3g${wn?" op3":""}"${wn} style="transform-origin:${x+w/2}px ${y+d/2}px;transform:rotate(${it.ang||0}deg)">`
+      +(flat?"":shadow3(x,y,w,d,f.h*S,S))+model3(it,x,y,w,d,S,mood)+`</div>`;
   });
   scene.innerHTML=html;
-  apply3D();
 }
-function wall(x,y,len,angle,h,color){
-  return `<div class="f3" style="left:${x}px;top:${y}px;width:${len}px;height:${h}px;
-    background:${color};transform:rotate(${angle}deg) rotateX(90deg);
-    border:1px solid #DCE8E2"></div>`;
-}
-function shade(hex,amt){
-  const n=parseInt(hex.slice(1),16);
-  const r=Math.max(0,Math.min(255,(n>>16)+amt));
-  const g=Math.max(0,Math.min(255,((n>>8)&255)+amt));
-  const b=Math.max(0,Math.min(255,(n&255)+amt));
-  return `rgb(${r},${g},${b})`;
-}
-function box(x,y,w,d,h,color,label){
-  const top=shade(color,16), s1=shade(color,-14), s2=shade(color,-30);
-  // 네 개의 옆면: 각 변을 따라 세운다
-  const faces=[
-    {px:x,     py:y,     len:w, a:0,   c:s1},
-    {px:x+w,   py:y,     len:d, a:90,  c:s2},
-    {px:x+w,   py:y+d,   len:w, a:180, c:s1},
-    {px:x,     py:y+d,   len:d, a:270, c:s2}
-  ].map(f=>`<div class="f3" style="left:${f.px}px;top:${f.py}px;width:${f.len}px;height:${h}px;
-      background:${f.c};transform:rotate(${f.a}deg) rotateX(90deg)"></div>`).join("");
-  return faces + `<div class="f3" style="left:${x}px;top:${y}px;width:${w}px;height:${d}px;
-    background:${top};transform:translateZ(${h}px);display:flex;align-items:center;
-    justify-content:center;font-size:9px;font-weight:700;color:#2B4A3B;
-    border:1px solid rgba(0,0,0,.06)">${label}</div>`;
+function wall(x,y,len,angle,h,color,S,wx,wy){
+  const base=Math.max(3,0.08*(S||40));
+  return `<div class="f3 wall3" data-wx="${wx||0}" data-wy="${wy||0}" style="left:${x}px;top:${y}px;width:${len}px;height:${h}px;
+    background:linear-gradient(0deg,#E7DFD3 0 ${base}px,#FBF8F3 ${base}px ${base+1}px,transparent ${base+1}px),linear-gradient(0deg,rgba(255,255,255,.35),rgba(255,255,255,0) 60%),repeating-linear-gradient(90deg,rgba(0,0,0,.012) 0 2px,transparent 2px 5px),${color};
+    transform:rotate(${angle}deg) rotateX(90deg);box-shadow:inset 0 0 0 1px rgba(160,140,110,.18)"></div>`;
 }
 function apply3D(){
-  document.getElementById("scene3d").style.transform=
-    `scale(${zoom}) rotateX(${rotX}deg) rotateZ(${rotZ}deg)`;
+  const sc=document.getElementById("scene3d");
+  sc.style.transform=`scale(${zoom}) rotateX(${rotX}deg) rotateZ(${rotZ}deg)`;
+  wallVis(sc,rotZ);
+}
+function wallVis(sc,rz){         // 카메라 쪽을 향한 벽(바깥 법선·카메라 방향 내적 > 0.3)은 숨김
+  const t=rz*Math.PI/180, cx=Math.sin(t), cy=Math.cos(t);
+  sc.querySelectorAll(".wall3,.op3").forEach(el=>{
+    const front=(+el.dataset.wx)*cx+(+el.dataset.wy)*cy>0.3;
+    el.classList.toggle("wall-hide",front);
+  });
 }
 (function bind3D(){
   const v=document.getElementById("view3d");
@@ -3081,6 +3228,114 @@ function renderMy(){
       <div class="space-meta"><strong>${escapeHtml(s.name)}</strong>
       <span>${s.w}m × ${s.d}m · 가구 ${s.items.filter(i=>i.type!=="win"&&i.type!=="door").length}개</span></div>
     </div>`).join("") : `<div class="empty" style="padding:20px">저장된 공간이 없어요.</div>`;
+}
+
+/* =========================================================
+   콘셉트 뷰 — 진단 결과로 '콘셉트 브리프'를 만들고, 공급자(provider)가 그걸 시각화
+   · local   : 내장 3D 렌더러의 무드 모드 + 팔레트 (오프라인, 항상 사용)
+   · curated : 라이선스 확보한 실사 레퍼런스 사진 목록(JSON, 태그 매칭)
+   · ai      : 실사풍 이미지 생성 백엔드(POST 브리프 → 이미지 URL, 결과 캐시)
+   설정값만 채우면 연동돼요. 자세한 계약은 docs/CONCEPT_VIEW.md
+   ========================================================= */
+const CONCEPT_CONFIG={curatedUrl:"", aiEndpoint:""};
+const STYLE_BY_EL={
+  wood: {name:"내추럴 보태니컬",en:"natural botanical Scandinavian",tags:["natural","botanical","wood","green","linen"],
+         palette:[["#A8C49A","세이지 그린","sage green"],["#E9E2D0","리넨 아이보리","linen ivory"],["#C9A57A","오크 우드","oak wood"],["#6F8F5E","올리브","olive"]],
+         mood:"아침 햇살이 드는 싱그러운 숲속 오두막 같은 분위기",enMood:"fresh morning daylight, leafy plants, linen bedding and light oak furniture"},
+  fire: {name:"웜 테라코타",en:"warm terracotta Mediterranean",tags:["warm","terracotta","mediterranean","cozy"],
+         palette:[["#D9835F","테라코타","terracotta"],["#F2D9C4","살구 베이지","apricot beige"],["#8E5A3C","월넛","walnut"],["#F6EEE3","크림","cream"]],
+         mood:"해 질 녘 노을빛처럼 따뜻하고 활기찬 분위기",enMood:"golden-hour warm glow, terracotta and apricot accents, walnut wood"},
+  earth:{name:"샌드 베이지 미니멀",en:"sand beige Japandi minimal",tags:["japandi","minimal","beige","ceramic"],
+         palette:[["#D8C3A0","샌드","sand"],["#EFE6D6","아이보리","ivory"],["#B08A5B","카멜","camel"],["#8C7B66","그레이지","greige"]],
+         mood:"흙과 도자기의 질감이 살아 있는 차분하고 안정된 분위기",enMood:"earthy textures, ceramics, low wide furniture, calm and balanced"},
+  metal:{name:"화이트 모던",en:"clean white modern",tags:["white","modern","hotel","metal"],
+         palette:[["#F4F4F2","퓨어 화이트","pure white"],["#C9CDD1","쿨 그레이","cool gray"],["#B8A27A","골드 포인트","gold accent"],["#2F3437","차콜","charcoal"]],
+         mood:"정돈된 호텔 객실처럼 깔끔하고 선명한 분위기",enMood:"crisp white surfaces, brushed metal and glass, round mirror, tidy hotel-like"},
+  water:{name:"딥 블루 라운지",en:"deep blue calm lounge",tags:["navy","blue","calm","velvet"],
+         palette:[["#2E4A66","네이비","navy"],["#8FA9BF","더스티 블루","dusty blue"],["#E8E4DC","오프화이트","off-white"],["#5B5550","차콜 브라운","charcoal brown"]],
+         mood:"깊은 밤바다처럼 고요하고 아늑한 분위기",enMood:"deep navy textiles, soft dim indirect lighting, velvet, serene"}
+};
+const EN_NAME={bed:"queen bed",desk:"desk",wardrobe:"wardrobe",sofa:"sofa",table:"dining table",shelf:"bookshelf",
+  x_dresser:"vanity table",x_aircon:"standing air conditioner",x_washer:"washing machine",x_dryer:"dryer",x_fridge:"refrigerator",x_tv:"TV console",
+  x_night:"nightstand",x_drawer:"chest of drawers",x_plant:"potted plant",x_rug:"rug",x_lamp:"floor lamp",x_ldesk:"L-shaped desk",x_bunk:"bunk bed",
+  x_sbed:"single bed",x_ssbed:"super single bed",x_dbed:"double bed",x_kbed:"king bed",x_armchair:"armchair",x_sofa2:"two-seater sofa",x_sofa3:"three-seater sofa"};
+const DIR_EN={"북":"north","북동":"north-east","동":"east","남동":"south-east","남":"south","남서":"south-west","서":"west","북서":"north-west"};
+const ROOM_EN={bed:"bedroom",living:"living room",study:"study room"};
+let conceptState=null;
+function conceptBrief(items,room,key,concerns){
+  const st=STYLE_BY_EL[key]||STYLE_BY_EL.earth, ei=KEYS.indexOf(key), add=ADD[ei>=0?ei:2], tw=TWEAK[concerns[0]]||TWEAK["학업"];
+  const furn=items.filter(i=>!isOpen(i)), area=pArea(polyOf(room));
+  const zoneEn=it=>{const z=zoneOf(it,room); return z==="가운데"?"center":(DIR_EN[z.replace("쪽","")]||"side")+" side";};
+  const layout=furn.map(i=>({type:i.type,name:FURN[i.type]?FURN[i.type].name:"가구",en:EN_NAME[i.type]||(FURN[i.type]&&FURN[i.type].custom?"furniture piece":"furniture"),zone:zoneOf(i,room),zoneEn:zoneEn(i),
+    x:+i.x.toFixed(2),y:+i.y.toFixed(2),w:+i.w.toFixed(2),d:+i.d.toFixed(2),ang:i.ang||0}));
+  const roomKo={bed:"침실",living:"거실",study:"공부방"}[room.rtype]||"방";
+  const promptKo=`실사 인테리어 사진, 약 ${area.toFixed(0)}㎡ 한국 ${roomKo}, ${st.name} 스타일, ${st.palette.map(c=>c[1]).join("·")} 색감, ${st.mood}. `
+    +`가구: ${layout.map(l=>`${l.zone} ${l.name}`).join(", ")}. 조명: ${add.light}. 패브릭: ${add.fabric}. 소품: ${add.item}.`;
+  const promptEn=`Photorealistic interior photograph of a ${area.toFixed(0)} square meter Korean ${ROOM_EN[room.rtype]||"room"}, ${st.en} style, `
+    +`${st.palette.map(c=>c[2]).join(", ")} color palette (${st.palette.map(c=>c[0]).join(" ")}), ${st.enMood}. `
+    +`Furniture layout: ${layout.map(l=>`${l.en} on the ${l.zoneEn}`).join(", ")}. Eye-level 24mm lens, soft natural light from the window, realistic materials, high detail, no people, no text.`;
+  return {style:st,key,area,room:{w:room.w,d:room.d,type:room.rtype||"bed"},layout,
+    tips:{light:add.light,fabric:add.fabric,item:add.item,place:tw.place},promptKo,promptEn,
+    negative:"cartoon, illustration, distorted furniture, extra rooms, text, watermark, people"};
+}
+function conceptRoom(){const c=state.cur; return {...c,w:c.w,d:c.d,poly:polyOf(c),heading:headOf(c)};}
+function renderConcept(){
+  const box=document.getElementById("concept-body"); if(!box||!conceptState||!state.cur) return;
+  const cs=conceptState, room=conceptRoom(), items=cs.which==="ideal"&&idealItems?idealItems:state.cur.items;
+  const brief=conceptBrief(items,room,cs.key,cs.concerns); cs.brief=brief;
+  const st=brief.style;
+  box.innerHTML=`
+    <div class="cvhead"><b>${st.name}</b><span>${st.mood}</span></div>
+    <div class="cv3d" id="cv3d"><div class="cvscene" id="cvscene"></div><div class="cvlight"></div>
+      <div class="cvseg">${idealItems?`<button class="${cs.which==="ideal"?"on":""}" onclick="conceptState.which='ideal';renderConcept()">제안 배치</button>`:""}<button class="${cs.which!=="ideal"||!idealItems?"on":""}" onclick="conceptState.which='now';renderConcept()">현재 배치</button></div></div>
+    <div class="cvpal">${st.palette.map(([c,n])=>`<span><i style="background:${c}"></i>${n}</span>`).join("")}</div>
+    <dl class="cvdl"><dt>💡 조명</dt><dd>${brief.tips.light}</dd><dt>🧵 패브릭</dt><dd>${brief.tips.fabric}</dd><dt>🪴 소품</dt><dd>${brief.tips.item}</dd></dl>
+    <div id="cvref"></div>`;
+  const sc=document.getElementById("cvscene");
+  render3D(sc,items,{...room,el:cs.key},{fit:220,mood:moodOf({el:cs.key})});
+  sc.style.transform="scale(1) rotateX(60deg) rotateZ(-28deg)"; wallVis(sc,-28);
+  renderConceptRefs(brief);
+}
+async function renderConceptRefs(brief){
+  const box=document.getElementById("cvref"); if(!box) return;
+  const parts=[];
+  if(CONCEPT_CONFIG.curatedUrl){
+    parts.push(`<div class="cvgrid" id="cvcur"><p class="hint">비슷한 분위기의 실제 인테리어 사진을 찾는 중…</p></div>`);
+  }
+  if(CONCEPT_CONFIG.aiEndpoint){
+    parts.push(`<div class="cvai" id="cvai"><button class="btn btn-ghost" onclick="genConcept()">✨ 이 배치로 실사풍 이미지 만들기</button></div>`);
+  }
+  if(!parts.length){
+    parts.push(`<div class="cvready"><b>📷 실사 레퍼런스 연동 준비 완료</b><p>사진 레퍼런스 라이브러리나 AI 이미지 생성 서버를 연결하면 이 자리에 실제 인테리어 사진이 나와요. 지금은 아래 프롬프트를 복사해 이미지 생성 AI에 붙여 넣으면 같은 분위기의 이미지를 만들 수 있어요.</p>
+      <div class="btn-row"><button class="btn btn-line" onclick="copyPrompt('ko')">한글 프롬프트 복사</button><button class="btn btn-line" onclick="copyPrompt('en')">English prompt</button></div></div>`);
+  }
+  box.innerHTML=parts.join("");
+  if(CONCEPT_CONFIG.curatedUrl){
+    try{
+      const list=await (await fetch(CONCEPT_CONFIG.curatedUrl)).json(), sty=new Set(brief.style.tags), ctx=new Set([brief.room.type,...brief.layout.map(l=>l.type)]);
+      const top=list.map(r=>{const t=r.tags||[], a=t.filter(x=>sty.has(x)).length; return {r,a,s:3*a+t.filter(x=>ctx.has(x)).length};})   // 스타일이 맞는 사진만, 스타일 3배 가중
+        .filter(x=>x.a>0).sort((a,b)=>b.s-a.s).slice(0,4);
+      document.getElementById("cvcur").innerHTML=top.length?top.map(({r})=>`<a class="cvimg" href="${escapeHtml(r.link||r.url)}" target="_blank" rel="noopener"><img src="${escapeHtml(r.url)}" alt="" loading="lazy"><small>${escapeHtml(r.credit||"")}</small></a>`).join(""):`<p class="hint">맞는 레퍼런스 사진이 아직 없어요.</p>`;
+    }catch(e){const el=document.getElementById("cvcur"); if(el) el.innerHTML=`<p class="hint">레퍼런스 사진을 불러오지 못했어요.</p>`;}
+  }
+}
+function briefHash(b){const t=JSON.stringify([b.key,b.room,b.layout.map(l=>[l.type,l.x,l.y,l.ang])]); let h=0; for(let i=0;i<t.length;i++) h=(h*31+t.charCodeAt(i))|0; return (h>>>0).toString(36);}
+async function genConcept(){
+  const box=document.getElementById("cvai"), b=conceptState&&conceptState.brief; if(!box||!b) return;
+  const key="bangku.concept."+briefHash(b), cached=store.get(key);
+  const show=u=>{box.innerHTML=`<img class="cvgen" src="${escapeHtml(u)}" alt="AI 콘셉트 이미지"><p class="hint">AI가 만든 참고용 이미지예요. 실제 가구·구조와 다를 수 있어요.</p>`;};
+  if(cached) return show(cached);
+  box.innerHTML=`<p class="hint">실사풍 이미지를 만드는 중이에요… (보통 10~30초)</p>`;
+  try{
+    const r=await fetch(CONCEPT_CONFIG.aiEndpoint,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({prompt:b.promptEn,prompt_ko:b.promptKo,negative_prompt:b.negative,style:b.style.en,palette:b.style.palette.map(c=>c[0]),room:b.room,layout:b.layout,size:"1024x768"})});
+    const j=await r.json(); if(!j.image_url) throw 0;
+    store.set(key,j.image_url); show(j.image_url);
+  }catch(e){box.innerHTML=`<p class="hint">이미지를 만들지 못했어요. 잠시 후 다시 시도해 주세요.</p><button class="btn btn-ghost" onclick="genConcept()">다시 시도</button>`;}
+}
+async function copyPrompt(lang){
+  const b=conceptState&&conceptState.brief; if(!b) return;
+  try{await navigator.clipboard.writeText(lang==="en"?b.promptEn:b.promptKo); toast("프롬프트를 복사했어요. 이미지 생성 AI에 붙여 넣어 보세요");}catch(e){toast("복사하지 못했어요");}
 }
 
 /* =========================================================

@@ -40,3 +40,7 @@ App Store 배포는 Product → Archive 후 Organizer에서 업로드하면 됩�
 2. 1~2분 뒤 `https://<사용자명>.github.io/<저장소명>/` 주소로 열립니다.
 
 `index.html`은 앱 안의 `Bangkku/Web/index.html`과 같은 파일이에요. 화면을 고치면 두 파일을 함께 바꿔 주세요.
+
+## 콘셉트 뷰 (실사풍 레퍼런스)
+
+종합 리포트의 '이 배치가 완성된 모습'은 내장 3D 무드 렌더로 바로 동작하고, 실사 사진 라이브러리나 AI 이미지 생성 서버를 연결할 수 있어요. 구조와 API 형식은 [`docs/CONCEPT_VIEW.md`](docs/CONCEPT_VIEW.md)를 보세요.
