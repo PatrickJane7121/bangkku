@@ -590,6 +590,17 @@ input[type=checkbox]{accent-color:var(--deep)}
 .cvimg img{width:100%;height:100%;object-fit:cover;display:block}
 .cvimg small{position:absolute;left:6px;bottom:4px;font-size:10px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 .cvgen{width:100%;border-radius:16px;margin-top:14px;display:block}
+.nav{justify-content:space-between}
+.nav h2{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;line-height:38px;max-width:calc(100% - 200px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;flex:none}
+.nav .home-btn{display:flex;align-items:center;justify-content:center;color:var(--deep-dark);margin-left:-6px;margin-right:auto}
+.nav .home-btn:active{background:var(--sage-soft)}
+.resume{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid rgba(227,216,199,.7);box-shadow:var(--sh-1);border-radius:20px;padding:12px 10px 12px 14px;margin:0 0 14px;animation:scrIn .35s var(--ease)}
+.resume .ri{font-size:22px;flex:none}
+.resume .rt{flex:1;min-width:0;text-align:left;border:none;background:none;padding:0;font:inherit;cursor:pointer;color:var(--ink)}
+.resume .rt b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.resume .rt small{font-size:12px;color:var(--ink-soft)}
+.resume .rgo{flex:none;border:none;border-radius:12px;background:var(--deep);color:#fff;font:inherit;font-size:13px;font-weight:700;padding:9px 12px;cursor:pointer}
+.resume .rx{flex:none;width:28px;height:28px;border:none;border-radius:50%;background:transparent;color:var(--ink-soft);cursor:pointer}
 </style>
 </head>
 <body>
@@ -627,6 +638,7 @@ input[type=checkbox]{accent-color:var(--deep)}
         <h3>오늘의 방, 조금 바꿔볼까요</h3>
         <p>사주에 맞는 배치로 공간의 흐름을 정리해 드려요</p>
       </div>
+      <div id="resume"></div>
       <button class="btn btn-primary" onclick="startNew()">내 방 진단 시작하기</button>
       <span class="label">내가 만든 공간</span>
       <div id="space-list"></div>
@@ -2464,6 +2476,7 @@ let draft = {photo:null, shape:"rect", w:3.6, d:3.0, birth:"1995-05-15", btime:"
    ========================================================= */
 function go(id){
   hideSsTip();
+  const from=curScreen(); if(["s-edit","s-result","s-report"].includes(from)&&state.cur&&from!==id) persistCur();   // 화면을 떠날 때 편집 중인 방 저장
   document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("active", s.id===id));
   window.scrollTo(0,0);
   if(id==="s-home") renderHome();
@@ -2497,6 +2510,9 @@ document.getElementById("ob-next").onclick=()=>{
 
 /* ---------- 홈 ---------- */
 function renderHome(){
+  const ri=resumeInfo(loadSnap()), rb=document.getElementById("resume");
+  rb.innerHTML=ri?`<div class="resume"><span class="ri">${ri.icon}</span><button class="rt" onclick="resumeSession()"><b>${escapeHtml(ri.t)}</b><small>마지막 작업 · ${ri.s}</small></button>
+    <button class="rgo" onclick="resumeSession()">이어서 하기</button><button class="rx" onclick="dismissResume()" aria-label="닫기">✕</button></div>`:"";
   const box=document.getElementById("space-list");
   if(!state.spaces.length){
     box.innerHTML=`<div class="empty"><span class="em">🗂</span>
@@ -3354,7 +3370,7 @@ function persistCur(){            // 편집 중인 공간을 '저장된 공간'�
 function saveSession(){
   if(resetting) return;
   try{
-    const scr=curScreen(); if(scr==="s-onboard") return;
+    const scr=curScreen(); if(["s-onboard","s-home","s-my"].includes(scr)) return;
     const v=id=>{const el=document.getElementById(id); return el?(el.type==="checkbox"?el.checked:el.value):null;};
     const snap={v:1,ts:Date.now(),screen:scr,step:state.step,sjMode,
       draft:{...draft,photo:null},
@@ -3370,11 +3386,29 @@ function autosave(){clearTimeout(saveT); saveT=setTimeout(saveSession,400);}
 ["pointerup","input","change","keyup"].forEach(ev=>document.addEventListener(ev,autosave,{passive:true,capture:true}));
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden") saveSession();});   // 앱을 내리거나 탭을 닫을 때 즉시 저장
 window.addEventListener("pagehide",saveSession);
-function restoreSession(){       // 저장된 데이터가 있으면 온보딩을 건너뛰고 이전 화면으로
-  let snap=null; try{snap=JSON.parse(store.get(SESSION_KEY)||"null");}catch(e){}
-  if(!(snap||state.profile||state.spaces.length||store.get("bangku.onboarded"))) return null;   // 첫 방문 → 온보딩
+const loadSnap=()=>{try{return JSON.parse(store.get(SESSION_KEY)||"null");}catch(e){return null;}};
+function restoreSession(){       // 재접속: 저장된 데이터가 있으면 온보딩을 건너뛰고 항상 홈(내 공간 목록)부터
+  const snap=loadSnap();
+  if(!(snap||state.profile||state.spaces.length||store.get("bangku.onboarded"))) return false;   // 첫 방문 → 온보딩
   if(state.profile&&state.profile.birth){const S=calcSaju(state.profile); if(!S.err) state.S=S;}
+  if(snap&&snap.draft) draft={...draft,...snap.draft};
+  go("s-home"); return true;
+}
+// 마지막으로 하던 작업 설명 (홈의 '이어서 하기' 카드용). 이어갈 게 없으면 null
+function resumeInfo(snap){
+  if(!snap) return null;
+  const space=snap.curId&&state.spaces.find(x=>x.id===snap.curId);
+  if(["s-edit","s-result","s-report"].includes(snap.screen)&&space) return {icon:"🛋",t:`‘${space.name}’ 배치를 이어서 할까요?`,s:{"s-edit":"가구 배치","s-result":"평면도·3D","s-report":"종합 리포트"}[snap.screen]};
+  if(snap.screen==="s-input") return snap.step===1?{icon:"📐",t:"그리던 방 모양이 있어요",s:"방 모양 그리기"}:{icon:"✍️",t:"입력하던 사주 정보가 있어요",s:"사주 정보 입력"};
+  if(snap.screen==="s-concern"&&state.profile) return {icon:"💭",t:"고민 선택을 이어서 할까요?",s:"고민 선택"};
+  if(snap.screen==="s-saju"&&state.profile) return {icon:"🧭",t:"사주 리포트를 다시 볼까요?",s:"사주 리포트"};
+  return null;
+}
+function dismissResume(){store.del(SESSION_KEY); renderHome();}
+function resumeSession(){       // '이어서 하기' — 마지막 작업 화면으로 이동
+  const snap=loadSnap(); if(!snap) return;
   try{
+    if(snap.draft) draft={...draft,...snap.draft};
     if(snap&&snap.draft) draft={...draft,...snap.draft};
     const scr=snap&&snap.screen, space=snap&&snap.curId&&state.spaces.find(x=>x.id===snap.curId);
     if(["s-edit","s-result","s-report"].includes(scr)&&space){
@@ -3406,7 +3440,7 @@ function restoreSession(){       // 저장된 데이터가 있으면 온보딩�
     if(scr==="s-concern"&&state.profile){draft.concerns=draft.concerns||[]; renderConcern(); go("s-concern"); return "고민 선택";}
     if(scr==="s-saju"&&state.profile){openSaju(snap.sjMode||"input",state.profile); return "사주 리포트";}
   }catch(e){}
-  go("s-home"); return "";
+  go("s-home");
 }
 function resetAll(){
   if(!confirm("모든 데이터를 지우고 처음부터 시작할까요?\n사주 정보, 저장된 공간, 직접 만든 가구가 모두 삭제되며 되돌릴 수 없어요.")) return;
@@ -3415,6 +3449,20 @@ function resetAll(){
   try{Object.keys(localStorage).filter(k=>k.startsWith("bangku.")).forEach(k=>localStorage.removeItem(k));}catch(e){}
   location.reload();
 }
+
+/* 모든 하위 화면 헤더에 '홈으로' 버튼 */
+const HOME_SVG='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 11L12 4l8.5 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 9.8V19a1 1 0 001 1h3.5v-5h3v5H17a1 1 0 001-1V9.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function goHome(){
+  document.getElementById("sheet").classList.remove("on"); hideSsTip(); closeFNew&&closeFNew();
+  go("s-home");
+}
+document.querySelectorAll(".screen").forEach(sc=>{
+  if(sc.id==="s-home"||sc.id==="s-onboard") return;
+  const nav=sc.querySelector(".nav"); if(!nav||nav.querySelector(".home-btn")) return;
+  const btn=document.createElement("button"); btn.className="back home-btn"; btn.type="button"; btn.setAttribute("aria-label","홈으로"); btn.title="홈으로";
+  btn.innerHTML=HOME_SVG; btn.onclick=goHome;
+  const first=nav.firstElementChild; nav.insertBefore(btn,first&&first.classList.contains("back")?first.nextSibling:first);
+});
 
 /* 햅틱 피드백 */
 let hapT=0;
@@ -3432,9 +3480,8 @@ window.addEventListener("resize",()=>{
   if(document.getElementById("s-edit").classList.contains("active")) renderCanvas();
   if(document.getElementById("s-result").classList.contains("active")){ drawPlan(); build3D(); }
 });
-const restored=restoreSession();
-setTimeout(()=>{const sp=document.getElementById("splash"); if(!sp) return; sp.classList.add("off"); setTimeout(()=>sp.remove(),500);
-  if(restored) setTimeout(()=>toast(`${restored} 화면을 이어서 불러왔어요`),450);},1600);
+restoreSession();
+setTimeout(()=>{const sp=document.getElementById("splash"); if(!sp) return; sp.classList.add("off"); setTimeout(()=>sp.remove(),500);},1600);
 </script>
 </body>
 </html>
