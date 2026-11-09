@@ -601,6 +601,22 @@ input[type=checkbox]{accent-color:var(--deep)}
 .resume .rt small{font-size:12px;color:var(--ink-soft)}
 .resume .rgo{flex:none;border:none;border-radius:12px;background:var(--deep);color:#fff;font:inherit;font-size:13px;font-weight:700;padding:9px 12px;cursor:pointer}
 .resume .rx{flex:none;width:28px;height:28px;border:none;border-radius:50%;background:transparent;color:var(--ink-soft);cursor:pointer}
+.space-card .sc-del{flex:none;width:36px;height:36px;border:none;border-radius:12px;background:transparent;color:#B9AC9B;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,color .2s,transform .25s var(--spring)}
+.space-card .sc-del:hover,.space-card .sc-del:focus-visible{background:var(--rose-soft);color:var(--rose)}
+.space-card .sc-del:active{transform:scale(.88);background:var(--rose-soft);color:var(--rose)}
+.space-card:has(.sc-del:active){transform:none}
+.space-card .sc-go{color:#C9BCA9;font-size:20px;margin-left:-4px}
+.space-card.removing{opacity:0;transform:translateX(-24px) scale(.97);transition:opacity .22s,transform .22s}
+.cmodal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(42,32,20,0);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);transition:background .2s,backdrop-filter .2s}
+.cmodal[hidden]{display:none}
+.cmodal.on{background:rgba(42,32,20,.38);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.cm-box{width:100%;max-width:340px;background:linear-gradient(180deg,#FFFDF9,#F8F2E8);border-radius:24px;padding:24px 20px 18px;text-align:center;box-shadow:0 24px 50px -16px rgba(60,40,20,.45);transform:scale(.92);opacity:0;transition:transform .28s var(--spring),opacity .2s}
+.cmodal.on .cm-box{transform:none;opacity:1}
+.cm-icon{width:56px;height:56px;margin:0 auto 12px;border-radius:18px;background:var(--rose-soft);display:flex;align-items:center;justify-content:center;font-size:26px}
+.cm-box h3{margin:0 0 8px;font-size:17.5px;letter-spacing:-.4px;line-height:1.4;word-break:keep-all}
+.cm-box p{margin:0 0 18px;font-size:14px;line-height:1.6;color:var(--ink-soft);word-break:keep-all}
+.cm-box .btn{padding:14px}
+.btn-danger-solid{background:linear-gradient(180deg,#C46A55,#A9533F);color:#fff;box-shadow:0 10px 22px -12px rgba(169,83,63,.8)}
 </style>
 </head>
 <body>
@@ -909,6 +925,14 @@ input[type=checkbox]{accent-color:var(--deep)}
   </section>
 
   <div id="sheet" onclick="if(event.target===this)this.classList.remove('on')"><div class="sc"><div class="sb"></div><div class="btn-row" style="margin-top:12px"><button class="btn btn-line" onclick="this.closest('#sheet').classList.remove('on')">배치 더 고치기</button><button class="btn btn-primary" onclick="this.closest('#sheet').classList.remove('on');openReport()">진단 리포트 보기</button></div></div></div>
+  <div class="cmodal" id="cmodal" hidden>
+    <div class="cm-box" role="alertdialog" aria-modal="true" aria-labelledby="cm-title" aria-describedby="cm-body">
+      <div class="cm-icon" id="cm-icon"></div>
+      <h3 id="cm-title"></h3>
+      <p id="cm-body"></p>
+      <div class="btn-row"><button class="btn btn-line" id="cm-cancel">취소</button><button class="btn btn-primary" id="cm-ok">확인</button></div>
+    </div>
+  </div>
   <div class="toast" id="toast"></div>
   <div id="sstip" role="tooltip"></div>
 </div>
@@ -2519,15 +2543,18 @@ function renderHome(){
       아직 만든 공간이 없어요.<br>위 버튼으로 첫 공간을 만들어 보세요.</div>`;
     return;
   }
-  box.innerHTML = state.spaces.map(s=>`
-    <div class="space-card" onclick="openSpace('${s.id}')">
+  box.innerHTML = state.spaces.map(s=>spaceCard(s,true)).join("");
+}
+const TRASH_SVG='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M9.5 7V5a1 1 0 011-1h3a1 1 0 011 1v2M6.5 7l.8 12a1.5 1.5 0 001.5 1.4h6.4a1.5 1.5 0 001.5-1.4L17.5 7M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function spaceCard(s,full){        // '내가 만든 공간' 카드 — 오른쪽 끝에 삭제 버튼
+  const n=s.items.filter(i=>i.type!=="win"&&i.type!=="door").length;
+  return `<div class="space-card" data-id="${s.id}" onclick="openSpace('${s.id}')">
       <div class="space-thumb">${s.photo?`<img src="${s.photo}" alt="">`:"🛏"}</div>
-      <div class="space-meta">
-        <strong>${escapeHtml(s.name)}</strong>
-        <span>${s.w}m × ${s.d}m · ${ELEMENTS[s.el].name} · ${s.items.filter(i=>i.type!=="win"&&i.type!=="door").length}개 가구</span>
-      </div>
-      <span style="color:#C3D2CA;font-size:20px">›</span>
-    </div>`).join("");
+      <div class="space-meta"><strong>${escapeHtml(s.name)}</strong>
+        <span>${s.w}m × ${s.d}m${full&&ELEMENTS[s.el]?` · ${ELEMENTS[s.el].name}`:""} · 가구 ${n}개</span></div>
+      <button type="button" class="sc-del" onclick="deleteSpace('${s.id}',event)" aria-label="${escapeHtml(s.name)} 삭제" title="삭제">${TRASH_SVG}</button>
+      ${full?`<span class="sc-go">›</span>`:""}
+    </div>`;
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 
@@ -3238,12 +3265,7 @@ function renderMy(){
   let snap=null; try{snap=JSON.parse(store.get(SESSION_KEY)||"null");}catch(e){}
   document.getElementById("my-saved").textContent=snap&&snap.ts?`마지막 자동 저장: ${new Date(snap.ts).toLocaleString("ko-KR",{month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"})}`:"";
   const box=document.getElementById("my-list");
-  box.innerHTML = state.spaces.length ? state.spaces.map(s=>`
-    <div class="space-card" onclick="openSpace('${s.id}')">
-      <div class="space-thumb">${s.photo?`<img src="${s.photo}" alt="">`:"🛏"}</div>
-      <div class="space-meta"><strong>${escapeHtml(s.name)}</strong>
-      <span>${s.w}m × ${s.d}m · 가구 ${s.items.filter(i=>i.type!=="win"&&i.type!=="door").length}개</span></div>
-    </div>`).join("") : `<div class="empty" style="padding:20px">저장된 공간이 없어요.</div>`;
+  box.innerHTML = state.spaces.length ? state.spaces.map(s=>spaceCard(s,false)).join("") : `<div class="empty" style="padding:20px">저장된 공간이 없어요.</div>`;
 }
 
 /* =========================================================
@@ -3442,12 +3464,42 @@ function resumeSession(){       // '이어서 하기' — 마지막 작업 화�
   }catch(e){}
   go("s-home");
 }
-function resetAll(){
-  if(!confirm("모든 데이터를 지우고 처음부터 시작할까요?\n사주 정보, 저장된 공간, 직접 만든 가구가 모두 삭제되며 되돌릴 수 없어요.")) return;
+async function resetAll(){
+  if(!await confirmModal({icon:"🔄",title:"모든 데이터를 지우고 처음부터 시작할까요?",body:"사주 정보, 저장된 공간, 직접 만든 가구가 모두 삭제되며 되돌릴 수 없어요.",ok:"초기화하기",danger:true})) return;
   resetting=true; clearTimeout(saveT);
   ALL_KEYS.forEach(k=>store.del(k));
   try{Object.keys(localStorage).filter(k=>k.startsWith("bangku.")).forEach(k=>localStorage.removeItem(k));}catch(e){}
   location.reload();
+}
+
+/* 확인 모달 — confirmModal({icon,title,body,ok,danger}) → Promise<boolean> */
+function confirmModal(o){
+  return new Promise(res=>{
+    const m=document.getElementById("cmodal"), g=id=>document.getElementById(id), ok=g("cm-ok"), cancel=g("cm-cancel");
+    g("cm-icon").textContent=o.icon||"⚠️"; g("cm-title").textContent=o.title||"계속할까요?"; g("cm-body").textContent=o.body||"";
+    ok.textContent=o.ok||"확인"; cancel.textContent=o.cancel||"취소"; ok.className="btn "+(o.danger?"btn-danger-solid":"btn-primary");
+    const done=v=>{m.classList.remove("on"); setTimeout(()=>{m.hidden=true;},200); document.removeEventListener("keydown",key,true); res(v);};
+    const key=e=>{if(e.key==="Escape"){e.preventDefault(); done(false);}};
+    ok.onclick=()=>done(true); cancel.onclick=()=>done(false); m.onclick=e=>{if(e.target===m) done(false);};
+    document.addEventListener("keydown",key,true);
+    m.hidden=false; requestAnimationFrame(()=>m.classList.add("on")); cancel.focus();   // 실수 방지: 기본 포커스는 취소
+  });
+}
+/* 공간 삭제 — 확인 후 저장 배열에서 제거하고 목록 즉시 갱신 */
+async function deleteSpace(id,ev){
+  if(ev){ev.stopPropagation(); ev.preventDefault();}
+  const sp=state.spaces.find(x=>x.id===id); if(!sp) return;
+  const ok=await confirmModal({icon:"🗑️",title:`‘${sp.name}’${eul(sp.name)} 삭제할까요?`,
+    body:"이 방의 모양, 가구 배치, 풍수 점검 답변이 모두 지워지고 되돌릴 수 없어요.",ok:"삭제하기",danger:true});
+  if(!ok) return;
+  document.querySelectorAll(`.space-card[data-id="${id}"]`).forEach(c=>c.classList.add("removing"));
+  await new Promise(r=>setTimeout(r,220));
+  state.spaces=state.spaces.filter(x=>x.id!==id);
+  store.set("bangku.spaces",JSON.stringify(state.spaces));
+  if(state.cur&&state.cur.id===id){state.cur=null; state.editing=null;}
+  const snap=loadSnap(); if(snap&&snap.curId===id) store.del(SESSION_KEY);       // '이어서 하기'가 지운 방을 가리키지 않게
+  const scr=curScreen(); if(scr==="s-home") renderHome(); else if(scr==="s-my") renderMy();
+  toast(`‘${sp.name}’${eul(sp.name)} 삭제했어요`);
 }
 
 /* 모든 하위 화면 헤더에 '홈으로' 버튼 */
