@@ -1168,7 +1168,7 @@ const RULES=[{"id":"SRC-001","sp":"침실","tg":"창문침대","q":"침대 머�
 RULES.push(
   {id:"DX-BLOCK",sp:"방",tg:"동선",q:"문 앞 통로가 열려 있고 가구끼리 겹치지 않나요?",o:"문 앞 1m를 가구가 막거나 가구가 서로 겹치면 개선 필요",x:"문 앞이 비어 있고 겹친 가구가 없으면 통과.",fx:"문 앞 1m를 비우고 겹친 가구를 떼어 놓아 주세요."},
   {id:"DX-ACCESS",sp:"방",tg:"동선",q:"책상 의자를 빼고 앉을 공간과 침대에 오르내릴 공간이 있나요?",o:"의자 쪽 공간이 60cm 미만이거나 침대 양옆이 모두 50cm 미만이면 개선 필요",x:"의자 뒤 60cm, 침대 한쪽 50cm 이상이 비어 있으면 통과.",fx:"책상 의자 쪽은 60cm, 침대 한쪽은 50cm 이상 비워 주세요."},
-  {id:"DX-GAP",sp:"방",tg:"동선",q:"가구와 가구, 가구와 벽 사이에 어정쩡한 틈(2~30cm)이 없나요?",o:"30cm보다 좁은 틈이 있으면 청소·통행이 불편해 개선 권장",x:"딱 붙어 있거나 30cm 이상 떨어져 있으면 통과.",fx:"가구를 서로(또는 벽에) 딱 붙이거나 30cm 이상 띄워 주세요."});
+  {id:"DX-GAP",sp:"방",tg:"동선",q:"가구끼리 30cm 이상 떨어져 있고, 벽과는 딱 붙거나 30cm 이상 떨어져 있나요?",o:"가구끼리 맞붙어 있거나 30cm보다 가까우면, 또는 벽과 2~30cm 어정쩡한 틈이 있으면 개선 권장",x:"가구 사이 30cm 이상, 벽과는 딱 붙거나 30cm 이상이면 통과.",fx:"가구끼리는 30cm 이상 띄우고, 벽에는 딱 붙이거나 30cm 이상 띄워 주세요."});
 const R=id=>RULES.find(r=>r.id===id);
 // 배치로 자동 판정하는 규칙 (나머지는 사용자가 O/X로 답변)
 const AUTO_IDS=["SRC-001","SRC-002","SRC-003","SRC-004","SRC-038","SRC-040","SRC-057","SRC-058","DX-BLOCK","DX-ACCESS","DX-GAP"];
@@ -1297,7 +1297,22 @@ function bedGapNote(items,room){
 }
 /* 가구 간 최소 동선(인체공학) — 어정쩡한 틈·겹침·막힌 문 앞·의자/침대 진입 공간 */
 const FLOW={min:0.3, flush:0.02, chair:0.6, bedSide:0.5};
-const SOFA_BACK=0.1;          // 소파 등받이가 '벽에 기댄' 것으로 보는 최대 거리 (벽 긁힘 방지용 10cm까지 허용)
+const SOFA_BACK=0.1;
+/* 가구 충돌 — 회전한 가구를 감싸는 AABB에 여백(margin)을 더해 판정
+   가구끼리는 PAD.levels[0](30cm) 이상 띄우는 게 원칙, 자리가 없을 때만 15cm → 5cm로 단계 완화 (붙거나 겹치는 일은 없음) */
+const PAD={levels:[0.3,0.15,0.05], min:0.05};
+const solid=i=>!isOpen(i)&&(FURN[i.type]?FURN[i.type].h:1)>=0.1&&i.type!=="x_aircon_w";   // 러그·벽걸이 에어컨은 바닥 충돌 제외
+function aabb(it,pad){const b=bb(it), p=pad||0; return {x0:b.x-p,y0:b.y-p,x1:b.x+b.w+p,y1:b.y+b.d+p};}
+function aabbSep(a,b){            // 두 AABB 사이 거리 (음수 = 겹침 깊이)
+  const A=aabb(a),B=aabb(b), gx=Math.max(B.x0-A.x1,A.x0-B.x1), gy=Math.max(B.y0-A.y1,A.y0-B.y1);
+  return gx>0&&gy>0?Math.hypot(gx,gy):Math.max(gx,gy);
+}
+const aabbHit=(a,b,m)=>solid(a)&&solid(b)&&aabbSep(a,b)<m-1e-6;
+function mtv(a,b,m){              // a를 b에서 여백 m만큼 떼어내는 축 방향 이동 후보 (짧은 순)
+  const A=aabb(a),B=aabb(b);
+  return [[B.x0-m-A.x1,0],[B.x1+m-A.x0,0],[0,B.y0-m-A.y1],[0,B.y1+m-A.y0]].map(([dx,dy])=>[dx+(dx<0?-0.001:dx>0?0.001:0),dy+(dy<0?-0.001:dy>0?0.001:0)])
+    .sort((p,q)=>Math.hypot(p[0],p[1])-Math.hypot(q[0],q[1]));
+}          // 소파 등받이가 '벽에 기댄' 것으로 보는 최대 거리 (벽 긁힘 방지용 10cm까지 허용)
 const fname=it=>FURN[it.type]?FURN[it.type].name:"가구";
 const cm=v=>Math.round(v*100)+"cm";
 const eul=w=>{const c=String(w).charCodeAt(String(w).length-1); return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28?"을":"를";};
@@ -1306,12 +1321,13 @@ function flowIssues(items0,room){
   const skip=room.flowSkip||{};
   const all=items0.map(withBB), furn=all.filter(i=>!isOpen(i)&&(FURN[i.type]?FURN[i.type].h:1)>=0.1);   // 러그처럼 납작한 건 제외
   const doors=items0.filter(i=>i.type==="door"), out=[];
-  for(let i=0;i<furn.length;i++) for(let j=i+1;j<furn.length;j++){          // 가구 ↔ 가구
-    const a=furn[i], b=furn[j];
+  const sol=furn.filter(i=>i.type!=="x_aircon_w");
+  for(let i=0;i<sol.length;i++) for(let j=i+1;j<sol.length;j++){            // 가구 ↔ 가구 (가구끼리는 30cm 이상)
+    const a=sol[i], b=sol[j];
     const gx=Math.max(b.x-(a.x+a.w),a.x-(b.x+b.w)), gy=Math.max(b.y-(a.y+a.d),a.y-(b.y+b.d));
-    if(gx<-0.05&&gy<-0.05) out.push({k:"overlap",ids:[a.id,b.id],t:`${fname(a)} ↔ ${fname(b)}: 서로 겹쳐 있어요 — 겹치지 않게 옮겨 주세요`});
-    else{const g=(gx>=-0.05&&gy<0)?gx:(gy>=-0.05&&gx<0)?gy:null;
-      if(g!=null&&g>FLOW.flush&&g<FLOW.min) out.push({k:"gap",ids:[a.id,b.id],g,t:`${fname(a)} ↔ ${fname(b)} 사이 ${cm(g)} — 딱 붙이거나 ${cm(FLOW.min)} 이상 띄워 주세요`});}
+    if(gx<-0.005&&gy<-0.005) out.push({k:"overlap",ids:[a.id,b.id],t:`${fname(a)} ↔ ${fname(b)}: 서로 겹쳐 있어요 — 겹치지 않게 옮겨 주세요`});
+    else{const g=(gx>=-0.005&&gy<0)?Math.max(0,gx):(gy>=-0.005&&gx<0)?Math.max(0,gy):null;
+      if(g!=null&&g<FLOW.min) out.push({k:"gap",ids:[a.id,b.id],g,t:g<=FLOW.flush?`${fname(a)} ↔ ${fname(b)}: 딱 붙어 있어요 — ${cm(FLOW.min)} 이상 띄워 주세요`:`${fname(a)} ↔ ${fname(b)} 사이 ${cm(g)} — ${cm(FLOW.min)} 이상 띄워 주세요`});}
   }
   furn.forEach(it=>{                                                        // 가구 ↔ 벽
     const back=it.type==="sofa"?dirOf(it):null;
@@ -2254,7 +2270,8 @@ async function optimize(items0,room,ctx,progress){
   furn.forEach(i=>{orig[i.id]={cx:i.x+i.w/2,cy:i.y+i.d/2,ang:(((i.ang||0)%360)+360)%360}; if(!primary[i.type]) primary[i.type]=i.id;});
   const ord=t=>{const k=["bed","desk","sofa","wardrobe","table","shelf"].indexOf(t); return k<0?9:k;};
   const seq=furn.slice().sort((a,b)=>ord(a.type)-ord(b.type)), placed=[];
-  const fits=(c,others)=>inRoom(c,poly)&&!others.some(o=>overlap(c,o))&&!obst.some(z=>overlap(c,z));
+  const fits=(c,others,m)=>inRoom(c,poly)&&!obst.some(z=>overlap(c,z))      // 방 안 + 문 앞 통로 비움
+    &&!others.some(o=>solid(c)&&solid(o)&&aabbSep(c,o)<(m==null?PAD.min:m)-1e-6);   // 가구끼리 여백 m 이상 (러그 등은 제외)
   const soft=(c,others)=>{
     const cx=c.x+c.w/2, cy=c.y+c.d/2, o=orig[c.id], bc=withBB(c);
     let s=-0.6*Math.hypot(cx-o.cx,cy-o.cy);                                  // 원래 자리에서 멀수록 감점
@@ -2286,9 +2303,9 @@ async function optimize(items0,room,ctx,progress){
     return s;
   };
   const at=(c,cx,cy)=>({...c,x:cx-c.w/2,y:cy-c.d/2});
-  const search=(it,others)=>{
+  const search=(it,others,m)=>{
     let best=null;
-    const tryC=c=>{if(!fits(c,others)) return; const sc=score(c,others); if(!best||sc>best.sc) best={c,sc};};
+    const tryC=c=>{if(!fits(c,others,m)) return; const sc=score(c,others); if(!best||sc>best.sc) best={c,sc};};
     tryC({...it});
     [0,90,180,270].forEach(a=>{
       const b0={...it,ang:a}, q=ext(b0);
@@ -2301,9 +2318,9 @@ async function optimize(items0,room,ctx,progress){
           tryC(at(b0,e.p[0]+e.ux*t+e.nx*(off+FLOW.min+0.01),e.p[1]+e.uy*t+e.ny*(off+FLOW.min+0.01)));   // 벽에서 딱 30cm
         }
       });
-      others.forEach(o=>{                                                                                   // 다른 가구에 딱 붙이거나 딱 30cm 띄운 위치
+      others.forEach(o=>{                                                                                   // 다른 가구에서 딱 여백만큼·30cm 띄운 위치
         const ob=bb(o), cy0=it.y+it.d/2, cx0=it.x+it.w/2;
-        [0,FLOW.min+0.01].forEach(sp=>{
+        [...new Set([m+0.002,FLOW.min+0.01])].forEach(sp=>{
           const ys=[ob.y+q.hd,ob.y+ob.d-q.hd,ob.y+ob.d/2,cy0], xs=[ob.x+q.hw,ob.x+ob.w-q.hw,ob.x+ob.w/2,cx0];
           ys.forEach(y=>{tryC(at(b0,ob.x+ob.w+sp+q.hw,y)); tryC(at(b0,ob.x-sp-q.hw,y));});
           xs.forEach(x=>{tryC(at(b0,x,ob.y+ob.d+sp+q.hd)); tryC(at(b0,x,ob.y-sp-q.hd));});
@@ -2318,7 +2335,8 @@ async function optimize(items0,room,ctx,progress){
       const it=seq[i];
       if(progress) progress(`${FURN[it.type]?FURN[it.type].name:"가구"} 배치를 찾는 중… (${pass*seq.length+i+1}/${seq.length*2})`);
       await new Promise(r=>setTimeout(r,0));
-      const c=search(it,pass===0?placed:furn.filter(f=>f!==it));
+      const others=pass===0?placed:furn.filter(f=>f!==it);
+      let c=null; for(const m of PAD.levels){c=search(it,others,m); if(c) break;}   // 30cm 자리가 없으면 15cm → 5cm로 완화
       if(c){it.x=c.x; it.y=c.y; it.ang=c.ang;}
       if(pass===0) placed.push(it);
     }
@@ -2357,6 +2375,54 @@ async function optimize(items0,room,ctx,progress){
       await new Promise(r=>setTimeout(r,0));
     }
     if(!moved) break;
+  }
+  // 충돌 해소 — 여전히 겹치거나 너무 가까운(여백 5cm 미만) 가구 쌍을 최소 이동 벡터(MTV)로 떼어냄
+  if(progress) progress("가구끼리 겹치지 않게 확인하는 중…");
+  const prio=f=>(primary[f.type]===f.id&&["bed","desk","sofa"].includes(f.type)?2:0)+Math.min(1,f.w*f.d/4);   // 덜 중요한 가구를 먼저 옮김
+  const nHits=()=>{let n=0; for(let i=0;i<furn.length;i++) for(let j=i+1;j<furn.length;j++) if(aabbHit(furn[i],furn[j],PAD.min)) n++; return n;};
+  const resolve=async()=>{
+  const stuck=new Set();
+  for(let it=0;it<60;it++){
+    let pair=null;
+    for(let i=0;i<furn.length&&!pair;i++) for(let j=i+1;j<furn.length;j++) if(!stuck.has(furn[i].id+"|"+furn[j].id)&&aabbHit(furn[i],furn[j],PAD.min)){pair=[furn[i],furn[j]]; break;}
+    if(!pair) break;
+    const order=prio(pair[0])<=prio(pair[1])?[pair[0],pair[1]]:[pair[1],pair[0]];
+    let done=false;
+    for(const [mv,fix] of [order,[order[1],order[0]]]){
+      const others=furn.filter(o=>o!==mv);
+      for(const m of PAD.levels){
+        const cands=[mv,{...mv,ang:(((mv.ang||0)+90)%360)}];   // 그대로, 또는 90° 돌려서
+        for(const base of cands){
+          for(const [dx,dy] of mtv(base,fix,m)){
+            const c={...base,x:base.x+dx,y:base.y+dy};
+            if(fits(c,others,PAD.min)){mv.x=c.x; mv.y=c.y; mv.ang=c.ang; done=true; break;}
+          }
+          if(done) break;
+        }
+        if(done) break;
+      }
+      if(done) break;
+    }
+    if(!done) for(const mv of order){                   // 짧게 밀어서 안 되면 방 전체에서 빈자리를 다시 찾음
+      const others=furn.filter(o=>o!==mv);
+      for(const m of PAD.levels){const c=search(mv,others,m); if(c){mv.x=c.x; mv.y=c.y; mv.ang=c.ang; done=true; break;}}
+      if(done) break;
+    }
+    if(!done) stuck.add(pair[0].id+"|"+pair[1].id);    // 물리적으로 자리가 없음 — 이 쌍은 건너뛰고 나머지 계속, 남은 문제는 진단에 표시
+    await new Promise(r=>setTimeout(r,0));
+  }
+  };
+  await resolve();
+  if(nHits()){                                          // 마지막 수단: 큰 가구부터 처음부터 다시 채워 넣기 (충돌이 줄 때만 채택)
+    if(progress) progress("좁은 방이라 가구 자리를 다시 맞추는 중…");
+    const saved=furn.map(f=>({x:f.x,y:f.y,ang:f.ang})), before=nHits(), placed2=[];
+    for(const f of furn.slice().sort((a,b)=>b.w*b.d-a.w*a.d)){
+      let c=null; for(const m of PAD.levels){c=search(f,placed2,m); if(c) break;}
+      if(c){f.x=c.x; f.y=c.y; f.ang=c.ang;} placed2.push(f);
+      await new Promise(r=>setTimeout(r,0));
+    }
+    await resolve();
+    if(nHits()>=before) furn.forEach((f,i)=>Object.assign(f,saved[i]));
   }
   return items0.map(o=>isOpen(o)?o:furn.find(f=>f.id===o.id));
 }
