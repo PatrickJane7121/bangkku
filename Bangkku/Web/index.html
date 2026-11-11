@@ -617,6 +617,78 @@ input[type=checkbox]{accent-color:var(--deep)}
 .cm-box p{margin:0 0 18px;font-size:14px;line-height:1.6;color:var(--ink-soft);word-break:keep-all}
 .cm-box .btn{padding:14px}
 .btn-danger-solid{background:linear-gradient(180deg,#C46A55,#A9533F);color:#fff;box-shadow:0 10px 22px -12px rgba(169,83,63,.8)}
+.sr-only{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;margin:0}
+/* 사주 입력 — 크림 카드 · 필 컨트롤 */
+.sj-hello{text-align:left;margin:4px 0 18px}
+.sj-wave{display:inline-flex;width:46px;height:46px;border-radius:16px;align-items:center;justify-content:center;font-size:24px;background:linear-gradient(145deg,#F1F6EC,#E2ECDB);box-shadow:var(--sh-1);margin-bottom:12px;animation:sway 3.2s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.sj-hello h1{font-size:25px;line-height:1.38;letter-spacing:-.8px;margin:0 0 10px}
+.sj-hello .sub{font-size:14.5px;line-height:1.75;margin:0}
+.sjc{background:linear-gradient(180deg,#FCF7EF,#F7EFE3);border-radius:28px;padding:18px 18px 16px;margin:0 0 14px;box-shadow:0 1px 2px rgba(84,62,36,.04),0 10px 24px -14px rgba(84,62,36,.22),inset 0 1px 0 rgba(255,255,255,.8)}
+.sjq{display:flex;align-items:center;gap:8px;margin:0 0 12px}
+.sjq b{font-size:15.5px;letter-spacing:-.3px;color:var(--ink)}
+.sjq-i{width:30px;height:30px;border-radius:11px;background:#FFFDF9;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 1px 3px rgba(84,62,36,.1)}
+.pill-in input{border:none;border-radius:999px;background:#FFFDF9;padding:15px 20px;font-size:16px;box-shadow:inset 0 1px 3px rgba(84,62,36,.08),0 0 0 1px rgba(227,216,199,.8)}
+.pill-in input:focus{box-shadow:inset 0 1px 3px rgba(84,62,36,.06),0 0 0 2px var(--deep),0 0 0 6px rgba(70,119,94,.12)}
+.pill-in input::placeholder{color:#B9AC9B}
+.sj-greet{margin:0;max-height:0;opacity:0;overflow:hidden;font-size:13.5px;color:var(--deep-dark);transition:max-height .3s var(--ease),opacity .3s,margin .3s}
+.sj-greet.on{max-height:30px;opacity:1;margin:10px 4px 0}
+/* 양력·음력 토글 */
+.seg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:#EFE5D6;border-radius:999px;padding:5px}
+.seg-thumb{position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 5px);border-radius:999px;background:#FFFDF9;box-shadow:0 4px 12px -4px rgba(84,62,36,.3);transition:transform .45s var(--spring)}
+.seg[data-v="lunar"] .seg-thumb{transform:translateX(100%)}
+.seg button{position:relative;z-index:1;border:none;background:none;font:inherit;font-size:15px;font-weight:700;color:#A3937E;padding:12px 8px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:color .3s}
+.seg button.on{color:var(--ink)}
+.seg .ico{display:inline-block;font-size:18px;filter:grayscale(.7) opacity(.55);transition:filter .3s,transform .5s var(--spring)}
+.seg button.on .ico{filter:none}
+.seg button.on.pop .sun{animation:sunpop .7s var(--spring)}
+.seg button.on.pop .moon{animation:moonswing .8s ease}
+.seg button.on .sun{transform:scale(1.12)}
+@keyframes sunpop{0%{transform:rotate(-90deg) scale(.6)}60%{transform:rotate(20deg) scale(1.25)}100%{transform:rotate(0) scale(1.12)}}
+@keyframes moonswing{0%{transform:rotate(0)}25%{transform:rotate(-24deg) scale(1.15)}55%{transform:rotate(14deg)}80%{transform:rotate(-6deg)}100%{transform:rotate(0)}}
+.sj-leap{animation:drop .35s var(--ease)}
+@keyframes drop{from{opacity:0;transform:translateY(-6px)}}
+/* 스위치 행 */
+.sw-row{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:12px 16px;border:none;border-radius:999px;background:#FFFDF9;box-shadow:0 0 0 1px rgba(227,216,199,.8);font:inherit;font-size:14.5px;color:var(--ink);cursor:pointer}
+.sw{position:relative;flex:none;width:46px;height:28px;border-radius:999px;background:#E3D8C7;transition:background .3s}
+.sw>i{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.18);transition:transform .4s var(--spring)}
+.sw-row.on .sw{background:var(--deep)}
+.sw-row.on .sw>i{transform:translateX(18px)}
+/* 날짜·시간 고르기 버튼 */
+.pick{width:100%;display:flex;align-items:center;gap:12px;padding:16px 18px;border:none;border-radius:22px;background:#FFFDF9;box-shadow:0 0 0 1px rgba(227,216,199,.8),0 4px 12px -8px rgba(84,62,36,.25);font:inherit;text-align:left;cursor:pointer;transition:transform .25s var(--spring),opacity .3s}
+.pick:active{transform:scale(.97)}
+.pick-v{font-size:18px;font-weight:800;letter-spacing:-.4px;color:var(--ink)}
+.pick-s{font-size:13px;color:var(--ink-soft);margin-left:auto}
+.pick.time .pick-txt{display:flex;flex-direction:column;gap:1px;flex:1}
+.pick.time .pick-s{margin-left:0}
+.pick-go{color:#C9BCA9;font-size:22px;margin-left:4px}
+.pick:not(.time) .pick-go{margin-left:6px}
+.pick.off{opacity:.55}
+.clk{flex:none;width:42px;height:42px}
+.clk-h,.clk-m{transform-origin:20px 20px;transition:transform .6s var(--spring)}
+.clk-q{opacity:0;transition:opacity .25s}
+.pick.off .clk-h,.pick.off .clk-m{opacity:0}
+.pick.off .clk-q{opacity:1}
+.clk.wig{animation:wig .6s ease}
+@keyframes wig{0%,100%{transform:rotate(0)}20%{transform:rotate(-14deg)}45%{transform:rotate(12deg)}70%{transform:rotate(-6deg)}}
+.sj-note{margin:0;max-height:0;opacity:0;overflow:hidden;font-size:13px;line-height:1.6;color:var(--deep-dark);background:var(--sage-soft);border-radius:16px;padding:0 14px;transition:all .35s var(--ease)}
+.sj-note.on{max-height:80px;opacity:1;margin-top:10px;padding:10px 14px}
+/* 바텀시트 휠 피커 */
+.psheet{position:fixed;inset:0;z-index:115;display:flex;align-items:flex-end;justify-content:center;background:rgba(42,32,20,0);transition:background .25s}
+.psheet[hidden]{display:none}
+.psheet.on{background:rgba(42,32,20,.34);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.ps-box{width:100%;max-width:480px;background:linear-gradient(180deg,#FCF7EF,#F5EDE0);border-radius:30px 30px 0 0;padding:12px 20px calc(18px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .38s var(--ease);box-shadow:0 -14px 40px -14px rgba(84,62,36,.35)}
+.psheet.on .ps-box{transform:none}
+.ps-grab{width:40px;height:5px;border-radius:3px;background:#D9CDBA;margin:0 auto 14px}
+.ps-box h3{margin:0;font-size:19px;letter-spacing:-.5px;text-align:center}
+.ps-sub{margin:4px 0 12px;font-size:13px;color:var(--ink-soft);text-align:center}
+.ps-wheels{position:relative;display:flex;gap:4px;height:220px;margin:0 0 14px;-webkit-mask-image:linear-gradient(180deg,transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(180deg,transparent,#000 30%,#000 70%,transparent)}
+.ps-band{position:absolute;left:0;right:0;top:88px;height:44px;border-radius:14px;background:#FFFDF9;box-shadow:0 0 0 1px rgba(227,216,199,.9);pointer-events:none}
+.wheel{position:relative;flex:1;height:220px;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior:contain}
+.wheel::-webkit-scrollbar{display:none}
+.wpad{height:88px}
+.wi{height:44px;line-height:44px;text-align:center;scroll-snap-align:center;font-size:17px;color:#B3A592;transition:color .2s,font-size .2s,font-weight .2s;cursor:pointer;user-select:none;-webkit-user-select:none}
+.wi.on{color:var(--ink);font-size:19px;font-weight:800}
 </style>
 </head>
 <body>
@@ -724,18 +796,44 @@ input[type=checkbox]{accent-color:var(--deep)}
       </div>
       <!-- 3-3 사주 -->
       <div class="step-pane" data-step="0">
-        <h1>사주 정보를 알려주세요</h1>
-        <p class="sub">이름과 생년월일시로 사주 원국을 계산해요. 음력도 입력할 수 있어요.</p>
-        <span class="label">이름</span>
-        <input type="text" id="uname" placeholder="예: 이나연" maxlength="20" autocomplete="given-name">
-        <span class="label">달력</span>
-        <div class="chips" id="calc"></div>
-        <div id="leapw" hidden><label style="display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink-soft);margin-top:10px"><input type="checkbox" id="leap" style="width:auto;padding:0"> 윤달이에요</label></div>
-        <span class="label">생년월일</span>
-        <input type="date" id="birth" value="2006-01-01">
-        <span class="label">태어난 시간</span>
-        <input type="time" id="btime">
-        <label style="display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink-soft);margin-top:10px"><input type="checkbox" id="unk" style="width:auto;padding:0"> 태어난 시간을 몰라요</label>
+        <div class="sj-hello">
+          <span class="sj-wave" aria-hidden="true">🌿</span>
+          <h1>반가워요!<br>당신을 조금만 알려 주세요</h1>
+          <p class="sub">태어난 날의 기운을 살펴보고, 그 기운에 꼭 맞는 방을 함께 꾸며 볼게요. 적어 주신 정보는 이 기기에만 소중히 저장돼요.</p>
+        </div>
+        <!-- 실제 값은 아래 숨은 입력칸에 담아요 (계산·저장 로직은 그대로) -->
+        <input type="hidden" id="birth" value="2006-01-01"><input type="hidden" id="btime">
+        <input type="checkbox" id="unk" class="sr-only" tabindex="-1" aria-hidden="true"><input type="checkbox" id="leap" class="sr-only" tabindex="-1" aria-hidden="true">
+
+        <div class="sjc">
+          <div class="sjq"><span class="sjq-i">🙂</span><b>뭐라고 불러 드릴까요?</b></div>
+          <div class="pill-in"><input type="text" id="uname" placeholder="이름이나 애칭을 적어 주세요" maxlength="20" autocomplete="given-name" oninput="refreshSajuUI()"></div>
+          <p class="sj-greet" id="sj-greet"></p>
+        </div>
+
+        <div class="sjc">
+          <div class="sjq"><span class="sjq-i">📅</span><b>어떤 달력으로 알고 있나요?</b></div>
+          <div class="seg" id="calc" role="radiogroup" aria-label="달력">
+            <span class="seg-thumb"></span>
+            <button type="button" role="radio" data-v="solar" onclick="setCal('solar')"><span class="ico sun">☀️</span>양력</button>
+            <button type="button" role="radio" data-v="lunar" onclick="setCal('lunar')"><span class="ico moon">🌙</span>음력</button>
+          </div>
+          <div class="sj-leap" id="leapw" hidden>
+            <button type="button" class="sw-row" id="leap-sw" role="switch" onclick="toggleLeap()"><span>윤달에 태어났어요</span><i class="sw"><i></i></i></button>
+          </div>
+        </div>
+
+        <div class="sjc">
+          <div class="sjq"><span class="sjq-i">🎂</span><b>언제 태어났나요?</b></div>
+          <button type="button" class="pick" id="birth-pick" onclick="openPicker('date')"><span class="pick-v" id="birth-v"></span><span class="pick-s" id="birth-s"></span><span class="pick-go">›</span></button>
+        </div>
+
+        <div class="sjc">
+          <div class="sjq"><span class="sjq-i">⏰</span><b>몇 시쯤 태어났나요?</b></div>
+          <button type="button" class="pick time" id="time-pick" onclick="openPicker('time')"><svg class="clk" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="#FFFDF8" stroke="#D9C7AC" stroke-width="2.5"/><g class="clk-ticks"><circle cx="20" cy="7.5" r="1.3" fill="#C9B593"/><circle cx="32.5" cy="20" r="1.3" fill="#C9B593"/><circle cx="20" cy="32.5" r="1.3" fill="#C9B593"/><circle cx="7.5" cy="20" r="1.3" fill="#C9B593"/></g><line class="clk-h" x1="20" y1="20" x2="20" y2="12" stroke="#5A4632" stroke-width="2.8" stroke-linecap="round"/><line class="clk-m" x1="20" y1="20" x2="20" y2="9" stroke="#46775E" stroke-width="2" stroke-linecap="round"/><circle cx="20" cy="20" r="2" fill="#5A4632"/><text class="clk-q" x="20" y="26" text-anchor="middle" font-size="16" font-weight="800" fill="#B08A5B">?</text></svg><span class="pick-txt"><span class="pick-v" id="time-v"></span><span class="pick-s" id="time-s"></span></span><span class="pick-go">›</span></button>
+          <button type="button" class="sw-row" id="unk-sw" role="switch" onclick="toggleUnk()"><span>태어난 시간을 몰라요</span><i class="sw"><i></i></i></button>
+          <p class="sj-note" id="unk-note">괜찮아요! 시간 없이도 년·월·일 기둥으로 충분히 살펴볼 수 있어요 🙌</p>
+        </div>
         
       </div>
     </div>
@@ -925,6 +1023,15 @@ input[type=checkbox]{accent-color:var(--deep)}
   </section>
 
   <div id="sheet" onclick="if(event.target===this)this.classList.remove('on')"><div class="sc"><div class="sb"></div><div class="btn-row" style="margin-top:12px"><button class="btn btn-line" onclick="this.closest('#sheet').classList.remove('on')">배치 더 고치기</button><button class="btn btn-primary" onclick="this.closest('#sheet').classList.remove('on');openReport()">진단 리포트 보기</button></div></div></div>
+  <div class="psheet" id="psheet" hidden>
+    <div class="ps-box" role="dialog" aria-modal="true" aria-labelledby="ps-title">
+      <div class="ps-grab"></div>
+      <h3 id="ps-title"></h3>
+      <p class="ps-sub" id="ps-sub"></p>
+      <div class="ps-wheels" id="ps-wheels"><div class="ps-band"></div></div>
+      <div class="btn-row"><button class="btn btn-line" onclick="closePicker()">취소</button><button class="btn btn-primary" onclick="confirmPicker()">이걸로 할게요</button></div>
+    </div>
+  </div>
   <div class="cmodal" id="cmodal" hidden>
     <div class="cm-box" role="alertdialog" aria-modal="true" aria-labelledby="cm-title" aria-describedby="cm-body">
       <div class="cm-icon" id="cm-icon"></div>
@@ -1774,11 +1881,97 @@ function sjNext(){if(sjMode==="input"){renderConcern(); go("s-concern");} else i
 function renderSajuChips(){
   const p=state.profile||{}, g=id=>document.getElementById(id);
   draft.cal=p.cal||"solar"; draft.leap=!!p.leap; draft.concerns=p.concerns||(p.concern?[p.concern]:[]);
-  chips("calc",[["solar","양력"],["lunar","음력"]],draft.cal,v=>{draft.cal=v; g("leapw").hidden=v!=="lunar";});
-  g("leapw").hidden=draft.cal!=="lunar"; g("leap").checked=draft.leap;
+  g("leap").checked=draft.leap;
   const ok=/^\d\d:\d\d$/.test(draft.btime||"");
   g("btime").value=ok?draft.btime:(state.profile?"":"12:30"); g("unk").checked=!ok&&!!state.profile; g("btime").disabled=g("unk").checked;
-  g("unk").onchange=()=>{g("btime").disabled=g("unk").checked;};
+  g("unk").onchange=()=>{g("btime").disabled=g("unk").checked; refreshSajuUI();};
+  setCal(draft.cal,true);
+}
+/* ---------- 사주 입력: 부드러운 카드 UI ---------- */
+const WD="일월화수목금토";
+function fmtBirth(v){const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(v||""); if(!m) return null; const y=+m[1],mo=+m[2],d=+m[3]; return {y,mo,d};}
+function refreshSajuUI(){
+  const g=id=>document.getElementById(id); if(!g("birth-v")) return;
+  const nm=g("uname").value.trim();
+  g("sj-greet").textContent=nm?`${nm}님, 반가워요! 예쁜 이름이에요 ✨`:""; g("sj-greet").classList.toggle("on",!!nm);
+  const b=fmtBirth(g("birth").value), lunar=draft.cal==="lunar";
+  if(b){
+    g("birth-v").textContent=`${b.y}년 ${b.mo}월 ${b.d}일`;
+    g("birth-s").textContent=lunar?`음력${g("leap").checked?" · 윤달":""}`:`${WD[new Date(b.y,b.mo-1,b.d).getDay()]}요일`;
+  } else {g("birth-v").textContent="날짜를 골라 주세요"; g("birth-s").textContent="";}
+  const unk=g("unk").checked, t=/^(\d\d):(\d\d)$/.exec(g("btime").value||"");
+  const tp=g("time-pick"); tp.classList.toggle("off",unk); tp.disabled=unk;
+  if(t&&!unk){
+    const h=+t[1], mi=+t[2], hb=Math.floor(((h+1)%24)/2);
+    g("time-v").textContent=`${h<12?"오전":"오후"} ${(h%12)||12}:${String(mi).padStart(2,"0")}`;
+    g("time-s").textContent=`${BR[hb]}시 · ${BRH[hb]}時`;
+    tp.querySelector(".clk-h").style.transform=`rotate(${(h%12)*30+mi*0.5}deg)`; tp.querySelector(".clk-m").style.transform=`rotate(${mi*6}deg)`;
+  } else {g("time-v").textContent=unk?"시간 몰라요":"시간을 골라 주세요"; g("time-s").textContent=unk?"시주 없이 계산해요":"";}
+  const us=g("unk-sw"); us.classList.toggle("on",unk); us.setAttribute("aria-checked",unk);
+  g("unk-note").classList.toggle("on",unk);
+  const ls=g("leap-sw"); ls.classList.toggle("on",g("leap").checked); ls.setAttribute("aria-checked",g("leap").checked);
+}
+function setCal(v,silent){
+  draft.cal=v; const seg=document.getElementById("calc");
+  seg.dataset.v=v; seg.querySelectorAll("button").forEach(b=>{const on=b.dataset.v===v; b.classList.toggle("on",on); b.setAttribute("aria-checked",on); if(on&&!silent){b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");}});
+  const lw=document.getElementById("leapw"); lw.hidden=v!=="lunar"; if(v!=="lunar") document.getElementById("leap").checked=false;
+  refreshSajuUI(); if(!silent) autosave();
+}
+function toggleLeap(){const c=document.getElementById("leap"); c.checked=!c.checked; draft.leap=c.checked; refreshSajuUI(); autosave();}
+function toggleUnk(){
+  const c=document.getElementById("unk"); c.checked=!c.checked; document.getElementById("btime").disabled=c.checked;
+  if(!c.checked&&!/^\d\d:\d\d$/.test(document.getElementById("btime").value)) document.getElementById("btime").value="12:30";
+  const ck=document.querySelector("#time-pick .clk"); ck.classList.remove("wig"); void ck.getBoundingClientRect(); ck.classList.add("wig");
+  refreshSajuUI(); autosave();
+}
+/* ---------- 바텀시트 휠 피커 (생년월일 · 태어난 시간) ---------- */
+const ROW=44; let pk=null;
+const dim=(y,m)=>draft.cal==="lunar"?30:new Date(y,m,0).getDate();
+function wheelCol(i,items,sel,label){
+  return `<div class="wheel" data-col="${i}" aria-label="${label}" role="listbox"><div class="wpad"></div>${items.map((t,k)=>`<div class="wi${k===sel?" on":""}" data-k="${k}" role="option">${t}</div>`).join("")}<div class="wpad"></div></div>`;
+}
+function openPicker(kind){
+  const g=id=>document.getElementById(id), now=new Date().getFullYear();
+  if(kind==="time"&&g("unk").checked) return;
+  if(kind==="date"){
+    const b=fmtBirth(g("birth").value)||{y:2000,mo:1,d:1};
+    const years=[]; for(let y=1930;y<=now;y++) years.push(y);
+    pk={kind,cols:[{vals:years,fmt:v=>v+"년",k:Math.max(0,years.indexOf(b.y))},{vals:[...Array(12)].map((_,i)=>i+1),fmt:v=>v+"월",k:b.mo-1},{vals:[],fmt:v=>v+"일",k:b.d-1}]};
+    g("ps-title").textContent="언제 태어났나요? 🎂"; g("ps-sub").textContent=draft.cal==="lunar"?"음력 날짜 그대로 골라 주세요":"위아래로 굴려서 골라 주세요";
+  } else {
+    const t=/^(\d\d):(\d\d)$/.exec(g("btime").value||"")||[0,"12","30"], h=+t[1], mi=+t[2];
+    pk={kind,cols:[{vals:["오전","오후"],fmt:v=>v,k:h<12?0:1},{vals:[...Array(12)].map((_,i)=>i+1),fmt:v=>v+"시",k:((h%12)||12)-1},{vals:[...Array(60)].map((_,i)=>i),fmt:v=>String(v).padStart(2,"0")+"분",k:mi}]};
+    g("ps-title").textContent="몇 시쯤 태어났나요? ⏰"; g("ps-sub").textContent="대략이어도 괜찮아요. 2시간 단위(12지시)로 사주가 정해져요";
+  }
+  if(kind==="date") syncDays(true);
+  renderWheels();
+  const m=g("psheet"); m.hidden=false; requestAnimationFrame(()=>{m.classList.add("on"); pk.cols.forEach((c,i)=>{const w=m.querySelector(`.wheel[data-col="${i}"]`); w.scrollTop=c.k*ROW;});});
+  m.onclick=e=>{if(e.target===m) closePicker();};
+}
+function syncDays(init){             // 년·월에 맞춰 일 수 조정
+  const c=pk.cols, n=dim(c[0].vals[c[0].k],c[1].vals[c[1].k]);
+  c[2].vals=[...Array(n)].map((_,i)=>i+1); c[2].k=Math.min(c[2].k,n-1);
+  if(!init){const w=document.querySelector('#ps-wheels .wheel[data-col="2"]'); if(w){w.outerHTML=wheelCol(2,c[2].vals.map(c[2].fmt),c[2].k,"일"); bindWheel(2); document.querySelector('#ps-wheels .wheel[data-col="2"]').scrollTop=c[2].k*ROW;}}
+}
+function renderWheels(){
+  const box=document.getElementById("ps-wheels"), labels=pk.kind==="date"?["년","월","일"]:["오전·오후","시","분"];
+  box.innerHTML=`<div class="ps-band"></div>`+pk.cols.map((c,i)=>wheelCol(i,c.vals.map(c.fmt),c.k,labels[i])).join("");
+  pk.cols.forEach((_,i)=>bindWheel(i));
+}
+function bindWheel(i){
+  const w=document.querySelector(`#ps-wheels .wheel[data-col="${i}"]`); let t=0;
+  const upd=()=>{const c=pk.cols[i], k=Math.max(0,Math.min(c.vals.length-1,Math.round(w.scrollTop/ROW)));
+    if(k!==c.k){c.k=k; haptic(); w.querySelectorAll(".wi").forEach(el=>el.classList.toggle("on",+el.dataset.k===k)); if(pk.kind==="date"&&i<2) syncDays(false);}};
+  w.onscroll=()=>{const c=pk.cols[i], k=Math.round(w.scrollTop/ROW); w.querySelectorAll(".wi").forEach(el=>el.classList.toggle("on",+el.dataset.k===k)); clearTimeout(t); t=setTimeout(upd,90);};
+  w.onclick=e=>{const el=e.target.closest(".wi"); if(el) w.scrollTo({top:+el.dataset.k*ROW,behavior:"smooth"});};
+}
+function closePicker(){const m=document.getElementById("psheet"); m.classList.remove("on"); setTimeout(()=>{m.hidden=true;},260);}
+function confirmPicker(){
+  const g=id=>document.getElementById(id), c=pk.cols;
+  document.querySelectorAll("#ps-wheels .wheel").forEach((w,i)=>{c[i].k=Math.max(0,Math.min(c[i].vals.length-1,Math.round(w.scrollTop/ROW)));});
+  if(pk.kind==="date"){const y=c[0].vals[c[0].k], mo=c[1].vals[c[1].k], d=Math.min(c[2].vals[c[2].k]||1,dim(y,mo)); g("birth").value=`${y}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`;}
+  else {let h=c[1].vals[c[1].k]%12; if(c[0].k===1) h+=12; g("btime").value=`${String(h).padStart(2,"0")}:${String(c[2].vals[c[2].k]).padStart(2,"0")}`;}
+  refreshSajuUI(); autosave(); closePicker();
 }
 
 
@@ -2673,7 +2866,7 @@ function setStep(n){
   document.querySelectorAll(".step-pane").forEach(p=>p.hidden = +p.dataset.step!==n);
   document.querySelectorAll(".step-bar").forEach((b,i)=>b.classList.toggle("on", i<=n));
   document.getElementById("in-title").textContent=["사주 정보","방 모양"][n];
-  document.getElementById("in-next").textContent = n===1 ? "현재 방 배치하기" : "다음";
+  document.getElementById("in-next").textContent = n===1 ? "현재 방 배치하기" : "내 사주 보러 가기 ✨";
 }
 document.getElementById("in-back").onclick=()=>{
   if(state.step===0) go("s-home"); else go("s-concern");
@@ -3510,7 +3703,7 @@ function resumeSession(){       // '이어서 하기' — 마지막 작업 화�
       const f=snap.form||{}, g=id=>document.getElementById(id);
       if(f.uname!=null) g("uname").value=f.uname; if(f.birth) g("birth").value=f.birth; if(f.btime!=null) g("btime").value=f.btime;
       g("unk").checked=!!f.unk; g("btime").disabled=!!f.unk; g("leap").checked=!!f.leap;
-      if(snap.draft&&snap.draft.cal){draft.cal=snap.draft.cal; chips("calc",[["solar","양력"],["lunar","음력"]],draft.cal,v=>{draft.cal=v; g("leapw").hidden=v!=="lunar";}); g("leapw").hidden=draft.cal!=="lunar";}
+      if(snap.draft&&snap.draft.cal) setCal(snap.draft.cal,true); else refreshSajuUI();
       if(snap.draft) draft={...draft,...snap.draft};
       if(snap.step===1){
         const r=snap.room||{};
