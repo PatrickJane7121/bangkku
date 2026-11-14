@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>방꾸</title>
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0;height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif;color:#2A2520;
+    background:radial-gradient(120% 60% at 0% 0%,#FFF8EC 0%,rgba(255,248,236,0) 60%),linear-gradient(180deg,#F8F3EB,#F1E8DA);
+    display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box;text-align:center}
+  .box{max-width:340px}
+  .ic{width:84px;height:84px;margin:0 auto 18px;border-radius:26px;background:linear-gradient(160deg,#fff,#F6F0E6);
+    display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 18px 36px -16px rgba(84,62,36,.45)}
+  h1{font-size:21px;letter-spacing:-.5px;margin:0 0 8px}
+  p{font-size:14.5px;line-height:1.7;color:#857A6C;margin:0 0 22px}
+  button{border:none;border-radius:18px;padding:16px 28px;font:inherit;font-size:16px;font-weight:700;color:#fff;
+    background:linear-gradient(180deg,#548A6E,#3E6C54);box-shadow:0 12px 24px -12px rgba(47,87,67,.7)}
+  button:active{transform:scale(.97)}
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="ic">🏠</div>
+    <h1>인터넷 연결이 필요해요</h1>
+    <p>방꾸는 처음 한 번 인터넷에 연결되면<br>그다음부터는 연결 없이도 열 수 있어요.<br>Wi-Fi나 데이터를 켠 뒤 다시 시도해 주세요.</p>
+    <button onclick="retry()">다시 시도</button>
+  </div>
+  <script>
+    function retry(){ var u=new URLSearchParams(location.search).get('u'); if(u) location.href=u; else location.reload(); }
+  </script>
+</body>
+</html>

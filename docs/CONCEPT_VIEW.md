@@ -14,7 +14,7 @@
         └─► ai      : 이미지 생성 서버에 브리프를 보내 실사풍 이미지를 받아 옴      (aiEndpoint 설정 시)
 ```
 
-- 연동 설정: `Bangkku/Web/index.html`(= 루트 `index.html`)의 `CONCEPT_CONFIG = {curatedUrl:"", aiEndpoint:""}`
+- 연동 설정: 루트 `index.html`의 `CONCEPT_CONFIG = {curatedUrl:"", aiEndpoint:""}`
 - 아무것도 설정하지 않으면 **local** 만 동작하고, "프롬프트 복사" 버튼으로 브리프를 아무 이미지 생성 AI에나 붙여 넣을 수 있습니다.
 
 ## 1. 콘셉트 브리프

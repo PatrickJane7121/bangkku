@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		B0000000000000000000A001 /* BangkkuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000F001 /* BangkkuApp.swift */; };
 		B0000000000000000000A002 /* BangkkuWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000F002 /* BangkkuWebView.swift */; };
-		B0000000000000000000A003 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000F003 /* index.html */; };
+		B0000000000000000000A003 /* offline.html in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000F003 /* offline.html */; };
 		B0000000000000000000A004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0000000000000000000F004 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -17,7 +17,7 @@
 		B0000000000000000000F000 /* Bangkku.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bangkku.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0000000000000000000F001 /* BangkkuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BangkkuApp.swift; sourceTree = "<group>"; };
 		B0000000000000000000F002 /* BangkkuWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BangkkuWebView.swift; sourceTree = "<group>"; };
-		B0000000000000000000F003 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+		B0000000000000000000F003 /* offline.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = offline.html; sourceTree = "<group>"; };
 		B0000000000000000000F004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B0000000000000000000F005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -56,7 +56,7 @@
 		B0000000000000000000C002 /* Web */ = {
 			isa = PBXGroup;
 			children = (
-				B0000000000000000000F003 /* index.html */,
+				B0000000000000000000F003 /* offline.html */,
 			);
 			path = Web;
 			sourceTree = "<group>";
@@ -129,7 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B0000000000000000000A004 /* Assets.xcassets in Resources */,
-				B0000000000000000000A003 /* index.html in Resources */,
+				B0000000000000000000A003 /* offline.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,0 +1,16 @@
+{
+  "name": "방꾸 — 내 방의 기운을 바꾸는 공간 진단",
+  "short_name": "방꾸",
+  "description": "사주와 풍수로 방 배치를 진단하고 고민에 맞는 배치를 제안해요.",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F7F2EA",
+  "theme_color": "#F7F2EA",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

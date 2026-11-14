@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#F7F2EA">
 <title>방꾸</title>
@@ -1017,6 +1020,7 @@ input[type=checkbox]{accent-color:var(--deep)}
       <div class="card">
         <p class="hint" style="margin:0 0 12px">입력한 사주 정보, 그리던 방, 가구 배치는 이 기기에 자동으로 저장되고, 앱을 다시 열면 하던 화면으로 바로 이어져요.</p>
         <p class="hint" id="my-saved" style="margin:0 0 12px"></p>
+        <p class="hint" id="my-ver" style="margin:0 0 12px"></p>
         <button class="btn btn-danger" onclick="resetAll()">🔄 데이터 초기화하고 처음부터 시작</button>
       </div>
     </div>
@@ -3522,6 +3526,7 @@ function renderMy(){
     : `<div class="empty" style="padding:20px">아직 사주 정보가 없어요.</div>`;
 
   let snap=null; try{snap=JSON.parse(store.get(SESSION_KEY)||"null");}catch(e){}
+  document.getElementById("my-ver").textContent=`웹 버전 ${WEB_VERSION}`+(APP_SHELL?` · iOS 앱 ${APP_SHELL} (웹뷰)`:" · 브라우저");
   document.getElementById("my-saved").textContent=snap&&snap.ts?`마지막 자동 저장: ${new Date(snap.ts).toLocaleString("ko-KR",{month:"long",day:"numeric",hour:"2-digit",minute:"2-digit"})}`:"";
   const box=document.getElementById("my-list");
   box.innerHTML = state.spaces.length ? state.spaces.map(s=>spaceCard(s,false)).join("") : `<div class="empty" style="padding:20px">저장된 공간이 없어요.</div>`;
@@ -3774,6 +3779,12 @@ document.querySelectorAll(".screen").forEach(sc=>{
   btn.innerHTML=HOME_SVG; btn.onclick=goHome;
   const first=nav.firstElementChild; nav.insertBefore(btn,first&&first.classList.contains("back")?first.nextSibling:first);
 });
+
+/* 웹 버전 · 실행 환경 — 앱은 웹뷰 셸이라 웹만 배포하면 앱에도 그대로 반영됨 */
+const WEB_VERSION="2026.11.14";
+const APP_SHELL=(/BangkkuApp\/([\d.]+)/.exec(navigator.userAgent)||[])[1]||"";   // iOS 앱 안이면 셸 버전
+if(APP_SHELL) document.documentElement.classList.add("in-app");
+if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")) navigator.serviceWorker.register("sw.js").catch(()=>{});   // 오프라인 캐시
 
 /* 햅틱 피드백 */
 let hapT=0;
